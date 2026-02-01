@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
 const HERO_IMAGES = [
@@ -86,16 +85,15 @@ export function HomeHero() {
           (hidden ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100")
         }
       >
-        <div className="group relative w-full overflow-hidden bg-black">
+        <div className="group relative w-full overflow-hidden">
           <div
             className="flex w-full transition-transform duration-700 ease-out"
             style={{ transform: `translateX(-${index * 100}%)` }}
           >
             {HERO_IMAGES.map((src) => (
               <div key={src} className="relative w-full shrink-0">
-                <div className="aspect-video w-full">
-                  <Image src={src} alt="홈 배너" fill priority className="object-contain" />
-                </div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt="홈 배너" className="w-full h-auto" />
               </div>
             ))}
           </div>
