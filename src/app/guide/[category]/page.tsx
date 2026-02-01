@@ -21,7 +21,7 @@ export default async function GuideCategoryPage({
           href="/guide"
           className="inline-flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-foreground"
         >
-          <span className="text-xl" aria-hidden>
+          <span className="text-base sm:text-xl" aria-hidden>
             ‹
           </span>
           가이드 목록
