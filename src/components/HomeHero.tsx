@@ -94,7 +94,7 @@ export function HomeHero() {
             {HERO_IMAGES.map((src) => (
               <div key={src} className="relative w-full shrink-0">
                 <div className="aspect-video w-full">
-                  <Image src={src} alt="홈 배너" fill priority className="object-cover" />
+                  <Image src={src} alt="홈 배너" fill priority className="object-contain" />
                 </div>
               </div>
             ))}
