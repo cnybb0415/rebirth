@@ -80,6 +80,19 @@ export type QuickLink = {
 
 type ModalType = "streaming" | "album";
 
+function renderActionLabel(label: string) {
+  if (label === "KWANGYA 119 신고하기") {
+    return (
+      <>
+        <span className="sm:hidden">KWANGYA 119</span>
+        <span className="hidden sm:inline">KWANGYA 119 신고하기</span>
+      </>
+    );
+  }
+
+  return label;
+}
+
 export function QuickActionsBar({
   actions,
   albumLinks,
@@ -172,6 +185,7 @@ export function QuickActionsBar({
         const isAlbum = action.kind === "albumModal" || legacyAlbum;
         const isSmsVote = action.kind === "smsVote";
 
+        const labelNode = renderActionLabel(action.label);
         const shared = {
           variant: buttonVariant,
           size: buttonSize,
@@ -188,7 +202,7 @@ export function QuickActionsBar({
             >
               <span className="inline-flex items-center gap-2 justify-center align-middle h-[22px]">
                 <span className={action.label === "가이드" ? "flex items-center h-full relative top-[1px]" : "flex items-center h-full"}>{actionIcons[action.label]}</span>
-                <span className="flex items-center h-full">{action.label}</span>
+                <span className="flex items-center h-full">{labelNode}</span>
               </span>
             </Button>
           );
@@ -203,7 +217,7 @@ export function QuickActionsBar({
             >
               <span className="inline-flex items-center gap-2">
                 {actionIcons[action.label]}
-                {action.label}
+                {labelNode}
               </span>
             </Button>
           );
@@ -214,7 +228,7 @@ export function QuickActionsBar({
             <Button key={action.label} {...shared} onClick={() => openSmsVote(action)}>
               <span className="inline-flex items-center gap-2">
                 {actionIcons[action.label]}
-                {action.label}
+                {labelNode}
               </span>
             </Button>
           );
@@ -233,7 +247,7 @@ export function QuickActionsBar({
             <Button {...shared}>
               <span className="inline-flex items-center gap-2">
                 {actionIcons[action.label]}
-                {action.label}
+                {labelNode}
               </span>
             </Button>
           </a>
