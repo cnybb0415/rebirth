@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { FanchantSongGrid } from "@/components/FanchantSongGrid";
 
 export default function CheerPage() {
@@ -8,6 +9,15 @@ export default function CheerPage() {
           <div className="min-w-0">
             <h1 className="text-2xl font-bold">응원법</h1>
           </div>
+          <Link
+            href="/concert"
+            className="inline-flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-foreground"
+          >
+            <span className="text-xl" aria-hidden>
+              ‹
+            </span>
+            콘서트 목록
+          </Link>
         </div>
 
         <div className="mt-6">

@@ -14,6 +14,7 @@ export function SiteHeader() {
   const [openGuide, setOpenGuide] = useState(false);
   const [openStreaming, setOpenStreaming] = useState(false);
   const [openPrevote, setOpenPrevote] = useState(false);
+  const [openConcert, setOpenConcert] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-foreground/10 bg-slate-100">
@@ -134,9 +135,34 @@ export function SiteHeader() {
                 <Link href="/schedule" className="rounded-lg px-2 py-2 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
                   스케줄
                 </Link>
-                <Link href="/cheer" className="rounded-lg px-2 py-2 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
-                  응원법
-                </Link>
+                <div>
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between rounded-lg px-2 py-2 hover:bg-foreground/5"
+                    onClick={() => setOpenConcert((prev) => !prev)}
+                  >
+                    <span>콘서트</span>
+                    <ChevronDown className={`h-4 w-4 transition ${openConcert ? "rotate-180" : ""}`} />
+                  </button>
+                  {openConcert ? (
+                    <div className="mt-1 space-y-1 pl-3 text-sm text-foreground/70">
+                      <Link
+                        href="/cheer"
+                        className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
+                        onClick={() => setOpenMenu(false)}
+                      >
+                        응원법
+                      </Link>
+                      <Link
+                        href="/notice"
+                        className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
+                        onClick={() => setOpenMenu(false)}
+                      >
+                        공지사항
+                      </Link>
+                    </div>
+                  ) : null}
+                </div>
                 <Link href="/support" className="rounded-lg px-2 py-2 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
                   서포트
                 </Link>

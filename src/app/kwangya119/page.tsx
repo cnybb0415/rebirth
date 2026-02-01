@@ -60,7 +60,7 @@ function ImageCarousel({ images }: { images: string[] }) {
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl bg-white">
+    <div className="group relative overflow-hidden rounded-2xl bg-white">
       <div
         className="flex transition-transform duration-300 ease-out"
         style={{ transform: `translateX(-${index * 100}%)` }}
@@ -82,7 +82,7 @@ function ImageCarousel({ images }: { images: string[] }) {
         type="button"
         onClick={goPrev}
         aria-label="이전 이미지"
-        className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/40 p-2 text-white/80 backdrop-blur hover:bg-black/60"
+        className="absolute left-3 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/40 p-2 text-white/80 backdrop-blur opacity-0 transition-opacity hover:bg-black/60 focus-visible:opacity-100 group-hover:opacity-100"
       >
         <span className="block text-sm">‹</span>
       </button>
@@ -90,7 +90,7 @@ function ImageCarousel({ images }: { images: string[] }) {
         type="button"
         onClick={goNext}
         aria-label="다음 이미지"
-        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/40 p-2 text-white/80 backdrop-blur hover:bg-black/60"
+        className="absolute right-3 top-1/2 -translate-y-1/2 rounded-full border border-white/15 bg-black/40 p-2 text-white/80 backdrop-blur opacity-0 transition-opacity hover:bg-black/60 focus-visible:opacity-100 group-hover:opacity-100"
       >
         <span className="block text-sm">›</span>
       </button>

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { CalendarDays, Megaphone } from "lucide-react";
+import { CalendarDays, Megaphone, Ticket } from "lucide-react";
 
 type IconProps = {
   className?: string;
@@ -93,7 +93,7 @@ const items = [
   { label: "스케줄", href: "/schedule", Icon: CalendarDays },
   { label: "스트리밍", href: "/streaming", Icon: IconMusic },
   { label: "홈", href: "/", Icon: IconHome },
-  { label: "응원법", href: "/cheer", Icon: Megaphone },
+  { label: "콘서트", href: "/concert", Icon: Ticket },
   { label: "서포트", href: "/support", Icon: IconHeart },
 ] as const;
 

@@ -4,9 +4,9 @@ import { YouTubeStatsCards } from "@/components/YouTubeStatsCards";
 import { QuickActionsBar } from "@/components/QuickActionsBar";
 import { ChartSummaryGrid } from "@/components/ChartSummaryGrid";
 import { getLatestTweet } from "@/lib/x";
-import Image from "next/image";
+import { HomeHero } from "@/components/HomeHero";
+import { SchedulePreview } from "@/components/SchedulePreview";
 import type { ReactNode } from "react";
-import logoPng from "@/../public/images/logo.png";
 
 export const dynamic = "force-dynamic";
 
@@ -92,55 +92,98 @@ function XIcon() {
 export default async function Home() {
   const charts = await getChartsData();
   const latestTweet = await getLatestTweet();
+  // 앨범 구매 버튼은 추후 발매 시 재노출 예정 (홈 화면에서만 숨김)
+  const homeActions = [
+    { label: "KWANGYA 119 신고하기", href: "/kwangya119" },
+    ...siteConfig.actions.filter(
+      (action) => action.label !== "REVERXE 앨범구매" && action.label !== "앨범 구매",
+    ),
+  ];
 
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <HomeHero />
       <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
         <section className="grid gap-10 lg:grid-cols-2 lg:items-start">
-          {/* Left: video (replaces photo) */}
-          <div className="overflow-hidden rounded-2xl border border-foreground/10 bg-white shadow-sm">
-            <div className="flex h-9 items-center gap-2 bg-[#ff4b4b] px-3">
-              <span className="h-2.5 w-2.5 rounded-full bg-white/90" aria-hidden />
-              <span className="h-2.5 w-2.5 rounded-full bg-white/90" aria-hidden />
-              <span className="h-2.5 w-2.5 rounded-full bg-white/90" aria-hidden />
-            </div>
-            <div className="aspect-video w-full bg-black">
-              <iframe
-                className="h-full w-full"
-                src={siteConfig.youtube.embedUrl}
-                title="YouTube video player"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              />
-            </div>
-            <div className="px-4 pb-4">
-              <YouTubeStatsCards variant="inline" />
+          {/* Left: latest posts */}
+          <div id="home-latest" className="rounded-2xl border border-foreground/10 bg-white p-5 shadow-sm">
+            <div className="mx-auto w-full max-w-3xl">
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className="text-base font-semibold">최신 게시물</div>
+                  <div className="text-sm text-foreground/60">X @weareoneEXO</div>
+                </div>
+                <a
+                  href={siteConfig.contacts.twitterUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-foreground/70 hover:text-foreground"
+                >
+                  X로 이동
+                </a>
+              </div>
+              <div className="mt-4">
+                {latestTweet ? (
+                  <article className="rounded-xl border border-white/10 bg-neutral-900 p-3 text-white shadow-sm">
+                    <div className="text-sm font-semibold text-white/90">@{latestTweet.username}</div>
+                    <p className="mt-2 whitespace-pre-wrap text-sm text-white/90">
+                      {latestTweet.text}
+                    </p>
+                    {latestTweet.mediaUrl || latestTweet.previewImageUrl ? (
+                      <div className="mt-3 overflow-hidden rounded-lg border border-white/10">
+                        <img
+                          src={latestTweet.mediaUrl ?? latestTweet.previewImageUrl}
+                          alt="X preview"
+                          className="aspect-square w-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    ) : null}
+                    {latestTweet.previewUrl ? (
+                      <a
+                        href={latestTweet.previewUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-2 block text-xs text-sky-300 hover:text-sky-200"
+                      >
+                        {latestTweet.previewUrl}
+                      </a>
+                    ) : null}
+                    <div className="mt-3 flex items-center justify-between text-xs text-white/60">
+                      {latestTweet.createdAt ? (
+                        <span>{new Date(latestTweet.createdAt).toLocaleString("ko-KR")}</span>
+                      ) : (
+                        <span />
+                      )}
+                      <a
+                        href={latestTweet.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="font-medium text-white/80 hover:text-white"
+                      >
+                        게시물 보기
+                      </a>
+                    </div>
+                  </article>
+                ) : (
+                  <div className="rounded-xl border border-foreground/10 bg-white p-4 text-sm text-foreground/60">
+                    최신 게시물을 불러오지 못했습니다.
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
-          {/* Right: logo + actions */}
+          {/* Right: actions */}
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
-            <Image
-              src={logoPng}
-              alt={siteConfig.title}
-              width={520}
-              height={150}
-              priority
-              className="mt-[15px] h-auto w-[min(460px,100%)]"
-            />
-
-            <div className="mt-8 w-full max-w-md">
-              <a
-                href="/kwangya119"
-                className="mb-3 inline-flex w-full items-center justify-center gap-2 rounded-2xl border border-foreground/15 bg-white px-4 py-2 text-sm font-semibold text-foreground shadow-sm hover:border-foreground/35 hover:shadow-md"
-                aria-label="광야 119 신고하기"
-              >
-                <img src="/images/icon/siren.png" alt="" className="h-4 w-4" />
-                <span>KWANGYA 119 신고하기</span>
-              </a>
+            <div className="w-full max-w-md">
+              <img
+                src="/images/logo.png"
+                alt="EXO RE:BIRTH 로고"
+                className="mx-auto mb-[25px] h-auto w-full max-w-md object-contain lg:mx-0"
+              />
               <QuickActionsBar
-                actions={siteConfig.actions}
+                actions={homeActions}
                 albumLinks={siteConfig.albumPurchaseLinks}
                 oneClickStreamingLinks={siteConfig.oneClickStreamingLinks}
                 containerVariant="none"
@@ -204,77 +247,38 @@ export default async function Home() {
 
         <div className="mt-10 border-t border-foreground/10" />
 
-        <section className="mt-8 rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
+
+        <section className="mt-2 rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
           <ChartSummaryGrid trackTitle={siteConfig.trackTitle} charts={charts} />
         </section>
 
-        <section className="mt-8 rounded-2xl border border-foreground/10 bg-white p-5 shadow-sm">
-          <div className="mx-auto w-full max-w-3xl">
-            <div className="flex items-center justify-between">
-            <div>
-              <div className="text-base font-semibold">최신 게시물</div>
-              <div className="text-sm text-foreground/60">X @weareoneEXO</div>
+        <section id="home-video" className="mt-6 rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
+          <div className="overflow-hidden rounded-2xl border border-foreground/10 bg-white shadow-sm">
+            <div className="flex h-9 items-center gap-2 bg-[#ff4b4b] px-3">
+              <span className="h-2.5 w-2.5 rounded-full bg-white/90" aria-hidden />
+              <span className="h-2.5 w-2.5 rounded-full bg-white/90" aria-hidden />
+              <span className="h-2.5 w-2.5 rounded-full bg-white/90" aria-hidden />
             </div>
-            <a
-              href={siteConfig.contacts.twitterUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-                className="text-sm font-medium text-foreground/70 hover:text-foreground"
-            >
-              X로 이동
-            </a>
+            <div className="aspect-video w-full bg-black">
+              <iframe
+                className="h-full w-full"
+                src={siteConfig.youtube.embedUrl}
+                title="YouTube video player"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
             </div>
-            <div className="mt-4">
-            {latestTweet ? (
-              <article className="rounded-xl border border-white/10 bg-neutral-900 p-3 text-white shadow-sm">
-                <div className="text-sm font-semibold text-white/90">@{latestTweet.username}</div>
-                <p className="mt-2 whitespace-pre-wrap text-sm text-white/90">
-                  {latestTweet.text}
-                </p>
-                {latestTweet.mediaUrl || latestTweet.previewImageUrl ? (
-                  <div className="mt-3 overflow-hidden rounded-lg border border-white/10">
-                    <img
-                      src={latestTweet.mediaUrl ?? latestTweet.previewImageUrl}
-                      alt="X preview"
-                      className="aspect-square w-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                ) : null}
-                {latestTweet.previewUrl ? (
-                  <a
-                    href={latestTweet.previewUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 block text-xs text-sky-300 hover:text-sky-200"
-                  >
-                    {latestTweet.previewUrl}
-                  </a>
-                ) : null}
-                <div className="mt-3 flex items-center justify-between text-xs text-white/60">
-                  {latestTweet.createdAt ? (
-                    <span>{new Date(latestTweet.createdAt).toLocaleString("ko-KR")}</span>
-                  ) : (
-                    <span />
-                  )}
-                  <a
-                    href={latestTweet.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium text-white/80 hover:text-white"
-                  >
-                    게시물 보기
-                  </a>
-                </div>
-              </article>
-            ) : (
-              <div className="rounded-xl border border-foreground/10 bg-white p-4 text-sm text-foreground/60">
-                최신 게시물을 불러오지 못했습니다.
-              </div>
-            )}
+            <div className="px-4 pb-4">
+              <YouTubeStatsCards variant="inline" />
             </div>
           </div>
         </section>
+
+        <section className="mt-6">
+          <SchedulePreview />
+        </section>
+
       </main>
     </div>
   );
