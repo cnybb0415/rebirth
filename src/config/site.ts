@@ -1,5 +1,5 @@
 export const siteConfig = {
-  title: "EXO RE:BIRH",
+  title: "EXO RE:BIRTH",
   artistName: "EXO",
   trackTitle: "Crown",
   releaseDate: "",

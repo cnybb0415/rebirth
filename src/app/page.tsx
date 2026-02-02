@@ -5,7 +5,6 @@ import { QuickActionsBar } from "@/components/QuickActionsBar";
 import { ChartSummaryGrid } from "@/components/ChartSummaryGrid";
 import { getLatestTweet } from "@/lib/x";
 import { HomeHero } from "@/components/HomeHero";
-import { SchedulePreview } from "@/components/SchedulePreview";
 import type { ReactNode } from "react";
 
 export const dynamic = "force-dynamic";
@@ -180,7 +179,7 @@ export default async function Home() {
               <img
                 src="/images/logo.png"
                 alt="EXO RE:BIRTH 로고"
-                className="mx-auto mb-[25px] h-auto w-full max-w-md object-contain lg:mx-0"
+                className="mx-auto mt-2.5 mb-[25px] h-auto w-full max-w-md object-contain lg:mx-0"
               />
               <QuickActionsBar
                 actions={homeActions}
@@ -275,9 +274,6 @@ export default async function Home() {
           </div>
         </section>
 
-        <section className="mt-6">
-          <SchedulePreview />
-        </section>
 
       </main>
     </div>

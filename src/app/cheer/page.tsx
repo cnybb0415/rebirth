@@ -13,7 +13,7 @@ export default function CheerPage() {
             href="/concert"
             className="inline-flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-foreground"
           >
-            <span className="text-base sm:text-xl" aria-hidden>
+            <span className="text-sm sm:text-xl" aria-hidden>
               ‹
             </span>
             콘서트 목록

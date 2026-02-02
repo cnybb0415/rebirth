@@ -15,13 +15,14 @@ export function SiteHeader() {
   const [openStreaming, setOpenStreaming] = useState(false);
   const [openPrevote, setOpenPrevote] = useState(false);
   const [openConcert, setOpenConcert] = useState(false);
+  const [openSupport, setOpenSupport] = useState(false);
 
   return (
     <header className="sticky top-0 z-50 border-b border-foreground/10 bg-slate-100">
-      <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between px-4 sm:px-6">
+      <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:max-w-none">
         <Link href="/" className="flex items-center gap-2">
           <Image src={logoPng} alt="EXO RE:BIRTH" width={20} height={20} className="h-5 w-5" priority />
-          <span className="text-sm font-semibold tracking-wide text-foreground/80">EXO RE:BIRTH</span>
+          <span className="relative top-[-1px] text-sm font-semibold tracking-wide text-foreground/80">EXO RE:BIRTH</span>
         </Link>
 
         <div className="flex items-center gap-4">
@@ -163,9 +164,48 @@ export function SiteHeader() {
                     </div>
                   ) : null}
                 </div>
-                <Link href="/support" className="rounded-lg px-2 py-2 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
-                  서포트
-                </Link>
+                <div>
+                  <button
+                    type="button"
+                    className="flex w-full items-center justify-between rounded-lg px-2 py-2 hover:bg-foreground/5"
+                    onClick={() => setOpenSupport((prev) => !prev)}
+                  >
+                    <span>서포트</span>
+                    <ChevronDown className={`h-4 w-4 transition ${openSupport ? "rotate-180" : ""}`} />
+                  </button>
+                  {openSupport ? (
+                    <div className="mt-1 space-y-1 pl-3 text-sm text-foreground/70">
+                      <Link
+                        href="/support/team"
+                        className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
+                        onClick={() => setOpenMenu(false)}
+                      >
+                        팀 소개
+                      </Link>
+                      <Link
+                        href="/support/fund"
+                        className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
+                        onClick={() => setOpenMenu(false)}
+                      >
+                        모금 공지
+                      </Link>
+                      <Link
+                        href="/support/id-donation"
+                        className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
+                        onClick={() => setOpenMenu(false)}
+                      >
+                        아이디 기부
+                      </Link>
+                      <Link
+                        href="/support/helper"
+                        className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
+                        onClick={() => setOpenMenu(false)}
+                      >
+                        헬퍼 지원
+                      </Link>
+                    </div>
+                  ) : null}
+                </div>
               </div>
             </nav>
           </aside>

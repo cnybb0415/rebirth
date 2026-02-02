@@ -115,7 +115,7 @@ function NavLinks({ pathname }: { pathname: string }) {
             className={
               "group flex flex-col items-center justify-center rounded-2xl px-1 py-2 text-[11px] font-medium transition " +
               (active
-                ? "text-lime-700"
+                ? "text-yellow-700"
                 : "text-foreground/70 hover:text-foreground")
             }
           >
@@ -123,14 +123,14 @@ function NavLinks({ pathname }: { pathname: string }) {
               className={
                 "mb-1 grid h-9 w-9 place-items-center rounded-xl transition " +
                 (active
-                  ? "bg-lime-600/20"
+                  ? "bg-[#FEF9C3]"
                   : "bg-foreground/5 group-hover:bg-foreground/10")
               }
               aria-hidden
             >
               <Icon className="h-5 w-5" />
             </span>
-            <span className={active ? "text-lime-700" : undefined}>{item.label}</span>
+            <span className={active ? "text-yellow-700" : undefined}>{item.label}</span>
           </Link>
         );
       })}

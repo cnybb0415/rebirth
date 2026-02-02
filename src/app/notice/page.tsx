@@ -14,7 +14,7 @@ export default function NoticePage() {
             href="/concert"
             className="inline-flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-foreground"
           >
-            <span className="text-base sm:text-xl" aria-hidden>
+            <span className="text-sm sm:text-xl" aria-hidden>
               ‹
             </span>
             콘서트 목록
@@ -22,16 +22,20 @@ export default function NoticePage() {
         </div>
 
         <section className="mt-6 rounded-2xl border border-foreground/10 bg-white p-5 shadow-sm">
-          <ul className="divide-y divide-foreground/10">
-            {announcements.map((item) => (
-              <li key={item.id} className="py-4">
-                <Link href={`/notice/${item.id}`} className="block">
-                  <div className="text-sm font-semibold text-foreground">{item.title}</div>
-                  <div className="mt-1 text-xs text-foreground/60">{item.date}</div>
-                </Link>
-              </li>
-            ))}
-          </ul>
+          {announcements.length ? (
+            <ul className="divide-y divide-foreground/10">
+              {announcements.map((item) => (
+                <li key={item.id} className="py-4">
+                  <Link href={`/notice/${item.id}`} className="block">
+                    <div className="text-sm font-semibold text-foreground">{item.title}</div>
+                    <div className="mt-1 text-xs text-foreground/60">{item.date}</div>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="text-sm text-foreground/60">등록된 공지사항이 없습니다.</div>
+          )}
         </section>
       </main>
     </div>

@@ -21,7 +21,7 @@ export default async function StreamingCategoryPage({
           href="/streaming"
           className="inline-flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-foreground"
         >
-          <span className="text-base sm:text-xl" aria-hidden>
+          <span className="text-sm sm:text-xl" aria-hidden>
             ‹
           </span>
           스트리밍 목록
