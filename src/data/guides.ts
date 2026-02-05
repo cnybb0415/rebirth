@@ -230,8 +230,8 @@ function buildStreamingParts(serviceId: string, serviceLabel: string): Streaming
  * - 스트리밍: public/images/guides/<service-id>/<part-folder>/...
  *   파일명 규칙: <service-id>_<part-folder>.png (또는 .jpg)
  *   예) /images/guides/melon/streaming/melon_streaming.png
- * - 응원법: public/images/cheering/<song-id>/{guide,album-art}/...
- *   예) /images/cheering/who-are-you/guide/who-are-you.jpg
+ * - 응원법: public/images/concert/cheering/<song-id>/{guide,album-art}/...
+ *   예) /images/concert/cheering/who-are-you/guide/who-are-you.jpg
  */
 export const streamingGuideServices: StreamingGuideService[] = [
   // 뮤직비디오: PCver, 모바일ver
@@ -300,30 +300,30 @@ export const cheeringGuideSongs: CheeringGuideSong[] = [
     id: "who-are-you",
     label: "Who Are You",
     artist: "SUHO",
-    coverImageSrc: "/images/cheering/who-are-you/album-art/who-are-you.webp",
+    coverImageSrc: "/images/concert/cheering/who-are-you/album-art/who-are-you.webp",
     updatedAt: undefined,
     assets: [
-      { type: "image", src: "/images/cheering/who-are-you/guide/who-are-you.jpg", alt: "Who Are You 응원법" },
+      { type: "image", src: "/images/concert/cheering/who-are-you/guide/who-are-you.jpg", alt: "Who Are You 응원법" },
     ],
   },
   {
     id: "medicine",
     label: "Medicine",
     artist: "SUHO",
-    coverImageSrc: "/images/cheering/medicine/album-art/medicine.jpg",
+    coverImageSrc: "/images/concert/cheering/medicine/album-art/medicine.jpg",
     updatedAt: undefined,
     assets: [
-      { type: "image", src: "/images/cheering/medicine/guide/medicine.jpg", alt: "Medicine 응원법" },
+      { type: "image", src: "/images/concert/cheering/medicine/guide/medicine.jpg", alt: "Medicine 응원법" },
     ],
   },
   {
     id: "cream-soda",
     label: "Cream Soda",
     artist: "EXO",
-    coverImageSrc: "/images/cheering/cream-soda/album-art/cream-soda.jpg",
+    coverImageSrc: "/images/concert/cheering/cream-soda/album-art/cream-soda.jpg",
     updatedAt: undefined,
     assets: [
-      { type: "image", src: "/images/cheering/cream-soda/guide/cream-soda.jpg", alt: "Cream Soda 응원법" },
+      { type: "image", src: "/images/concert/cheering/cream-soda/guide/cream-soda.jpg", alt: "Cream Soda 응원법" },
     ],
   },
 ];

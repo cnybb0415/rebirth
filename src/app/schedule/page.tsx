@@ -295,7 +295,7 @@ export default function SchedulePage() {
                     ) : (
                       <div>
                         상세 정보는 날짜를 클릭해주세요.
-                        {monthEvents.length ? "" : " (해당 월 투어 일정 없음)"}
+                        {monthEvents.length ? "" : " (해당 월 일정 없음)"}
                       </div>
                     )}
                   </div>

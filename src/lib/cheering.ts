@@ -43,7 +43,7 @@ export type CheeringSongAsset = {
 };
 
 export type CheeringSong = {
-  id: string; // folder name under public/images/cheering
+  id: string; // folder name under public/images/concert/cheering
   slug: string;
   label: string;
   order: number | null;
@@ -62,7 +62,7 @@ async function listFilesIfExists(dirPath: string): Promise<string[]> {
 }
 
 export async function getCheeringSongs(): Promise<CheeringSong[]> {
-  const rootDir = path.join(process.cwd(), "public", "images", "cheering");
+  const rootDir = path.join(process.cwd(), "public", "images", "concert", "cheering");
   const entries = await readdir(rootDir, { withFileTypes: true });
 
   const dirs = entries
@@ -90,12 +90,12 @@ export async function getCheeringSongs(): Promise<CheeringSong[]> {
         .sort((a, b) => a.localeCompare(b, "ko"));
 
       const coverSrc = albumFiles.length
-        ? `/images/cheering/${encodePathSegments(dirName, "album-art", albumFiles[0])}`
+        ? `/images/concert/cheering/${encodePathSegments(dirName, "album-art", albumFiles[0])}`
         : null;
 
       const guideAssets: CheeringSongAsset[] = guideFiles.map((file) => ({
         type: "image",
-        src: `/images/cheering/${encodePathSegments(dirName, "guide", file)}`,
+        src: `/images/concert/cheering/${encodePathSegments(dirName, "guide", file)}`,
         alt: `${label} 응원법`,
       }));
 

@@ -95,10 +95,10 @@ export function CheeringGuide() {
       <EmptyState
         title="응원법"
         lines={[
-          "1) 파일을 public/images/cheering/<song-id>/guide/ 아래에 넣기",
-          "2) 커버는 public/images/cheering/<song-id>/album-art/ 아래에 넣기 (선택)",
+              "1) 파일을 public/images/concert/cheering/<song-id>/guide/ 아래에 넣기",
+              "2) 커버는 public/images/concert/cheering/<song-id>/album-art/ 아래에 넣기 (선택)",
           "2) src/data/guides.ts 의 cheeringGuideSongs에 곡을 추가",
-          "예시: /images/cheering/who-are-you/guide/who-are-you.jpg",
+              "예시: /images/concert/cheering/who-are-you/guide/who-are-you.jpg",
         ]}
       />
     );
@@ -129,9 +129,9 @@ export function CheeringGuide() {
                 idKey={`cheering-${song.id}`}
                 assets={song.assets}
                 emptyLines={[
-                  "1) 파일을 public/images/cheering/<song-id>/guide/ 아래에 넣기",
+                  "1) 파일을 public/images/concert/cheering/<song-id>/guide/ 아래에 넣기",
                   `2) src/data/guides.ts 에서 ${song.label} assets에 경로 추가`,
-                  "예시: /images/cheering/who-are-you/guide/who-are-you.jpg",
+                  "예시: /images/concert/cheering/who-are-you/guide/who-are-you.jpg",
                 ]}
               />
             </TabsContent>

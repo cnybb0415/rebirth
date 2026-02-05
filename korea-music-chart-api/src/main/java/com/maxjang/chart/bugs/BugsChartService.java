@@ -16,7 +16,7 @@ public class BugsChartService {
     // Get Top100 Chart
     public List<ChartVO> getBugsChartTop100(boolean isSearch, String artistName) throws Exception {
         String url1 = "https://music.bugs.co.kr/chart";
-        Document doc1 = Jsoup.connect(url1).userAgent("Chrome").get();
+        Document doc1 = fetchDocument(url1);
 
         List<String> artistNames = getTextsOfElements(doc1, "p.artist");
 
@@ -30,9 +30,12 @@ public class BugsChartService {
 
         List<String> rankStatuses = getRankStatus(doc1);
 
+        int limit = minSize(titles, artistNames, albumNames, albumArts, songNumbers);
         List<ChartVO> data = new ArrayList<>();
-        for (int i = 0; i < titles.size(); i++) {
-            String[] rank = rankStatuses.get(i).split(",");
+        for (int i = 0; i < limit; i++) {
+            String rankStatus = i < rankStatuses.size() ? rankStatuses.get(i) : "static,0";
+            String[] rank = rankStatus.split(",");
+            String albumArt = normalizeAlbumArt(albumArts.get(i));
             if (isSearch) { // 아티스트 필터링 검색일 때
                 if (artistNames.get(i).contains(artistName)) { // 해당 아티스트만 리스트에 추가
                     data.add(ChartVO.builder()
@@ -40,7 +43,7 @@ public class BugsChartService {
                             .artistName(artistNames.get(i))
                             .title(titles.get(i))
                             .albumName(albumNames.get(i))
-                            .albumArt("https://" + albumArts.get(i).split("//")[1])
+                            .albumArt(albumArt)
                             .songNumber(songNumbers.get(i))
                             .rankStatus(rank[0])
                             .changedRank(Integer.parseInt(rank[1]))
@@ -52,7 +55,7 @@ public class BugsChartService {
                         .artistName(artistNames.get(i))
                         .title(titles.get(i))
                         .albumName(albumNames.get(i))
-                        .albumArt("https://" + albumArts.get(i).split("//")[1])
+                        .albumArt(albumArt)
                         .songNumber(songNumbers.get(i))
                         .rankStatus(rank[0])
                         .changedRank(Integer.parseInt(rank[1]))
@@ -73,7 +76,12 @@ public class BugsChartService {
     private List<String> getRankStatus(Document doc) {
         List<String> hasChangedList = new ArrayList<>();
         for (Element element : doc.select(".byChart tbody .ranking p")) {
-            String className = element.className().split(" ")[1];
+            String[] classNames = element.className().split(" ");
+            if (classNames.length < 2) {
+                hasChangedList.add("static,0");
+                continue;
+            }
+            String className = classNames[1];
             String text = element.select("em").text();
             switch (className) {
                 case "none":
@@ -89,9 +97,36 @@ public class BugsChartService {
                 case "renew":
                     hasChangedList.add("new,0"); // 진입
                     break;
+                default:
+                    hasChangedList.add("static,0");
+                    break;
             }
         }
         return hasChangedList;
+    }
+
+    private Document fetchDocument(String url) throws Exception {
+        return Jsoup.connect(url)
+                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
+                .referrer("https://music.bugs.co.kr/")
+                .timeout(10_000)
+                .get();
+    }
+
+    private int minSize(List<?>... lists) {
+        int min = Integer.MAX_VALUE;
+        for (List<?> list : lists) {
+            if (list == null) return 0;
+            min = Math.min(min, list.size());
+        }
+        return min == Integer.MAX_VALUE ? 0 : min;
+    }
+
+    private String normalizeAlbumArt(String src) {
+        if (src == null || src.isBlank()) return "";
+        if (src.startsWith("http://") || src.startsWith("https://")) return src;
+        if (src.startsWith("//")) return "https:" + src;
+        return "https://music.bugs.co.kr" + src;
     }
 
     // Get tag attribute values
@@ -106,7 +141,7 @@ public class BugsChartService {
         String url = "https://music.bugs.co.kr/search/album?q="
                 + artistName
                 + "&target=ARTIST_ONLY&flac_only=false&sort=A";
-        Document doc = Jsoup.connect(url).userAgent("Chrome").get();
+        Document doc = fetchDocument(url);
         List<DetailVO> data = new ArrayList<>();
         for (Element element : doc.select(".albumInfo")) {
                 data.add(DetailVO.builder()
@@ -120,7 +155,7 @@ public class BugsChartService {
     // Find Songs By AlbumNumber
     public List<DetailVO> getSongLists(String albumNumber) throws Exception {
         String url = "https://music.bugs.co.kr/album/" + albumNumber;
-        Document doc = Jsoup.connect(url).userAgent("Chrome").get();
+        Document doc = fetchDocument(url);
         List<DetailVO> data = new ArrayList<>();
         for (Element element : doc.select(".track tbody tr")) {
             data.add(DetailVO.builder()

@@ -30,7 +30,40 @@ export default async function NoticeDetailPage({
               <li key={`${item.id}-line-${idx}`}>{line}</li>
             ))}
           </ul>
+          {item.images && item.images.length > 0 ? (
+            <div className="mt-6 grid gap-4">
+              {item.images.map((image, idx) => (
+                <div key={`${item.id}-image-${idx}`} className="overflow-hidden rounded-xl">
+                  <img
+                    src={image.src}
+                    alt={image.alt}
+                    className="h-auto w-full object-contain"
+                    loading="lazy"
+                  />
+                </div>
+              ))}
+            </div>
+          ) : null}
         </section>
+
+        <div className="mt-6 flex justify-end">
+          <a
+            href="https://m.ticket.melon.com/public/index.html#performance.index?prodId=212768"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center justify-center rounded-full bg-black px-4 py-2 text-xs font-semibold text-white transition hover:bg-black/90 sm:hidden"
+          >
+            멜론티켓 바로가기
+          </a>
+          <a
+            href="https://ticket.melon.com/performance/index.htm?prodId=212768"
+            target="_blank"
+            rel="noreferrer"
+            className="hidden items-center justify-center rounded-full bg-black px-4 py-2 text-xs font-semibold text-white transition hover:bg-black/90 sm:inline-flex"
+          >
+            멜론티켓 바로가기
+          </a>
+        </div>
 
         <AnnouncementDetailActions />
       </main>
