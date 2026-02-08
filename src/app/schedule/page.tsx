@@ -456,7 +456,7 @@ export default function SchedulePage() {
                             setSelectedDate((prev) => (prev === dateKey ? null : dateKey));
                           }}
                           className={
-                            "relative flex h-20 flex-col items-start justify-start gap-1 overflow-hidden rounded-lg border border-foreground/5 px-1 py-1 text-sm transition sm:h-24" +
+                            "relative flex aspect-[1/1.4] flex-col items-start justify-start gap-1 overflow-hidden rounded-lg border border-foreground/5 px-1 py-1 text-sm transition sm:h-24 sm:aspect-auto" +
                             (day ? " bg-foreground/5" : " bg-transparent") +
                             (isSunday ? " text-rose-500" : "") +
                             (isSaturday ? " text-blue-500" : "") +
@@ -467,10 +467,10 @@ export default function SchedulePage() {
                           aria-label={day ? `${monthItem.name} ${day}일` : undefined}
                         >
                           <span className="w-full pr-6 text-left text-xs font-semibold leading-none">
-                            {day ?? ""}
+                            <span className="inline-flex h-3 items-center">{day ?? ""}</span>
                           </span>
                           {hasEvent && day ? (
-                            <span className="absolute right-1 top-1 flex items-center gap-0.5 sm:right-1 sm:top-1">
+                            <span className="absolute right-1 top-1 flex h-3 items-center gap-0.5 sm:right-1 sm:top-1 sm:h-4">
                               {primaryCategory ? (
                                 <span className="h-3 w-3 sm:hidden">
                                   <CategoryIcon category={primaryCategory} />
