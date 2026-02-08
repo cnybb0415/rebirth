@@ -44,7 +44,7 @@ export function SiteHeader() {
             className="absolute inset-0 bg-black/40"
             onClick={() => setOpenMenu(false)}
           />
-          <aside className="relative ml-auto h-full w-[78%] max-w-xs bg-white shadow-xl">
+          <aside className="relative ml-auto flex h-full w-[78%] max-w-xs flex-col bg-white shadow-xl">
             <div className="flex items-center justify-between border-b border-foreground/10 px-4 py-3">
               <span className="text-sm font-semibold text-foreground/80" />
               <button
@@ -56,7 +56,7 @@ export function SiteHeader() {
                 <X className="h-5 w-5" />
               </button>
             </div>
-            <nav className="px-4 py-3">
+            <nav className="flex-1 overflow-y-auto px-4 py-3">
               <div className="grid gap-2 text-sm font-medium text-foreground/80">
                 <Link href="/" className="rounded-lg px-2 py-2 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
                   홈
