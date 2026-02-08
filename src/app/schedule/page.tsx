@@ -305,7 +305,7 @@ function getCategoryBadgeClass(category: ScheduleCategory): string {
     case "영상":
       return "bg-sky-100 text-sky-700";
     case "티켓팅":
-      return "bg-purple-100 text-purple-700";
+      return "bg-emerald-100 text-emerald-700";
     default:
       return "bg-foreground/10 text-foreground";
   }
@@ -432,7 +432,7 @@ export default function SchedulePage() {
                             setSelectedDate((prev) => (prev === dateKey ? null : dateKey));
                           }}
                           className={
-                            "relative flex min-h-16 flex-col items-start justify-start gap-1 rounded-lg border border-foreground/5 px-1 py-1 text-sm transition" +
+                            "relative flex h-20 flex-col items-start justify-start gap-1 overflow-hidden rounded-lg border border-foreground/5 px-1 py-1 text-sm transition sm:h-24" +
                             (day ? " bg-foreground/5" : " bg-transparent") +
                             (isSunday ? " text-rose-500" : "") +
                             (isSaturday ? " text-blue-500" : "") +
@@ -442,33 +442,60 @@ export default function SchedulePage() {
                           }
                           aria-label={day ? `${monthItem.name} ${day}일` : undefined}
                         >
-                          <span className="text-xs font-semibold leading-none">{day ?? ""}</span>
+                          <span className="w-full pr-6 text-left text-xs font-semibold leading-none">
+                            {day ?? ""}
+                          </span>
                           {hasEvent && day ? (
-                            <span className="absolute right-0.5 top-0.5 flex items-center gap-0.5 sm:right-1 sm:top-1">
-                              {dayCategories.map((category) => (
-                                <span key={`${dateKey}-${category}`} className="h-3.5 w-3.5 sm:h-4 sm:w-4">
-                                  <CategoryIcon category={category} />
-                                </span>
-                              ))}
-                            </span>
+                            <>
+                              <span className="absolute right-0.5 top-0.5 hidden items-center gap-0.5 sm:flex sm:right-1 sm:top-1">
+                                {dayCategories.map((category) => (
+                                  <span key={`${dateKey}-${category}`} className="h-3 w-3 sm:h-4 sm:w-4">
+                                    <CategoryIcon category={category} />
+                                  </span>
+                                ))}
+                              </span>
+                              <span className="mt-0.5 flex w-full items-center gap-0.5 sm:hidden">
+                                {dayCategories.map((category) => (
+                                  <span key={`${dateKey}-${category}`} className="h-3 w-3">
+                                    <CategoryIcon category={category} />
+                                  </span>
+                                ))}
+                              </span>
+                            </>
                           ) : null}
                           {hasEvent ? (
                             <span className="mt-1 flex w-full flex-col items-start gap-0.5">
-                              {displayEvents.map((eventItem) => (
+                              <span className="w-full sm:hidden">
                                 <span
-                                  key={`${dateKey}-${eventItem.id}-badge`}
                                   className={
                                     "w-full truncate rounded px-1 py-0.5 text-left text-[10px] font-medium leading-tight " +
-                                    getCategoryBadgeClass(eventItem.category)
+                                    getCategoryBadgeClass(displayEvents[0].category)
                                   }
-                                  title={eventItem.title}
+                                  title={displayEvents[0].title}
                                 >
-                                  {eventItem.title}
+                                  {displayEvents[0].title}
                                 </span>
-                              ))}
-                              {dayEvents.length > displayEvents.length ? (
-                                <span className="text-[10px] text-foreground/50">+{dayEvents.length - displayEvents.length}</span>
-                              ) : null}
+                                {dayEvents.length > 1 ? (
+                                  <span className="mt-0.5 block text-[10px] text-foreground/50">+{dayEvents.length - 1}</span>
+                                ) : null}
+                              </span>
+                              <span className="hidden w-full flex-col items-start gap-0.5 sm:flex">
+                                {displayEvents.map((eventItem) => (
+                                  <span
+                                    key={`${dateKey}-${eventItem.id}-badge`}
+                                    className={
+                                      "w-full truncate rounded px-1 py-0.5 text-left text-[10px] font-medium leading-tight " +
+                                      getCategoryBadgeClass(eventItem.category)
+                                    }
+                                    title={eventItem.title}
+                                  >
+                                    {eventItem.title}
+                                  </span>
+                                ))}
+                                {dayEvents.length > displayEvents.length ? (
+                                  <span className="text-[10px] text-foreground/50">+{dayEvents.length - displayEvents.length}</span>
+                                ) : null}
+                              </span>
                             </span>
                           ) : null}
                         </button>
