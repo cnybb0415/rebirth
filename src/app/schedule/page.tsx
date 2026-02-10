@@ -214,6 +214,13 @@ const excelScheduleItems: ScheduleItem[] = [
     title: "<Crown to the Throne> 1편 유튜브 공개",
     category: "영상",
   },
+  {
+    id: "2026-02-11-ch-chanyeol",
+    date: "2026-02-11",
+    time: "18:30",
+    title: "채널 찬열[CH CHANYEOL] (찬열, 카이, 세훈)",
+    category: "영상",
+  },
   { id: "2026-02-12-presale", date: "2026-02-12", time: "20:00", title: "EXhOrizon in SEOUL 선예매", category: "티켓팅" },
   { id: "2026-02-13-onsale", date: "2026-02-13", time: "20:00", title: "EXhOrizon in SEOUL 일반예매", category: "티켓팅" },
   {
