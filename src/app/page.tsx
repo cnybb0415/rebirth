@@ -177,7 +177,7 @@ export default async function Home() {
           <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
             <div className="w-full max-w-md">
               <img
-                src="/images/logo.png"
+                src="/images/logo_width.png"
                 alt="EXO RE:BIRTH 로고"
                 className="mx-auto mt-2.5 mb-[25px] h-auto w-full max-w-md object-contain lg:mx-0"
               />
