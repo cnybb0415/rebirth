@@ -26,8 +26,27 @@ function stripLeadingNumber(name: string): string {
   return name.replace(/^\s*\d{1,3}\s*[.\-_\s]+/, "").trim();
 }
 
+function extractEnglishTitle(name: string): string {
+  const target = stripLeadingNumber(name);
+  const parenMatches = [...target.matchAll(/\(([^)]+)\)/g)].map((m) => m[1]);
+  const englishInParens = parenMatches.filter((value) => /[A-Za-z]/.test(value));
+
+  if (englishInParens.length) {
+    return englishInParens[englishInParens.length - 1].trim();
+  }
+
+  return target
+    .replace(/[^A-Za-z0-9\s-]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
 function toSlug(name: string): string {
-  return stripLeadingNumber(name)
+  const stripped = stripLeadingNumber(name);
+  const hasHangul = /[\uAC00-\uD7A3]/.test(stripped);
+  const base = hasHangul ? extractEnglishTitle(name) : stripped;
+
+  return base
     .replace(/[.]/g, "")
     .replace(/[()]/g, "")
     .replace(/\s+/g, "-")
