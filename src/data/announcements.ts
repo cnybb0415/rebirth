@@ -26,6 +26,7 @@ export const announcements: AnnouncementItem[] = [
       "",
       { text: "엑소엘분들의 많은 참여 부탁드립니다. 🩶", emphasis: true },
       "본 이벤트는 사측과 협의 후 진행됩니다.",
+      "하단 버튼을 클릭하시면 바로 폼으로 이동 가능합니다.",
     ],
     actions: [
       { label: "떼창곡 투표", href: "https://forms.gle/zjJB9nfMw8JTSH9N6" },

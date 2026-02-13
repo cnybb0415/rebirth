@@ -73,6 +73,11 @@ export default async function NoticeDetailPage({
               ))}
             </div>
           ) : null}
+          {item.footerNote ? (
+            <div className="mt-4 text-sm text-foreground/70">
+              {item.footerNote}
+            </div>
+          ) : null}
         </section>
 
         {item.ticketLinks ? (
