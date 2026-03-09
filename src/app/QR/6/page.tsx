@@ -12,7 +12,7 @@ export default function QR6Page() {
         <div className="rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
           <div className="mb-5 text-center">
             <p className="text-xs font-semibold uppercase tracking-widest text-foreground/40">DAY3</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground">카드섹션</h1>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground">Card Section Guide</h1>
           </div>
           <div className="overflow-hidden rounded-xl border border-foreground/10">
             <Image
