@@ -2,7 +2,7 @@ import Image from "next/image";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "카드섹션 (중콘) | EXO RE:BIRTH",
+  title: "카드섹션 (DAY2) | EXO RE:BIRTH",
 };
 
 export default function QR5Page() {
@@ -11,7 +11,7 @@ export default function QR5Page() {
       <main className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6">
         <div className="rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
           <div className="mb-5 text-center">
-            <p className="text-xs font-semibold uppercase tracking-widest text-foreground/40">중콘</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-foreground/40">DAY2</p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground">카드섹션</h1>
           </div>
           <div className="overflow-hidden rounded-xl border border-foreground/10">
