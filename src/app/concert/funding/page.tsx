@@ -15,7 +15,8 @@ async function getFundPercent(): Promise<number> {
   try {
     const res = await fetch(url, { next: { revalidate: 3600 } });
     const text = await res.text();
-    const value = parseFloat(text.split("\n")[1].split(",")[0].trim());
+    const numberLine = text.split("\n").find((line) => /^\d/.test(line.trim()));
+    const value = numberLine ? parseFloat(numberLine.split(",")[0].trim()) : NaN;
     if (!isNaN(value) && value >= 0 && value <= 100) return value;
   } catch {
     // 실패 시 기본값 사용
