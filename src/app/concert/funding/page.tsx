@@ -6,10 +6,22 @@ import { announcements } from "@/data/announcements";
 
 const ACCENT = "#ffd700";
 
-// ─────────────────────────────────────────────────────────
-//  ★ 모금 퍼센트 — 여기서만 수정하면 배터리가 바뀝니다 (0 ~ 100)
-// ─────────────────────────────────────────────────────────
-const FUND_PERCENT = 35;
+// 1시간마다 재검증 (Vercel ISR)
+export const revalidate = 3600;
+
+async function getFundPercent(): Promise<number> {
+  const url = process.env.FUND_SHEET_CSV_URL;
+  if (!url) return 35;
+  try {
+    const res = await fetch(url, { next: { revalidate: 3600 } });
+    const text = await res.text();
+    const value = parseFloat(text.split("\n")[1].split(",")[0].trim());
+    if (!isNaN(value) && value >= 0 && value <= 100) return value;
+  } catch {
+    // 실패 시 기본값 사용
+  }
+  return 35;
+}
 
 // 디데이 기준일 (콘서트 첫날)
 const CONCERT_DATE = new Date("2026-04-10T00:00:00+09:00");
@@ -25,7 +37,8 @@ function getDDay() {
 
 const TOTAL_CELLS = 10; // 배터리 칸 수
 
-export default function ConcertFundingPage() {
+export default async function ConcertFundingPage() {
+  const FUND_PERCENT = await getFundPercent();
   const notice = announcements.find((a) => a.id === "2");
   const dDay = getDDay();
   const filledCells = Math.round((FUND_PERCENT / 100) * TOTAL_CELLS);
