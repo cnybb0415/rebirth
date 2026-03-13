@@ -1,4 +1,4 @@
-const images = ["/images/support/team/%ED%8C%80%EC%9B%90%EC%86%8C%EA%B0%9C.png"];
+const images = ["/images/support/team/%ED%8C%80%EC%9B%90%EC%86%8C%EA%B0%9C.webp"];
 
 const links = [
   {
