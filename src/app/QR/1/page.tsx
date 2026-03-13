@@ -11,8 +11,8 @@ export default function QR1Page() {
       <main className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6">
         <div className="rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
           <div className="mb-5 text-center">
-            <p className="text-xs font-semibold uppercase tracking-widest text-foreground/40">오프닝 떼창</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground">월광</h1>
+            <p className="text-xs font-semibold uppercase tracking-widest text-foreground/40">Opening Sing-Along</p>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground">Moonlight</h1>
           </div>
           <QRLangViewer
             alt="월광 떼창 안내"

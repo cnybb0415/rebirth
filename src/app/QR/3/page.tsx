@@ -11,7 +11,7 @@ export default function QR3Page() {
       <main className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6">
         <div className="rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
           <div className="mb-5 text-center">
-            <p className="text-xs font-semibold uppercase tracking-widest text-foreground/40">2일차 떼창</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-foreground/40">Day2 Sing-Along</p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground">Baby</h1>
           </div>
           <QRLangViewer
