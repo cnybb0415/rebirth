@@ -16,7 +16,7 @@ export default function QR5Page() {
           </div>
           <div className="overflow-hidden rounded-xl border border-foreground/10">
             <Image
-              src="/images/QR/카드섹션_중콘_CN JP.png"
+              src="/images/QR/카드섹션/카드섹션_중콘_CN JP.png"
               alt="카드섹션 중콘 안내"
               width={800}
               height={1200}

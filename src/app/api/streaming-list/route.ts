@@ -30,11 +30,9 @@ export async function GET() {
     }));
 
     return NextResponse.json({ items }, { headers: { "cache-control": "no-store" } });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : "Unknown error";
-    return NextResponse.json(
-      { items: [], error: message },
-      { status: 200, headers: { "cache-control": "no-store" } }
-    );
+  } catch {
+    // readdir 실패 시 알려진 파일 폴백
+    const fallback = [{ name: "streaming_list.png", src: "/images/streaming/list/streaming_list.png" }];
+    return NextResponse.json({ items: fallback }, { headers: { "cache-control": "no-store" } });
   }
 }

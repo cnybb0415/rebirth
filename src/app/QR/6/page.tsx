@@ -16,7 +16,7 @@ export default function QR6Page() {
           </div>
           <div className="overflow-hidden rounded-xl border border-foreground/10">
             <Image
-              src="/images/QR/카드섹션_막콘__CN JP.png"
+              src="/images/QR/카드섹션/카드섹션_막콘__CN JP.png"
               alt="카드섹션 막콘 안내"
               width={800}
               height={1200}

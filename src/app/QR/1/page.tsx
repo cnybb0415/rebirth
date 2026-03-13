@@ -1,5 +1,5 @@
-import Image from "next/image";
 import type { Metadata } from "next";
+import { QRLangViewer } from "@/components/QRLangViewer";
 
 export const metadata: Metadata = {
   title: "오프닝 떼창 - 월광 | EXO RE:BIRTH",
@@ -14,16 +14,15 @@ export default function QR1Page() {
             <p className="text-xs font-semibold uppercase tracking-widest text-foreground/40">오프닝 떼창</p>
             <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground">월광</h1>
           </div>
-          <div className="overflow-hidden rounded-xl border border-foreground/10">
-            <Image
-              src="/images/QR/월광.png"
-              alt="오프닝 떼창 월광 안내"
-              width={800}
-              height={1200}
-              className="w-full h-auto"
-              priority
-            />
-          </div>
+          <QRLangViewer
+            alt="월광 떼창 안내"
+            images={{
+              ko: "/images/QR/떼창/월광/moonlight_ko.png",
+              en: "/images/QR/떼창/월광/moonlight_en.png",
+              cn: "/images/QR/떼창/월광/moonlight_cn.png",
+              jp: "/images/QR/떼창/월광/moonlight_jp.png",
+            }}
+          />
         </div>
       </main>
     </div>
