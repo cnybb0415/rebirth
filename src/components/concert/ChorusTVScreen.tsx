@@ -35,7 +35,7 @@ const DAYS = [
   },
   {
     label: "DAY 3",
-    videoId: null as string | null,
+    videoId: "sJw3HGgQB3Q",
     imgs: {
       ko: "/images/concert/sing-along/DAY3/flatline_ko.png",
       en: "/images/concert/sing-along/DAY3/flatline_en.png",
