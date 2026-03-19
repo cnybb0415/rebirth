@@ -135,6 +135,13 @@ const tourEvents: TourEvent[] = [
     venue: "SINGAPORE INDOOR STADIUM",
     dates: ["2026-07-26"],
   },
+  {
+    id: "taipei",
+    city: "TAIPEI",
+    country: "TAIWAN",
+    venue: "TAIPEI ARENA",
+    dates: ["2026-05-09", "2026-05-10"],
+  },
 ];
 
 const excelScheduleItems: ScheduleItem[] = [
@@ -205,6 +212,16 @@ const excelScheduleItems: ScheduleItem[] = [
     city: "FUKUOKA",
     country: "JAPAN",
     venue: "MIZUHO PayPay Dome",
+  },
+  {
+    id: "2026-05-30-mega-concert",
+    date: "2026-05-30",
+    time: "19:00",
+    title: "2026 MEGA CONCERT X MCOUNTDOWN",
+    category: "공연",
+    city: "INCHEON",
+    country: "KOREA",
+    venue: "Inspire Arena",
   },
   { id: "2026-02-02-spotify-party", date: "2026-02-02", title: "Spotify 디오와 카이의 생일파티", category: "영상" },
   {
