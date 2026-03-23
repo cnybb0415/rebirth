@@ -12,7 +12,16 @@ const PIXEL_FONT: React.CSSProperties = {
 type Lang = "ko" | "en" | "cn" | "jp";
 const LANG_LABELS: Record<Lang, string> = { ko: "한국어", en: "English", cn: "中文", jp: "日本語" };
 
-const DAYS = [
+type Version = "음원" | "MR";
+
+type Day = {
+  label: string;
+  videoId: string;
+  videoIdMR?: string;
+  imgs: Record<Lang, string>;
+};
+
+const DAYS: Day[] = [
   {
     label: "DAY 1",
     videoId: "vF6J3T1I5gU",
@@ -43,20 +52,42 @@ const DAYS = [
       jp: "/images/concert/sing-along/DAY3/flatline_jp.png",
     },
   },
-] as const;
+  {
+    label: "월광",
+    videoId: "",      // ★ 음원ver YouTube ID
+    videoIdMR: "",    // ★ MRver YouTube ID
+    imgs: {
+      ko: "/images/concert/sing-along/월광/moonlight_ko.png",
+      en: "/images/concert/sing-along/월광/moonlight_en.png",
+      cn: "/images/concert/sing-along/월광/moonlight_cn.png",
+      jp: "/images/concert/sing-along/월광/moonlight_jp.png",
+    },
+  },
+];
 
-type DayIdx = 0 | 1 | 2;
+type DayIdx = 0 | 1 | 2 | 3;
 
 export function ChorusTVScreen() {
   const [selectedDay, setSelectedDay] = useState<DayIdx | null>(null);
   const [pressed, setPressed] = useState<DayIdx | null>(null);
   const [lang, setLang] = useState<Lang>("ko");
+  const [version, setVersion] = useState<Version>("음원");
 
   const currentDay = selectedDay !== null ? DAYS[selectedDay] : null;
+  const hasMR = currentDay?.videoIdMR !== undefined;
+
+  const activeVideoId =
+    hasMR && version === "MR" ? currentDay!.videoIdMR : currentDay?.videoId;
+
   const embedUrl =
-    currentDay?.videoId
-      ? `https://www.youtube.com/embed/${currentDay.videoId}?autoplay=0&rel=0`
+    activeVideoId
+      ? `https://www.youtube.com/embed/${activeVideoId}?autoplay=0&rel=0`
       : null;
+
+  function handleSelectDay(idx: DayIdx) {
+    setSelectedDay(idx);
+    setVersion("음원");
+  }
 
   return (
     <>
@@ -142,7 +173,7 @@ export function ChorusTVScreen() {
                 </div>
               ) : embedUrl ? (
                 <iframe
-                  key={selectedDay}
+                  key={`${selectedDay}-${version}`}
                   src={embedUrl}
                   style={{ position: "absolute", inset: 0, width: "100%", height: "100%", border: "none" }}
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -164,21 +195,51 @@ export function ChorusTVScreen() {
 
           {/* Bottom controls */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: "8px" }}>
+            {/* PWR */}
             <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
               <div style={{ width: "5px", height: "5px", borderRadius: "50%", backgroundColor: selectedDay !== null ? ACCENT : `${ACCENT}33`, boxShadow: selectedDay !== null ? `0 0 5px ${ACCENT}` : "none", transition: "background-color 0.3s, box-shadow 0.3s" }} />
               <span style={{ ...PIXEL_FONT, fontSize: "0.35rem", letterSpacing: "0.14em", color: `${ACCENT}44` }}>PWR</span>
             </div>
+
+            {/* BACK + 월광 version buttons */}
             {selectedDay !== null && (
-              <button
-                type="button"
-                onClick={() => setSelectedDay(null)}
-                style={{ background: "none", border: `1px solid ${ACCENT}44`, color: `${ACCENT}77`, cursor: "pointer", ...PIXEL_FONT, fontSize: "0.36rem", letterSpacing: "0.14em", padding: "3px 8px", borderRadius: "2px", transition: "border-color 0.1s, color 0.1s" }}
-                onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = ACCENT; (e.currentTarget as HTMLButtonElement).style.color = ACCENT; }}
-                onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = `${ACCENT}44`; (e.currentTarget as HTMLButtonElement).style.color = `${ACCENT}77`; }}
-              >
-                ◀ BACK
-              </button>
+              <div style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                <button
+                  type="button"
+                  onClick={() => setSelectedDay(null)}
+                  style={{ background: "none", border: `1px solid ${ACCENT}44`, color: `${ACCENT}77`, cursor: "pointer", ...PIXEL_FONT, fontSize: "0.36rem", letterSpacing: "0.14em", padding: "3px 8px", borderRadius: "2px", transition: "border-color 0.1s, color 0.1s" }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = ACCENT; (e.currentTarget as HTMLButtonElement).style.color = ACCENT; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.borderColor = `${ACCENT}44`; (e.currentTarget as HTMLButtonElement).style.color = `${ACCENT}77`; }}
+                >
+                  ◀ BACK
+                </button>
+
+                {/* 월광 전용 버전 선택 */}
+                {hasMR && (["음원", "MR"] as Version[]).map((v) => (
+                  <button
+                    key={v}
+                    type="button"
+                    onClick={() => setVersion(v)}
+                    style={{
+                      background: version === v ? `${ACCENT}22` : "none",
+                      border: `1px solid ${version === v ? ACCENT : ACCENT + "44"}`,
+                      color: version === v ? ACCENT : `${ACCENT}77`,
+                      cursor: "pointer",
+                      ...PIXEL_FONT,
+                      fontSize: "0.36rem",
+                      letterSpacing: "0.1em",
+                      padding: "3px 8px",
+                      borderRadius: "2px",
+                      transition: "border-color 0.1s, color 0.1s, background 0.1s",
+                    }}
+                  >
+                    {v}ver
+                  </button>
+                ))}
+              </div>
             )}
+
+            {/* indicator dots */}
             <div style={{ display: "flex", gap: "3px" }}>
               {DAYS.map((_, i) => (
                 <div key={i} style={{ width: "4px", height: "4px", borderRadius: "50%", backgroundColor: selectedDay === i ? ACCENT : `${ACCENT}22`, boxShadow: selectedDay === i ? `0 0 4px ${ACCENT}` : "none", transition: "background-color 0.2s" }} />
@@ -198,7 +259,7 @@ export function ChorusTVScreen() {
                 key={i}
                 type="button"
                 onPointerDown={() => setPressed(idx)}
-                onPointerUp={() => { setPressed(null); setSelectedDay(idx); }}
+                onPointerUp={() => { setPressed(null); handleSelectDay(idx); }}
                 onPointerLeave={() => setPressed(null)}
                 onPointerCancel={() => setPressed(null)}
                 style={{ position: "relative", display: "inline-flex", flexDirection: "column", alignItems: "stretch", cursor: "pointer", border: "none", background: "none", padding: 0, paddingBottom: isPressed ? "1px" : "4px", ...PIXEL_FONT }}
