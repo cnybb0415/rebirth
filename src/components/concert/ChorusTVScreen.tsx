@@ -54,8 +54,8 @@ const DAYS: Day[] = [
   },
   {
     label: "월광",
-    videoId: "",      // ★ 음원ver YouTube ID
-    videoIdMR: "",    // ★ MRver YouTube ID
+    videoId: "b5dL6vdJt7E",
+    videoIdMR: "RyElYj2s6i0",
     imgs: {
       ko: "/images/concert/sing-along/월광/moonlight_ko.png",
       en: "/images/concert/sing-along/월광/moonlight_en.png",
