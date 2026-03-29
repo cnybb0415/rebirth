@@ -25,6 +25,7 @@ const DAYS: Day[] = [
   {
     label: "DAY 1",
     videoId: "vF6J3T1I5gU",
+    videoIdMR: "3iXuu_f7rEw",
     imgs: {
       ko: "/images/concert/sing-along/DAY1/run_ko.png",
       en: "/images/concert/sing-along/DAY1/run_en.png",
@@ -35,6 +36,7 @@ const DAYS: Day[] = [
   {
     label: "DAY 2",
     videoId: "FlTw8m_gnrU",
+    videoIdMR: "VyqGWgZbFOw",
     imgs: {
       ko: "/images/concert/sing-along/DAY2/baby_ko.png",
       en: "/images/concert/sing-along/DAY2/baby_en.png",
@@ -45,6 +47,7 @@ const DAYS: Day[] = [
   {
     label: "DAY 3",
     videoId: "sJw3HGgQB3Q",
+    videoIdMR: "MIc-hE7YXCU",
     imgs: {
       ko: "/images/concert/sing-along/DAY3/flatline_ko.png",
       en: "/images/concert/sing-along/DAY3/flatline_en.png",
