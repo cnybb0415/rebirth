@@ -334,6 +334,17 @@ export function HelperForm() {
         </p>
       )}
 
+      {/* ── 개인정보 수집 동의 ── */}
+      <div style={{ marginBottom: "14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "6px", padding: "12px 14px" }}>
+        <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.9)", marginBottom: "6px", letterSpacing: "0.02em" }}>
+          개인정보 수집 및 이용 동의
+        </p>
+        <p style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.7, letterSpacing: "0.01em" }}>
+          콘서트 이벤트 헬퍼를 위한 연락용 이메일을 수집·이용하는 것에 동의합니다.<br />
+          수집된 정보는 세부 일정 및 진행 방법 전달을 위한 연락 목적 외에는 사용되지 않으며 콘서트 이후 전부 폐기처리됩니다.
+        </p>
+      </div>
+
       {/* ── 제출 버튼 ── */}
       <button
         type="submit"
