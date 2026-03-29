@@ -99,6 +99,7 @@ export function HelperForm() {
   });
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [errors, setErrors] = useState<string[]>([]);
+  const [agreed, setAgreed] = useState(false);
 
   const isCardsectionGuide = form.roles.includes("카드섹션 경광봉 도우미");
   const needs11 = isCardsectionGuide && form.dates.includes("4월 11일(토)");
@@ -335,21 +336,26 @@ export function HelperForm() {
       )}
 
       {/* ── 개인정보 수집 동의 ── */}
-      <div style={{ marginBottom: "14px", background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.15)", borderRadius: "6px", padding: "12px 14px" }}>
+      <div style={{ marginBottom: "14px", background: "rgba(255,255,255,0.05)", border: `1px solid ${agreed ? "rgba(185,127,255,0.4)" : "rgba(255,255,255,0.15)"}`, borderRadius: "6px", padding: "12px 14px", transition: "border-color 0.2s" }}>
         <p style={{ fontSize: "0.75rem", fontWeight: 700, color: "rgba(255,255,255,0.9)", marginBottom: "6px", letterSpacing: "0.02em" }}>
           개인정보 수집 및 이용 동의
         </p>
-        <p style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.7, letterSpacing: "0.01em" }}>
+        <p style={{ fontSize: "0.7rem", color: "rgba(255,255,255,0.7)", lineHeight: 1.7, letterSpacing: "0.01em", marginBottom: "10px" }}>
           콘서트 이벤트 헬퍼를 위한 연락용 연락처, 이메일을 수집·이용하는 것에 동의합니다.<br />
           수집된 정보는 세부 일정 및 진행 방법 전달을 위한 연락 목적 외에는 사용되지 않으며 콘서트 이후 전부 폐기처리됩니다.
         </p>
+        <PixelCheckbox
+          checked={agreed}
+          label="위 내용에 동의합니다"
+          onChange={() => setAgreed((v) => !v)}
+        />
       </div>
 
       {/* ── 제출 버튼 ── */}
       <button
         type="submit"
-        disabled={status === "loading"}
-        style={{ position: "relative", width: "100%", border: "none", background: "none", cursor: status === "loading" ? "not-allowed" : "pointer", padding: 0, paddingBottom: "4px", ...PIXEL_FONT }}
+        disabled={status === "loading" || !agreed}
+        style={{ position: "relative", width: "100%", border: "none", background: "none", cursor: (status === "loading" || !agreed) ? "not-allowed" : "pointer", padding: 0, paddingBottom: "4px", ...PIXEL_FONT, opacity: agreed ? 1 : 0.4, transition: "opacity 0.2s" }}
       >
         <span aria-hidden style={{ position: "absolute", bottom: 0, left: "2px", right: "2px", height: "4px", backgroundColor: "#4a1a7f", borderRadius: "2px 2px 4px 4px" }} />
         <span style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center", width: "100%", padding: "11px 0", backgroundColor: status === "loading" ? `${ACCENT}77` : ACCENT, border: `2px solid ${ACCENT}`, borderRadius: "4px", boxShadow: `0 0 18px ${ACCENT}44, inset 0 2px 0 rgba(255,255,255,0.2)`, fontSize: "0.65rem", fontWeight: 800, letterSpacing: "0.22em", color: "#1a0030", transition: "background-color 0.15s" }}>
