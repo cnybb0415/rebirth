@@ -32,6 +32,28 @@ public class BugsChartController {
         return bugsChartService.getBugsChartTop100(true, artistName);
     }
 
+    // 일간
+    @GetMapping("/chart/day")
+    public ResponseFormat<ChartVO> getBugsChartDay() throws Exception {
+        return new ResponseFormat<>(bugsChartService.getBugsChart("https://music.bugs.co.kr/chart/track/day/total", false, null));
+    }
+
+    @GetMapping("/chart/day/{artistName}")
+    public List<ChartVO> getBugsChartDayByArtist(@PathVariable String artistName) throws Exception {
+        return bugsChartService.getBugsChart("https://music.bugs.co.kr/chart/track/day/total", true, artistName);
+    }
+
+    // 주간
+    @GetMapping("/chart/week")
+    public ResponseFormat<ChartVO> getBugsChartWeek() throws Exception {
+        return new ResponseFormat<>(bugsChartService.getBugsChart("https://music.bugs.co.kr/chart/track/week/total", false, null));
+    }
+
+    @GetMapping("/chart/week/{artistName}")
+    public List<ChartVO> getBugsChartWeekByArtist(@PathVariable String artistName) throws Exception {
+        return bugsChartService.getBugsChart("https://music.bugs.co.kr/chart/track/week/total", true, artistName);
+    }
+
     @GetMapping("/album/{artistName}")
     public ResponseFormat<DetailVO> getAlbums(@PathVariable String artistName) throws Exception {
         return new ResponseFormat<>(bugsChartService.getAlbums(artistName));

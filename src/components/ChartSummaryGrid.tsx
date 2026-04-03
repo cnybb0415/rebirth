@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ChartItem, ChartsData } from "@/lib/charts";
 import { cn } from "@/lib/utils";
 import { MusicServiceIcon } from "@/components/MusicServiceIcon";
@@ -202,9 +203,11 @@ function ClockIcon() {
 export function ChartSummaryGrid({
   trackTitle,
   charts,
+  moreHref,
 }: {
   trackTitle: string;
   charts: ChartsData;
+  moreHref?: string;
 }) {
   const safeTitle = trackTitle?.trim().length ? trackTitle.trim() : "노래제목";
   const updated = formatKstTimestampTopOfHour(charts.lastUpdated);
@@ -221,6 +224,14 @@ export function ChartSummaryGrid({
             <span className="tabular-nums">{updated}</span>
           </div>
         </div>
+        {moreHref ? (
+          <Link
+            href={moreHref}
+            className="text-xs font-medium text-foreground/50 hover:text-foreground whitespace-nowrap pt-1"
+          >
+            음원차트 더보기 →
+          </Link>
+        ) : null}
       </div>
 
       <div className="mt-5 grid grid-cols-2 gap-1.5 sm:gap-4">

@@ -248,7 +248,7 @@ export default async function Home() {
 
 
         <section className="mt-2 rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
-          <ChartSummaryGrid trackTitle={siteConfig.trackTitle} charts={charts} />
+          <ChartSummaryGrid trackTitle={siteConfig.trackTitle} charts={charts} moreHref="/charts" />
         </section>
 
         <section id="home-video" className="mt-6 rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">

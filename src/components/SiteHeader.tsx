@@ -112,6 +112,13 @@ export function SiteHeader() {
                           {category.label}
                         </Link>
                       ))}
+                      <Link
+                        href="/charts"
+                        className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
+                        onClick={() => setOpenMenu(false)}
+                      >
+                        음원 순위
+                      </Link>
                     </div>
                   ) : null}
                 </div>
@@ -154,14 +161,42 @@ export function SiteHeader() {
                   {openConcert ? (
                     <div className="mt-1 space-y-1 pl-3 text-sm text-foreground/70">
                       <Link
-                        href="/cheer"
+                        href="/concert"
+                        className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
+                        onClick={() => setOpenMenu(false)}
+                      >
+                        콘서트 홈
+                      </Link>
+                      <Link
+                        href="/concert/chorus"
+                        className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
+                        onClick={() => setOpenMenu(false)}
+                      >
+                        떼창
+                      </Link>
+                      <Link
+                        href="/concert/cheer"
                         className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
                         onClick={() => setOpenMenu(false)}
                       >
                         응원법
                       </Link>
                       <Link
-                        href="/notice"
+                        href="/concert/helper"
+                        className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
+                        onClick={() => setOpenMenu(false)}
+                      >
+                        헬퍼모집
+                      </Link>
+                      <Link
+                        href="/concert/funding"
+                        className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
+                        onClick={() => setOpenMenu(false)}
+                      >
+                        펀딩
+                      </Link>
+                      <Link
+                        href="/concert/notice"
                         className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
                         onClick={() => setOpenMenu(false)}
                       >

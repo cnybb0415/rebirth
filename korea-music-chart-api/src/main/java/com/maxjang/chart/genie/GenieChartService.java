@@ -22,16 +22,22 @@ public class GenieChartService {
     private static final DateTimeFormatter GENIE_DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
     private static final DateTimeFormatter GENIE_HOUR = DateTimeFormatter.ofPattern("HH");
 
-    // Get Top200 Chart
+    // Get Top200 Chart (실시간)
     public List<ChartVO> getGenieChartTop100(String artistName) throws Exception {
+        return getGenieChart("D", true, artistName);
+    }
+
+    // Get Top200 Chart (타입 지정: ditc=D/W/M, rtm=Y/N)
+    public List<ChartVO> getGenieChart(String ditc, boolean rtm, String artistName) throws Exception {
         ZonedDateTime now = ZonedDateTime.now(KST);
         String ymd = now.format(GENIE_DATE);
         String hh = now.format(GENIE_HOUR);
+        String rtmStr = rtm ? "Y" : "N";
 
         List<ChartVO> data = new ArrayList<>();
         for (int page = 1; page <= 4; page++) {
             String url =
-                    "https://www.genie.co.kr/chart/top200?ditc=D&rtm=Y&ymd=" + ymd + "&hh=" + hh + "&pg=" + page;
+                    "https://www.genie.co.kr/chart/top200?ditc=" + ditc + "&rtm=" + rtmStr + "&ymd=" + ymd + "&hh=" + hh + "&pg=" + page;
             Document doc = fetchDocument(url);
 
             for (Element row : doc.select("table.list-wrap tbody tr.list")) {

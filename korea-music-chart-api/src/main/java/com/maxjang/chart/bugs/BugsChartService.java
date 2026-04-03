@@ -15,7 +15,11 @@ import java.util.stream.Collectors;
 public class BugsChartService {
     // Get Top100 Chart
     public List<ChartVO> getBugsChartTop100(boolean isSearch, String artistName) throws Exception {
-        String url1 = "https://music.bugs.co.kr/chart";
+        return getBugsChart("https://music.bugs.co.kr/chart/track/realtime/total", isSearch, artistName);
+    }
+
+    public List<ChartVO> getBugsChart(String chartUrl, boolean isSearch, String artistName) throws Exception {
+        String url1 = chartUrl;
         Document doc1 = fetchDocument(url1);
 
         List<String> artistNames = getTextsOfElements(doc1, "p.artist");
