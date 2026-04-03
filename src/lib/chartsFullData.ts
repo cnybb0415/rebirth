@@ -157,7 +157,7 @@ async function fetchSection(
   artistName: string
 ): Promise<ChartSection> {
   try {
-    const res = await fetch(endpoint, { headers: { accept: "application/json" } });
+    const res = await fetch(endpoint, { headers: { accept: "application/json" }, next: { revalidate: 3600 } });
     if (!res.ok) return { label: sectionLabel, items: [], error: "차트 연동 실패" };
 
     const json = (await res.json()) as unknown;

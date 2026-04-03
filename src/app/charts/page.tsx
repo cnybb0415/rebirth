@@ -3,7 +3,7 @@ import { siteConfig } from "@/config/site";
 import { ChartsFullPanel } from "@/components/ChartsFullPanel";
 import { fetchFullChartsData } from "@/lib/chartsFullData";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 function formatKst(iso: string): string {
   const date = new Date(iso);
