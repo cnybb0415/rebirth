@@ -13,15 +13,17 @@ export async function generateStaticParams() {
 function toYouTubeEmbedUrl(input: string): string {
   try {
     const url = new URL(input);
+    const t = url.searchParams.get("t");
+    const startParam = t ? `?start=${t}` : "";
 
     if (url.hostname.includes("youtu.be")) {
       const id = url.pathname.replace(/^\//, "").split("/")[0];
-      if (id) return `https://www.youtube.com/embed/${id}`;
+      if (id) return `https://www.youtube.com/embed/${id}${startParam}`;
     }
 
     if (url.hostname.includes("youtube.com")) {
       const id = url.searchParams.get("v");
-      if (id) return `https://www.youtube.com/embed/${id}`;
+      if (id) return `https://www.youtube.com/embed/${id}${startParam}`;
     }
   } catch {
     return input;
