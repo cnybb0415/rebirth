@@ -96,8 +96,15 @@ export const voteGuides: VoteGuide[] = [
     id: "common",
     label: "공통",
     assets: [
-      { type: "image", src: "/images/vote/공통/01.음악방송_사전투표.jpg", alt: "음악방송 사전투표 공통 가이드" },
-      { type: "image", src: "/images/vote/공통/02.음악방송_반영비율.png", alt: "음악방송 반영비율 공통 가이드" },
+      { type: "image", src: "/images/vote/공통/음악방송/01.음악방송_사전투표.jpg", alt: "음악방송 사전투표 공통 가이드" },
+      { type: "image", src: "/images/vote/공통/음악방송/02.음악방송_반영비율.png", alt: "음악방송 반영비율 공통 가이드" },
+    ],
+  },
+  {
+    id: "award",
+    label: "시상식",
+    assets: [
+      { type: "image", src: "/images/vote/공통/시상식/투표가이드.png", alt: "시상식 투표 가이드" },
     ],
   },
   {

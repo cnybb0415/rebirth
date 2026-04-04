@@ -130,6 +130,27 @@ public class MelonChartService {
         return parseChartRows(doc, artistName);
     }
 
+    // Get Daily Chart
+    public List<ChartVO> getMelonChartDaily(String artistName) throws Exception {
+        String url = "https://www.melon.com/chart/day/index.htm?classCd=GN0000";
+        Document doc = fetchDocument(url);
+        return parseChartRows(doc, artistName);
+    }
+
+    // Get Weekly Chart
+    public List<ChartVO> getMelonChartWeekly(String artistName) throws Exception {
+        String url = "https://www.melon.com/chart/week/index.htm?classCd=GN0000";
+        Document doc = fetchDocument(url);
+        return parseChartRows(doc, artistName);
+    }
+
+    // Get Monthly Chart
+    public List<ChartVO> getMelonChartMonthly(String artistName) throws Exception {
+        String url = "https://www.melon.com/chart/month/index.htm?classCd=GN0000";
+        Document doc = fetchDocument(url);
+        return parseChartRows(doc, artistName);
+    }
+
     // Get HOT100 Chart (D100 = 발매100일, D30 = 발매30일)
     public List<ChartVO> getMelonHot100(String chartType, String artistName) throws Exception {
         String safeType = "D100";

@@ -12,6 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type GuideCategoryId } from "@/lib/guideCategories";
+import { PrevoteCategoryContent } from "@/components/PrevoteCategoryContent";
+import { prevoteCategories } from "@/lib/prevoteCategories";
 
 function uniqueStrings(values: string[]) {
   const seen = new Set<string>();
@@ -175,7 +177,7 @@ const buildMvServiceEmptyLines = (partId: "pcver" | "mobilever", partLabel: stri
   `2) src/data/guides.ts 에서 뮤직비디오 > ${partLabel} assets에 경로 추가`,
 ];
 
-export function GuideCategoryContent({ categoryId }: { categoryId: GuideCategoryId }) {
+export function GuideCategoryContent({ categoryId, initialTab }: { categoryId: GuideCategoryId; initialTab?: string }) {
   const services = streamingGuideServices;
   const normalServices = services.filter((service) => service.id !== "mv");
 
@@ -215,6 +217,34 @@ export function GuideCategoryContent({ categoryId }: { categoryId: GuideCategory
       </Tabs>
     ) : (
       <EmptyState title="가이드" lines={["아직 등록된 가이드가 없어요."]} />
+    );
+  }
+
+  if (categoryId === "prevote") {
+    const validTab = prevoteCategories.find((c) => c.id === initialTab)?.id;
+    const defaultTab = validTab ?? prevoteCategories[0]?.id ?? "";
+    return (
+      <Tabs defaultValue={defaultTab}>
+        <div className="border-b border-foreground/10 pb-2">
+          <TabsList
+            aria-label="사전투표 가이드"
+            className="w-full flex-nowrap justify-start gap-6 overflow-x-auto rounded-none border-0 bg-transparent p-0 shadow-none"
+          >
+            {prevoteCategories.map((cat) => (
+              <TabsTrigger key={cat.id} value={cat.id} variant="underline">
+                <span className="inline-flex items-center gap-2 whitespace-nowrap">
+                  <span>{cat.label}</span>
+                </span>
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
+        {prevoteCategories.map((cat) => (
+          <TabsContent key={cat.id} value={cat.id}>
+            <PrevoteCategoryContent categoryId={cat.id} />
+          </TabsContent>
+        ))}
+      </Tabs>
     );
   }
 

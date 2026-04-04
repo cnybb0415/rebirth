@@ -54,6 +54,18 @@ const PROVIDER_DEFS: ProviderDef[] = [
         label: "멜론 HOT100 (30일)",
         buildEndpoint: (base, artist) => `${base}/melon/hot100/D30/chart/${encodeURIComponent(artist)}`,
       },
+      {
+        label: "멜론 일간",
+        buildEndpoint: (base, artist) => `${base}/melon/chart/daily/${encodeURIComponent(artist)}`,
+      },
+      {
+        label: "멜론 주간",
+        buildEndpoint: (base, artist) => `${base}/melon/chart/weekly/${encodeURIComponent(artist)}`,
+      },
+      {
+        label: "멜론 월간",
+        buildEndpoint: (base, artist) => `${base}/melon/chart/monthly/${encodeURIComponent(artist)}`,
+      },
     ],
   },
   {

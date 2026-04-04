@@ -8,13 +8,10 @@ import { usePathname } from "next/navigation";
 import logoPng from "@/../public/images/exo_logo.png";
 import { guideCategories } from "@/lib/guideCategories";
 import { streamingCategories } from "@/lib/streamingCategories";
-import { prevoteCategories } from "@/lib/prevoteCategories";
-
 export function SiteHeader() {
   const [openMenu, setOpenMenu] = useState(false);
   const [openGuide, setOpenGuide] = useState(false);
   const [openStreaming, setOpenStreaming] = useState(false);
-  const [openPrevote, setOpenPrevote] = useState(false);
   const [openConcert, setOpenConcert] = useState(false);
   const [openSupport, setOpenSupport] = useState(false);
   const pathname = usePathname();
@@ -122,30 +119,9 @@ export function SiteHeader() {
                     </div>
                   ) : null}
                 </div>
-                <div>
-                  <button
-                    type="button"
-                    className="flex w-full items-center justify-between rounded-lg px-2 py-2 hover:bg-foreground/5"
-                    onClick={() => setOpenPrevote((prev) => !prev)}
-                  >
-                    <span>사전투표</span>
-                    <ChevronDown className={`h-4 w-4 transition ${openPrevote ? "rotate-180" : ""}`} />
-                  </button>
-                  {openPrevote ? (
-                    <div className="mt-1 space-y-1 pl-3 text-sm text-foreground/70">
-                      {prevoteCategories.map((category) => (
-                        <Link
-                          key={category.id}
-                          href={`/prevote/${category.id}`}
-                          className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5"
-                          onClick={() => setOpenMenu(false)}
-                        >
-                          {category.label}
-                        </Link>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
+                <Link href="/vote" className="rounded-lg px-2 py-2 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
+                  투표
+                </Link>
                 <Link href="/schedule" className="rounded-lg px-2 py-2 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
                   스케줄
                 </Link>

@@ -56,6 +56,7 @@ const actionIcons: Record<string, React.ReactNode> = {
   "가이드": <IconBookClosed />,
   "응원법": <Megaphone size={18} />,
   "음악방송 사전투표": <Vote size={18} />,
+  "투표": <Vote size={18} />,
 };
 
 import * as React from "react";

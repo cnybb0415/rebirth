@@ -1,86 +1,93 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { VotePanel, type VoteItem } from "@/components/VotePanel";
 
-type VotePageProps = {
-  searchParams?: Record<string, string | string[] | undefined>;
-};
+export const revalidate = 3600;
 
-function getSingleParam(value: string | string[] | undefined): string | undefined {
-  if (typeof value === "string") return value;
-  if (Array.isArray(value)) return value[0];
-  return undefined;
+async function fetchVoteItems(): Promise<VoteItem[]> {
+  const csvUrl = process.env.VOTE_SHEET_CSV_URL;
+  if (!csvUrl) return [];
+
+  try {
+    const res = await fetch(csvUrl, { next: { revalidate: 3600 } });
+    if (!res.ok) return [];
+
+    const text = await res.text();
+    const lines = text.trim().split("\n");
+    if (lines.length < 2) return [];
+
+    const now = new Date();
+
+    // Columns: 카테고리(0) 투표주최(1) 투표이름(2) 투표페이지(3) 마감날짜(4) 링크(5) 후보(6) 순위(7) 퍼센트(8)
+    return lines.slice(1).flatMap((line) => {
+      const cols = parseCSVLine(line);
+      if (cols.length < 3) return [];
+
+      const [category, organizer, name, votePage, deadline, link, candidate, rank, percent] =
+        cols.map((c) => c.trim());
+      if (!name) return [];
+
+      // Supports "YYYY.MM.DD HH:MM" or "YYYY-MM-DD"
+      const isActive = (() => {
+        if (!deadline) return false;
+        const m = deadline.match(/(\d{4})[.\-](\d{2})[.\-](\d{2})(?:\s+(\d{2}):(\d{2}))?/);
+        if (!m) return false;
+        const deadlineDate = new Date(
+          `${m[1]}-${m[2]}-${m[3]}T${m[4] ?? "23"}:${m[5] ?? "59"}:00+09:00`
+        );
+        return now <= deadlineDate;
+      })();
+
+      return [
+        {
+          category: category ?? "",
+          organizer: organizer ?? "",
+          name,
+          votePage: votePage ?? "",
+          deadline: deadline ?? "",
+          link: link ?? "",
+          candidate: candidate ?? "",
+          rank: rank ?? "",
+          percent: percent ?? "",
+          isActive,
+        } satisfies VoteItem,
+      ];
+    });
+  } catch {
+    return [];
+  }
 }
 
-export default function VotePage({ searchParams }: VotePageProps) {
-  const smsToRaw = getSingleParam(searchParams?.to) ?? "0505";
-  const smsTo = smsToRaw.startsWith("#") ? smsToRaw.slice(1) : smsToRaw;
+function parseCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
 
-  const bodyText = getSingleParam(searchParams?.body) ?? "엑소";
-  const encodedBody = encodeURIComponent(bodyText);
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') {
+        current += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (ch === "," && !inQuotes) {
+      result.push(current);
+      current = "";
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current);
+  return result;
+}
 
-  // Platform quirks:
-  // - Android commonly supports: sms:0505?body=...
-  // - iOS commonly supports: sms:0505&body=...
-  const androidSmsHref = `sms:${smsTo}?body=${encodedBody}`;
-  const iosSmsHref = `sms:${smsTo}&body=${encodedBody}`;
+export default async function VotePage() {
+  const items = await fetchVoteItems();
 
   return (
-    <div className="min-h-screen bg-transparent text-foreground">
-      <main className="mx-auto w-full max-w-6xl px-3 py-10 sm:px-6 sm:py-14">
-        <div className="flex items-center gap-2">
-          <h1 className="text-xl font-semibold">투표</h1>
-          <Badge variant="default">준비중</Badge>
-        </div>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>투표 안내 / 바로가기</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2 text-sm">
-            <p>여기에 문자투표/앱투표/사전투표 안내와 링크를 넣을 수 있어요.</p>
-            <p className="text-foreground/70">(원하시면 버튼/카드 UI로 바로 구성해둘게요)</p>
-          </CardContent>
-        </Card>
-
-        <Card className="mt-6">
-          <CardHeader>
-            <CardTitle>생방송 문자투표</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="space-y-1">
-              <p>
-                받는 사람: <span className="font-semibold">{smsTo}</span>
-              </p>
-              <p>
-                내용: <span className="font-semibold">{bodyText}</span>
-              </p>
-              <p className="text-foreground/70">기기별로 `sms:` 링크 형식이 달라서 아래를 따로 제공해요.</p>
-            </div>
-
-            <div className="grid gap-2 sm:grid-cols-2">
-              <a
-                href={androidSmsHref}
-                className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md bg-foreground px-4 text-sm font-medium text-background transition-[background-color,border-color,box-shadow,color,transform] hover:bg-foreground/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/25"
-              >
-                Android 문자앱 열기
-              </a>
-              <a
-                href={iosSmsHref}
-                className="inline-flex h-10 items-center justify-center gap-2 whitespace-nowrap rounded-md border border-foreground/15 bg-white px-4 text-sm font-medium text-foreground shadow-sm transition-[background-color,border-color,box-shadow,color,transform] hover:border-foreground/35 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-foreground/25"
-              >
-                iPhone(iOS) 문자앱 열기
-              </a>
-            </div>
-
-            <div className="rounded-xl border border-foreground/15 bg-white p-3 text-xs text-foreground/70">
-              <p>
-                참고: 링크에 <span className="font-semibold">#</span> (예: #0505) 를 붙이면 대부분의 기기에서 받는 번호로
-                인식이 안 됩니다. 보통은 <span className="font-semibold">0505</span>처럼 숫자만 써야 해요.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
-    </div>
+    <main className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+      <h1 className="mb-6 text-2xl font-bold">투표</h1>
+      <VotePanel items={items} guideHref="/guide/prevote?tab=시상식" />
+    </main>
   );
 }

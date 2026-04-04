@@ -42,7 +42,7 @@ export const siteConfig = {
     // Opens the SMS app directly with OS-specific sms: URI format.
     { label: "생방송 문자투표", href: "#", kind: "smsVote", smsTo: "#0505", smsBody: "EXO" },
     { label: "가이드", href: "/guide" },
-    { label: "음악방송 사전투표", href: "/prevote" },
+    { label: "투표", href: "/vote" },
   ] as const,
 
   streamingLinks: [

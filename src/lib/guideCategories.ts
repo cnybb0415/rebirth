@@ -1,4 +1,4 @@
-export type GuideCategoryId = "streaming" | "download" | "signup" | "gift" | "mv";
+export type GuideCategoryId = "streaming" | "download" | "signup" | "gift" | "mv" | "prevote";
 
 export type GuideCategory = {
   id: GuideCategoryId;
@@ -30,6 +30,11 @@ export const guideCategories: GuideCategory[] = [
   {
     id: "mv",
     label: "뮤직비디오",
+    description: "",
+  },
+  {
+    id: "prevote",
+    label: "투표 가이드",
     description: "",
   },
 ];
