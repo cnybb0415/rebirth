@@ -16,7 +16,35 @@ export type AnnouncementItem = {
 };
 
 export const announcements: AnnouncementItem[] = [
-   {
+  {
+    id: "3",
+    title: "[공지] 콘서트 관람 유의사항",
+    date: "2026.04.09",
+    content: ["자세한 내용은 사진 참고 부탁드리며, 모두가 즐겁게 공연을 즐길 수 있도록 배려 부탁드립니다."],
+    localizedImages: [
+      {
+        label: "한국어",
+        content: ["자세한 내용은 사진 참고 부탁드리며, 모두가 즐겁게 공연을 즐길 수 있도록 배려 부탁드립니다."],
+        images: [{ src: "/images/concert/notice/03-1 한국어.jpg", alt: "공지 03 한국어" }],
+      },
+      {
+        label: "English",
+        content: ["Please refer to the image for details. We kindly ask for your cooperation so that everyone can enjoy the concert."],
+        images: [{ src: "/images/concert/notice/03-2 영어.jpg", alt: "공지 03 English" }],
+      },
+      {
+        label: "中文",
+        content: ["详细内容请参考图片。希望大家互相体谅，让所有人都能愉快地享受演出。"],
+        images: [{ src: "/images/concert/notice/03-3 중국어.jpg", alt: "公告 03 中文" }],
+      },
+      {
+        label: "日本語",
+        content: ["詳細は画像をご参照ください。皆が楽しくコンサートを楽しめるよう、ご配慮をお願いいたします。"],
+        images: [{ src: "/images/concert/notice/03-4 일본어.jpg", alt: "お知らせ 03 日本語" }],
+      },
+    ],
+  },
+  {
     id: "2",
     title: "[공지] EXO PLANET #6 - EXhOrizon 팬 이벤트 모금 공지",
     date: "2026.02.23",

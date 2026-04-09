@@ -83,7 +83,7 @@ function getLangKey(filename: string): LangKey {
 
 const YOUTUBE_BY_SLUG: Record<string, string> = {
   mama: "https://youtu.be/w09ZCW9PmqU",
-  wolf: "https://music.youtube.com/watch?v=nViHrml-LtU&si=_oQDihgFUChJOreh",
+  wolf: "https://youtu.be/laco0v52Tt0",
   growl: "https://youtu.be/GsvwMGhxWJk",
   overdose: "https://youtu.be/m91io9Tq20E",
   "call-me-baby": "https://youtu.be/Z_jlOWwQEwQ",
