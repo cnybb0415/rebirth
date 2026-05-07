@@ -1,37 +1,59 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
 
+import { useState } from "react";
 import { TossActionButton } from "@/components/AnnouncementDetailActions";
+import { cn } from "@/lib/utils";
+
+const LANGS = [
+  { label: "한국어", src: "/images/support/fund/모금공지.png", alt: "모금공지 한국어" },
+  { label: "English", src: "/images/support/fund/모금공지_en.png", alt: "Fundraising Notice English" },
+  { label: "中文", src: "/images/support/fund/모금공지_cn.png", alt: "募款公告 中文" },
+  { label: "日本語", src: "/images/support/fund/모금공지_jp.png", alt: "募金のお知らせ 日本語" },
+] as const;
 
 export default function SupportFundPage() {
+  const [activeLang, setActiveLang] = useState(0);
+
   return (
     <div className="min-h-screen bg-transparent text-foreground">
       <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
         <h1 className="text-2xl font-bold">모금공지</h1>
 
         <div className="mt-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>모금 공지</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-hidden rounded-2xl border border-foreground/10 bg-white">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src="/images/support/fund/%EB%AA%A8%EA%B8%88%EA%B3%B5%EC%A7%80.png"
-                  alt="모금공지"
-                  className="h-auto w-full"
-                  loading="lazy"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          {/* 언어 탭 */}
+          <div className="mb-3 flex gap-2">
+            {LANGS.map((lang, i) => (
+              <button
+                key={lang.label}
+                type="button"
+                onClick={() => setActiveLang(i)}
+                className={cn(
+                  "rounded-full border px-4 py-1.5 text-sm font-medium transition",
+                  activeLang === i
+                    ? "border-transparent bg-foreground text-background"
+                    : "border-foreground/15 bg-white text-foreground/70 hover:bg-foreground/5"
+                )}
+              >
+                {lang.label}
+              </button>
+            ))}
+          </div>
+
+          {/* 이미지 */}
+          <div className="overflow-hidden rounded-2xl border border-foreground/10 bg-white">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={LANGS[activeLang].src}
+              alt={LANGS[activeLang].alt}
+              className="h-auto w-full"
+              loading="lazy"
+            />
+          </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-2 justify-between">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-2">
           <div className="flex gap-2">
-            {/* TOSS Button */}
             <TossActionButton href="supertoss://send?bank=토스뱅크&accountNo=100159180057" label="TOSS" />
-            {/* PAYPAL Button */}
             <a
               href="https://paypal.me/EXOREBIRTH"
               target="_blank"
@@ -41,9 +63,8 @@ export default function SupportFundPage() {
               PAYPAL
             </a>
           </div>
-          {/* 입금 폼 작성 Button */}
           <a
-            href="https://docs.google.com/forms/d/e/1FAIpQLSe5yBba1sPzJQsy2rBqOP5PU6BZDfw7XmmR-H3nrS7yhhopBw/viewform?usp=send_form"
+            href="https://docs.google.com/forms/d/e/1FAIpQLSd1nF68HSKuxfRThMP0uBNx3ZVwUtlIfdq4lByRR2SVuTnTHg/viewform"
             target="_blank"
             rel="noreferrer"
             className="rounded-2xl border border-foreground/15 bg-white px-5 py-2.5 text-sm font-semibold text-foreground shadow-sm hover:border-foreground/35 hover:shadow-md"
