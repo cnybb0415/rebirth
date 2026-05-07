@@ -129,29 +129,32 @@ function GuideModal({ onClose }: { onClose: () => void }) {
           </button>
         </div>
 
-        {/* 슬라이드 전환 시 스크롤 위치 초기화 + 세로 스크롤 가능 */}
-        <div className="relative flex-1 min-h-0 bg-gray-50 overflow-hidden">
-          <div ref={scrollRef} className="absolute inset-0 overflow-y-auto overscroll-contain">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img.src} alt={img.alt} className="w-full h-auto block" />
-          </div>
-          <button
-            type="button"
-            onClick={() => setIdx((i) => (i - 1 + total) % total)}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 rounded-full bg-black/40 border border-white/20 p-2 text-white"
-            aria-label="이전"
-          >
-            <ChevronLeft size={16} />
-          </button>
-          <button
-            type="button"
-            onClick={() => setIdx((i) => (i + 1) % total)}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 rounded-full bg-black/40 border border-white/20 p-2 text-white"
-            aria-label="다음"
-          >
-            <ChevronRight size={16} />
-          </button>
+        {/* 이미지 스크롤 영역: overflow-y-auto를 flex-1에 직접 적용 */}
+        <div
+          ref={scrollRef}
+          className="flex-1 min-h-0 overflow-y-auto overscroll-contain bg-gray-50"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={img.src} alt={img.alt} className="w-full h-auto block" />
         </div>
+
+        {/* 화살표: 모달 컨테이너(relative) 기준으로 absolute 배치 */}
+        <button
+          type="button"
+          onClick={() => setIdx((i) => (i - 1 + total) % total)}
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 rounded-full bg-black/40 border border-white/20 p-2 text-white"
+          aria-label="이전"
+        >
+          <ChevronLeft size={16} />
+        </button>
+        <button
+          type="button"
+          onClick={() => setIdx((i) => (i + 1) % total)}
+          className="absolute right-2 top-1/2 -translate-y-1/2 z-10 rounded-full bg-black/40 border border-white/20 p-2 text-white"
+          aria-label="다음"
+        >
+          <ChevronRight size={16} />
+        </button>
 
         <div className="flex shrink-0 justify-center gap-2 py-3">
           {GUIDE_IMAGES.map((_, i) => (
