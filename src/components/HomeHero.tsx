@@ -35,7 +35,7 @@ export function HomeHero() {
   }, []);
 
   useEffect(() => {
-    const target = () => document.getElementById("home-latest");
+    const target = () => document.getElementById("home-quickview");
     const wheelCount = { current: 0 };
     const hideCount = { current: 0 };
     let resetTimer: number | null = null;

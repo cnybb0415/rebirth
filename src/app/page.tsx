@@ -5,6 +5,7 @@ import { QuickActionsBar } from "@/components/QuickActionsBar";
 import { ChartSummaryGrid } from "@/components/ChartSummaryGrid";
 import { getLatestTweet } from "@/lib/x";
 import { HomeHero } from "@/components/HomeHero";
+import { HomeQuickView } from "@/components/HomeQuickView";
 import type { ReactNode } from "react";
 
 export const dynamic = "force-dynamic";
@@ -103,78 +104,12 @@ export default async function Home() {
     <div className="min-h-screen bg-background text-foreground">
       <HomeHero />
       <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
-        <section className="grid gap-10 lg:grid-cols-2 lg:items-start">
-          {/* Left: latest posts */}
-          <div id="home-latest" className="rounded-2xl border border-foreground/10 bg-white p-5 shadow-sm">
-            <div className="mx-auto w-full max-w-3xl">
-              <div className="flex items-center justify-between">
-                <div>
-                  <div className="text-base font-semibold">최신 게시물</div>
-                  <div className="text-sm text-foreground/60">X @weareoneEXO</div>
-                </div>
-                <a
-                  href={siteConfig.contacts.twitterUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm font-medium text-foreground/70 hover:text-foreground"
-                >
-                  X로 이동
-                </a>
-              </div>
-              <div className="mt-4">
-                {latestTweet ? (
-                  <article className="rounded-xl border border-white/10 bg-neutral-900 p-3 text-white shadow-sm">
-                    <div className="text-sm font-semibold text-white/90">@{latestTweet.username}</div>
-                    <p className="mt-2 whitespace-pre-wrap text-sm text-white/90">
-                      {latestTweet.text}
-                    </p>
-                    {latestTweet.mediaUrl || latestTweet.previewImageUrl ? (
-                      <div className="mt-3 overflow-hidden rounded-lg border border-white/10">
-                        <img
-                          src={latestTweet.mediaUrl ?? latestTweet.previewImageUrl}
-                          alt="X preview"
-                          className="aspect-square w-full object-cover"
-                          loading="lazy"
-                        />
-                      </div>
-                    ) : null}
-                    {latestTweet.previewUrl ? (
-                      <a
-                        href={latestTweet.previewUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="mt-2 block text-xs text-sky-300 hover:text-sky-200"
-                      >
-                        {latestTweet.previewUrl}
-                      </a>
-                    ) : null}
-                    <div className="mt-3 flex items-center justify-between text-xs text-white/60">
-                      {latestTweet.createdAt ? (
-                        <span>{new Date(latestTweet.createdAt).toLocaleString("ko-KR")}</span>
-                      ) : (
-                        <span />
-                      )}
-                      <a
-                        href={latestTweet.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="font-medium text-white/80 hover:text-white"
-                      >
-                        게시물 보기
-                      </a>
-                    </div>
-                  </article>
-                ) : (
-                  <div className="rounded-xl border border-foreground/10 bg-white p-4 text-sm text-foreground/60">
-                    최신 게시물을 불러오지 못했습니다.
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+        <section id="home-quickview" className="grid gap-10 lg:grid-cols-2">
+          {/* Left: schedule + active votes */}
+          <HomeQuickView />
 
           {/* Right: actions */}
-          <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+          <div className="flex flex-col items-center text-center lg:items-start lg:justify-between lg:text-left">
             <div className="w-full max-w-md">
               <img
                 src="/images/logo_width.png"
@@ -244,8 +179,72 @@ export default async function Home() {
           </div>
         </section>
 
-        <div className="mt-10 border-t border-foreground/10" />
+        {/* Latest X post */}
+        <section id="home-latest" className="mt-10 rounded-2xl border border-foreground/10 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="text-base font-semibold">최신 게시물</div>
+              <div className="text-sm text-foreground/60">X @weareoneEXO</div>
+            </div>
+            <a
+              href={siteConfig.contacts.twitterUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-foreground/70 hover:text-foreground"
+            >
+              X로 이동
+            </a>
+          </div>
+          <div className="mt-4">
+            {latestTweet ? (
+              <article className="rounded-xl border border-white/10 bg-neutral-900 p-3 text-white shadow-sm">
+                <div className="text-sm font-semibold text-white/90">@{latestTweet.username}</div>
+                <p className="mt-2 whitespace-pre-wrap text-sm text-white/90">{latestTweet.text}</p>
+                {latestTweet.mediaUrl || latestTweet.previewImageUrl ? (
+                  <div className="mt-3 overflow-hidden rounded-lg border border-white/10">
+                    <img
+                      src={latestTweet.mediaUrl ?? latestTweet.previewImageUrl}
+                      alt="X preview"
+                      className="aspect-square w-full object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                ) : null}
+                {latestTweet.previewUrl ? (
+                  <a
+                    href={latestTweet.previewUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-2 block text-xs text-sky-300 hover:text-sky-200"
+                  >
+                    {latestTweet.previewUrl}
+                  </a>
+                ) : null}
+                <div className="mt-3 flex items-center justify-between text-xs text-white/60">
+                  {latestTweet.createdAt ? (
+                    <span>{new Date(latestTweet.createdAt).toLocaleString("ko-KR")}</span>
+                  ) : (
+                    <span />
+                  )}
+                  <a
+                    href={latestTweet.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="font-medium text-white/80 hover:text-white"
+                  >
+                    게시물 보기
+                  </a>
+                </div>
+              </article>
+            ) : (
+              <div className="rounded-xl border border-foreground/10 bg-white p-4 text-sm text-foreground/60">
+                최신 게시물을 불러오지 못했습니다.
+              </div>
+            )}
+          </div>
+        </section>
 
+        <div className="mt-10 border-t border-foreground/10" />
 
         <section className="mt-2 rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
           <ChartSummaryGrid trackTitle={siteConfig.trackTitle} charts={charts} moreHref="/charts" />
@@ -273,7 +272,6 @@ export default async function Home() {
             </div>
           </div>
         </section>
-
 
       </main>
     </div>
