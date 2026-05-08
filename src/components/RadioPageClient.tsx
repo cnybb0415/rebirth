@@ -295,9 +295,9 @@ function StationCard({ station, mins }: { station: RadioStation; mins: number })
           : "bg-foreground/10"
       )} />
 
-      <div className="flex flex-1 flex-col justify-center gap-1 px-3.5 py-3">
+      <div className="flex min-w-0 flex-1 flex-col justify-center gap-1 px-3.5 py-3">
         <div className="flex items-center justify-between gap-2">
-          <div>
+          <div className="min-w-0">
             <span className="text-sm font-bold">{station.name}</span>
             <span className="ml-2 text-xs text-foreground/40">{station.frequency}</span>
           </div>
@@ -314,9 +314,9 @@ function StationCard({ station, mins }: { station: RadioStation; mins: number })
         {!hasSchedule ? (
           <p className="text-xs text-foreground/30">편성표 없음</p>
         ) : current ? (
-          <div className="flex items-baseline gap-1.5">
-            <span className="text-[10px] font-bold text-rose-500 leading-none">NOW</span>
-            <span className="truncate text-sm font-medium">{current.name}</span>
+          <div className="flex min-w-0 items-baseline gap-1.5">
+            <span className="shrink-0 text-[10px] font-bold text-rose-500 leading-none">NOW</span>
+            <span className="min-w-0 truncate text-sm font-medium">{current.name}</span>
             <span className="shrink-0 text-[10px] text-foreground/40 tabular-nums">
               {formatTime(current.start)}~{current.end === 0 ? "00:00" : formatTime(current.end)}
             </span>
@@ -330,7 +330,7 @@ function StationCard({ station, mins }: { station: RadioStation; mins: number })
         )}
       </div>
 
-      <div className="flex flex-col items-center justify-center gap-1 border-l border-foreground/5 px-3.5">
+      <div className="flex shrink-0 flex-col items-center justify-center gap-1 border-l border-foreground/5 px-3.5">
         <span className="text-[10px] text-foreground/40">{station.smsTo}</span>
         <span className="rounded-xl bg-foreground px-3 py-1.5 text-[11px] font-semibold text-background transition group-hover:bg-foreground/80">
           문자
