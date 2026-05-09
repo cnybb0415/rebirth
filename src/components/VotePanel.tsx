@@ -70,8 +70,8 @@ function VoteCard({ item }: { item: VoteItem }) {
   const hasRank = item.rank && item.rank !== "";
   const rankLabel = hasRank
     ? item.percent
-      ? t("rankLabelWithPercent", { rank: item.rank, percent: item.percent })
-      : t("rankLabel", { rank: item.rank })
+      ? t("rankLabelWithPercent", { rank: String(item.rank), percent: String(item.percent) })
+      : t("rankLabel", { rank: String(item.rank) })
     : null;
 
   return (
