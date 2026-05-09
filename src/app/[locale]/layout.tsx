@@ -4,6 +4,11 @@ import { getMessages, setRequestLocale } from "next-intl/server";
 import { siteConfig } from "@/config/site";
 import { ShellWrapper } from "@/components/ShellWrapper";
 import { SetHtmlLang } from "@/components/SetHtmlLang";
+import { routing } from "@/i18n/routing";
+
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
 
 export const metadata: Metadata = {
   title: siteConfig.title,
