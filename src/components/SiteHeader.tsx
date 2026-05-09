@@ -125,6 +125,12 @@ export function SiteHeader() {
                 <Link href="/schedule" className="rounded-lg px-2 py-2 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
                   스케줄
                 </Link>
+                <Link href="/radio" className="rounded-lg px-2 py-2 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
+                  라디오
+                </Link>
+                <Link href="/kwangya119" className="rounded-lg px-2 py-2 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
+                  KWANGYA 119
+                </Link>
                 <div>
                   <button
                     type="button"

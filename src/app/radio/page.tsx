@@ -24,12 +24,20 @@ function rawToPrograms(
   if (!raw.length) return [];
   const items = raw.map((p) => ({ name: p.name, start: t(p.time) }));
   const patterns = SELECTABLE_PATTERNS[stationId] ?? [];
-  return items.map((p, i) => ({
-    name: p.name,
-    start: p.start,
-    end: items[(i + 1) % items.length].start,
-    selectable: patterns.some((pat) => p.name.includes(pat)),
-  }));
+  return items.map((p, i) => {
+    const circularEnd = items[(i + 1) % items.length].start;
+    const duration = circularEnd > p.start
+      ? circularEnd - p.start
+      : circularEnd + 1440 - p.start;
+    // 마지막 프로그램이 첫 프로그램으로 순환할 때 5시간 초과면 자정 처리
+    const end = i === items.length - 1 && duration > 300 ? 0 : circularEnd;
+    return {
+      name: p.name,
+      start: p.start,
+      end,
+      selectable: patterns.some((pat) => p.name.includes(pat)),
+    };
+  });
 }
 
 function fmtTime(raw: string): string {
