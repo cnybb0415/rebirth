@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { PixelButton } from "./PixelButton";
 
 const ACCENT = "#ffd700";
@@ -14,11 +15,13 @@ const PIXEL_FONT: React.CSSProperties = {
 
 export function FundingFormModal() {
   const [open, setOpen] = useState(false);
+  const t = useTranslations("support");
+  const tc = useTranslations("common");
 
   return (
     <>
       <PixelButton
-        label="입금 폼 작성"
+        label={t("depositForm")}
         accentColor="#4CFF7A"
         shadowColor="#1E8A3B"
         textColor="#031A0B"
@@ -29,7 +32,7 @@ export function FundingFormModal() {
         <div
           role="dialog"
           aria-modal="true"
-          aria-label="입금 폼 작성"
+          aria-label={t("depositForm")}
           style={{
             position: "fixed",
             inset: 0,
@@ -38,7 +41,6 @@ export function FundingFormModal() {
             alignItems: "center",
             justifyContent: "center",
             backgroundColor: "rgba(0,0,0,0.88)",
-            /* safe-area 패딩으로 상단/하단 네비게이션 바 겹침 방지 */
             paddingTop: "max(0px, env(safe-area-inset-top))",
             paddingRight: "max(12px, env(safe-area-inset-right))",
             paddingBottom: "max(16px, env(safe-area-inset-bottom))",
@@ -51,17 +53,17 @@ export function FundingFormModal() {
         >
           <div
             style={{
-  width: "min(920px, calc(100vw - 24px))",   // ✅ 더 넓게
-  maxHeight: "min(900px, 90vh)",             // ✅ 더 크게 (하지만 풀스크린 X)
-  display: "flex",
-  flexDirection: "column",
-  background:
-    "linear-gradient(170deg, rgba(10,12,28,0.99) 0%, rgba(5,7,18,1) 100%)",
-  border: `2.5px solid ${ACCENT}`,
-  boxShadow: `0 0 40px ${ACCENT}33, 0 20px 60px rgba(0,0,0,0.8)`,
-  borderRadius: "16px",
-  overflow: "hidden",
-}}
+              width: "min(920px, calc(100vw - 24px))",
+              maxHeight: "min(900px, 90vh)",
+              display: "flex",
+              flexDirection: "column",
+              background:
+                "linear-gradient(170deg, rgba(10,12,28,0.99) 0%, rgba(5,7,18,1) 100%)",
+              border: `2.5px solid ${ACCENT}`,
+              boxShadow: `0 0 40px ${ACCENT}33, 0 20px 60px rgba(0,0,0,0.8)`,
+              borderRadius: "16px",
+              overflow: "hidden",
+            }}
           >
             {/* ── 헤더 ── */}
             <div
@@ -83,7 +85,7 @@ export function FundingFormModal() {
                   color: ACCENT,
                 }}
               >
-                💰 입금 폼 작성
+                💰 {t("depositForm")}
               </span>
 
               <div style={{ display: "flex", gap: "3px" }}>
@@ -101,7 +103,7 @@ export function FundingFormModal() {
 
               <button
                 type="button"
-                aria-label="닫기"
+                aria-label={tc("close")}
                 onClick={() => setOpen(false)}
                 style={{
                   background: "none",
@@ -127,17 +129,16 @@ export function FundingFormModal() {
                     "rgba(255,215,0,0.7)";
                 }}
               >
-                ✕ 닫기
+                ✕ {tc("close")}
               </button>
             </div>
 
-            {/* ── Google Form iframe (스크롤 가능) ── */}
+            {/* ── Google Form iframe ── */}
             <div
               style={{
                 flex: 1,
                 overflow: "auto",
                 position: "relative",
-                /* 최소 높이로 스크롤 없이 볼 수 있는 영역 확보 */
                 minHeight: "400px",
               }}
             >
@@ -145,12 +146,11 @@ export function FundingFormModal() {
                 src={FORM_EMBED_URL}
                 style={{
                   width: "100%",
-                  /* iframe 내부 높이를 충분히 설정해 스크롤 가능하게 */
                   height: "400px",
                   border: "none",
                   display: "block",
                 }}
-                title="입금 폼"
+                title={t("depositForm")}
                 loading="lazy"
               />
             </div>

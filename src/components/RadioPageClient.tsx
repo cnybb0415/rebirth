@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
 import { openSms } from "@/lib/sms";
 import { cn } from "@/lib/utils";
 import { X, ChevronLeft, ChevronRight, BookOpen, AlignJustify } from "lucide-react";
@@ -88,6 +89,7 @@ function useBodyScrollLock() {
 
 // ── 가이드 모달 ────────────────────────────────────────
 function GuideModal({ onClose }: { onClose: () => void }) {
+  const t = useTranslations("radio");
   const [idx, setIdx] = React.useState(0);
   const total = GUIDE_IMAGES.length;
   const scrollRef = React.useRef<HTMLDivElement>(null);
@@ -121,7 +123,7 @@ function GuideModal({ onClose }: { onClose: () => void }) {
       >
         <div className="flex shrink-0 items-center justify-between border-b px-4 py-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold">라디오 신청 가이드</span>
+            <span className="text-sm font-semibold">{t("guideModalTitle")}</span>
             <span className="text-xs text-foreground/40">{idx + 1} / {total}</span>
           </div>
           <button type="button" onClick={onClose} className="rounded-full p-1.5 hover:bg-foreground/5">
@@ -143,7 +145,7 @@ function GuideModal({ onClose }: { onClose: () => void }) {
           type="button"
           onClick={() => setIdx((i) => (i - 1 + total) % total)}
           className="absolute left-2 top-1/2 -translate-y-1/2 z-10 rounded-full bg-black/40 border border-white/20 p-2 text-white"
-          aria-label="이전"
+          aria-label={t("prev")}
         >
           <ChevronLeft size={16} />
         </button>
@@ -151,7 +153,7 @@ function GuideModal({ onClose }: { onClose: () => void }) {
           type="button"
           onClick={() => setIdx((i) => (i + 1) % total)}
           className="absolute right-2 top-1/2 -translate-y-1/2 z-10 rounded-full bg-black/40 border border-white/20 p-2 text-white"
-          aria-label="다음"
+          aria-label={t("next")}
         >
           <ChevronRight size={16} />
         </button>
@@ -185,6 +187,7 @@ function FullScheduleModal({
   mins: number;
   stations: RadioStation[];
 }) {
+  const t = useTranslations("radio");
   const stationsWithSchedule = stations.filter((s) => s.programs.length > 0);
   const [activeId, setActiveId] = React.useState(stationsWithSchedule[0]?.id ?? "");
   useBodyScrollLock();
@@ -208,7 +211,7 @@ function FullScheduleModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex shrink-0 items-center justify-between border-b px-4 py-3">
-          <span className="text-sm font-semibold">전체 편성표</span>
+          <span className="text-sm font-semibold">{t("fullScheduleTitle")}</span>
           <button type="button" onClick={onClose} className="rounded-full p-1.5 hover:bg-foreground/5">
             <X size={16} />
           </button>
@@ -261,11 +264,11 @@ function FullScheduleModal({
         <div className="flex shrink-0 items-center gap-4 border-t bg-foreground/[0.02] px-4 py-2.5">
           <span className="flex items-center gap-1 text-[10px] text-foreground/40">
             <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            선정 가능
+            {t("selectableLegend")}
           </span>
           <span className="flex items-center gap-1 text-[10px] text-foreground/40">
             <span className="text-[10px] font-bold text-rose-500">NOW</span>
-            현재 방송중
+            {t("nowOnAir")}
           </span>
         </div>
       </div>
@@ -275,6 +278,7 @@ function FullScheduleModal({
 
 // ── 스테이션 카드 ──────────────────────────────────────
 function StationCard({ station, mins }: { station: RadioStation; mins: number }) {
+  const t = useTranslations("radio");
   const current = getCurrentProgram(station, mins);
   const hasSchedule = station.programs.length > 0;
   const nextSelectableTime =
@@ -306,13 +310,13 @@ function StationCard({ station, mins }: { station: RadioStation; mins: number })
               "shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold",
               current.selectable ? "bg-emerald-100 text-emerald-700" : "bg-neutral-100 text-neutral-500"
             )}>
-              {current.selectable ? "선정가능" : "선정불가"}
+              {current.selectable ? t("selectableOn") : t("selectableOff")}
             </span>
           )}
         </div>
 
         {!hasSchedule ? (
-          <p className="text-xs text-foreground/30">편성표 없음</p>
+          <p className="text-xs text-foreground/30">{t("noSchedule")}</p>
         ) : current ? (
           <div className="flex min-w-0 items-baseline gap-1.5">
             <span className="shrink-0 text-[10px] font-bold text-rose-500 leading-none">NOW</span>
@@ -322,18 +326,18 @@ function StationCard({ station, mins }: { station: RadioStation; mins: number })
             </span>
           </div>
         ) : (
-          <p className="text-xs text-foreground/30">현재 방송 없음</p>
+          <p className="text-xs text-foreground/30">{t("noCurrentBroadcast")}</p>
         )}
 
         {nextSelectableTime && (
-          <p className="text-[10px] text-amber-600">다음 신청 가능: {nextSelectableTime}</p>
+          <p className="text-[10px] text-amber-600">{t("nextSelectable")}: {nextSelectableTime}</p>
         )}
       </div>
 
       <div className="flex shrink-0 flex-col items-center justify-center gap-1 border-l border-foreground/5 px-3.5">
         <span className="text-[10px] text-foreground/40">{station.smsTo}</span>
         <span className="rounded-xl bg-foreground px-3 py-1.5 text-[11px] font-semibold text-background transition group-hover:bg-foreground/80">
-          문자
+          {t("smsBtn")}
         </span>
       </div>
     </button>
@@ -342,6 +346,7 @@ function StationCard({ station, mins }: { station: RadioStation; mins: number })
 
 // ── 메인 클라이언트 컴포넌트 ───────────────────────────
 export function RadioPageClient({ stations }: { stations: RadioStation[] }) {
+  const t = useTranslations("radio");
   const [mins, setMins] = React.useState<number | null>(null);
   const [showGuide, setShowGuide] = React.useState(false);
   const [showSchedule, setShowSchedule] = React.useState(false);
@@ -367,10 +372,10 @@ export function RadioPageClient({ stations }: { stations: RadioStation[] }) {
         <main className="mx-auto w-full max-w-2xl px-3 py-10 sm:px-6 sm:py-14">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-xl font-semibold">원클릭 라디오 문자 신청</h1>
+              <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
               {mins !== null && (
                 <p className="mt-0.5 text-xs text-foreground/40">
-                  KST {formatTime(mins)} 기준 · 평일 편성 기준
+                  {t("timeNote", { time: formatTime(mins) })}
                 </p>
               )}
             </div>
@@ -381,7 +386,7 @@ export function RadioPageClient({ stations }: { stations: RadioStation[] }) {
                 className="flex items-center gap-1.5 rounded-full border border-foreground/15 bg-white px-3 py-1.5 text-xs font-medium text-foreground/70 shadow-sm hover:bg-foreground/5"
               >
                 <BookOpen size={12} />
-                가이드
+                {t("guideBtn")}
               </button>
               <button
                 type="button"
@@ -389,7 +394,7 @@ export function RadioPageClient({ stations }: { stations: RadioStation[] }) {
                 className="flex items-center gap-1.5 rounded-full border border-foreground/15 bg-white px-3 py-1.5 text-xs font-medium text-foreground/70 shadow-sm hover:bg-foreground/5"
               >
                 <AlignJustify size={12} />
-                편성표
+                {t("scheduleBtn")}
               </button>
             </div>
           </div>

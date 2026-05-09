@@ -4,6 +4,7 @@ import type { ChartsData } from "@/lib/charts";
 import { cn } from "@/lib/utils";
 import { MusicServiceIcon, resolveMusicServiceIdFromLabel } from "@/components/MusicServiceIcon";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
 type ProviderKey = "melon" | "genie" | "bugs" | "flo" | "vibe" | "other" | "all";
 
@@ -113,6 +114,7 @@ function ProviderPill({
 }
 
 export function ChartsPanel({ charts }: { charts: ChartsData }) {
+  const t = useTranslations("charts");
   const grouped = useMemo(() => {
     const byProvider = new Map<Exclude<ProviderKey, "all">, ChartsData["items"]>();
     for (const item of charts.items) {
@@ -141,13 +143,13 @@ export function ChartsPanel({ charts }: { charts: ChartsData }) {
     <div>
       <div className="flex items-baseline justify-between gap-3">
         <p className="text-xs text-neutral-400">
-          업데이트: {formatKstTimestampTopOfHour(charts.lastUpdated)} KST
+          {t("updatedLabel")} {formatKstTimestampTopOfHour(charts.lastUpdated)} KST
         </p>
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-6">
         <ProviderPill
-          label="전체"
+          label={t("all")}
           isActive={active === "all"}
           color="#111827"
           onClick={() => setActive("all")}
@@ -165,14 +167,14 @@ export function ChartsPanel({ charts }: { charts: ChartsData }) {
 
       <div className="mt-5 overflow-hidden rounded-xl border border-neutral-100">
         <div className="flex items-center text-xs text-neutral-400 h-10 border-b border-neutral-100 bg-neutral-50">
-          <p className="w-12 text-center">순위</p>
-          <div className="flex-1 px-3">차트</div>
-          <p className="w-14 text-center">변동</p>
+          <p className="w-12 text-center">{t("rank")}</p>
+          <div className="flex-1 px-3">{t("chartCol")}</div>
+          <p className="w-14 text-center">{t("change")}</p>
         </div>
 
         {rows.length === 0 ? (
           <div className="flex h-24 items-center justify-center text-sm text-neutral-500">
-            차트 데이터가 없습니다
+            {t("noData")}
           </div>
         ) : (
           rows.map((item) => {
@@ -182,7 +184,7 @@ export function ChartsPanel({ charts }: { charts: ChartsData }) {
             const statusText =
               typeof item.rank === "number"
                 ? null
-                : (item.status ?? "차트 데이터가 없습니다").trim();
+                : (item.status ?? t("noData")).trim();
 
             return (
               <div

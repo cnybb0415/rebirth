@@ -1,5 +1,10 @@
-export function formatCompactNumber(value: number): string {
-  return new Intl.NumberFormat("ko-KR", {
+export function formatCompactNumber(value: number, locale = "ko"): string {
+  const intlLocale =
+    locale === "zh" ? "zh-CN" :
+    locale === "ja" ? "ja-JP" :
+    locale === "en" ? "en-US" :
+    "ko-KR";
+  return new Intl.NumberFormat(intlLocale, {
     notation: "compact",
     maximumFractionDigits: 1,
   }).format(value);

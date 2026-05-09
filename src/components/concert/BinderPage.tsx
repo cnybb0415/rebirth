@@ -1,4 +1,5 @@
-import Link from "next/link";
+import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 
 // ─────────────────────────────────────────────────────────
 //  카테고리 정의 — 탭 순서·색상·링크 변경은 여기서
@@ -54,6 +55,7 @@ interface BinderPageProps {
   activeTab?: CategoryId;
   /** 페이지 콘텐츠에 적용할 픽셀 폰트 패밀리 (기본: PFStarDust) */
   pixelFontFamily?: string;
+  locale: string;
 }
 
 const PIXEL_FONT: React.CSSProperties = {
@@ -70,10 +72,26 @@ const PIXEL_FONT: React.CSSProperties = {
 // ─────────────────────────────────────────────────────────
 const TAB_W = 25;        // px — 줄일수록 탭이 얇아지고 본문이 넓어짐
 const TAB_H = 80;        // px — 높이는 모든 탭에 동일 적용
-const TAB_FONT_SIZE  = "0.65rem"; // 탭 세로 글자 크기
 const TAB_EMOJI_SIZE = "0.8rem";  // 탭 이모지 크기
 
-export function BinderPage({ children, activeTab, pixelFontFamily }: BinderPageProps) {
+// 로케일별 탭 텍스트 스타일 (zh/ja는 글자가 많아 작은 폰트+좁은 자간 사용)
+function getTabTextStyle(locale: string): { fontSize: string; letterSpacing: string } {
+  if (locale === "ja") return { fontSize: "0.55rem", letterSpacing: "0.04em" };
+  if (locale === "zh") return { fontSize: "0.60rem", letterSpacing: "0.1em" };
+  if (locale === "en") return { fontSize: "0.65rem", letterSpacing: "0.05em" };
+  return { fontSize: "0.65rem", letterSpacing: "0.35em" }; // ko default
+}
+
+export async function BinderPage({ children, activeTab, pixelFontFamily, locale }: BinderPageProps) {
+  setRequestLocale(locale);
+  const t = await getTranslations("concert");
+  const tabLabels: Record<CategoryId, string> = {
+    cheer: t("tab.cheer"),
+    chorus: t("tab.chorus"),
+    helper: t("tab.helper"),
+    funding: t("tab.funding"),
+    notice: t("tab.notice"),
+  };
   return (
     /* 바깥 여백 — 모바일에서 사방 숨쉬기 */
     <div
@@ -142,21 +160,22 @@ export function BinderPage({ children, activeTab, pixelFontFamily }: BinderPageP
                   {cat.emoji}
                 </span>
 
-                {/* 세로 텍스트 — Mulmaru: 기기 간 폭 일관성 보장 */}
+                {/* 세로 텍스트 */}
                 <span
                   className="flex-1 flex items-center justify-center"
                   style={{
                     writingMode: "vertical-rl",
-                    textOrientation: "upright",
-                    fontFamily: "'PFStarDust', monospace",
+                    textOrientation: locale === "ko" ? "upright" : "mixed",
+                    fontFamily: locale === "ko"
+                      ? "'PFStarDust', monospace"
+                      : "'Mulmaru', 'PFStarDust', monospace",
                     WebkitFontSmoothing: "none",
                     fontWeight: 800,
-                    fontSize: TAB_FONT_SIZE,
-                    letterSpacing: "0.4em",
+                    ...getTabTextStyle(locale),
                     color: isActive ? cat.textColor : "#1a1020",
                   }}
                 >
-                  {cat.title}
+                  {tabLabels[cat.id]}
                 </span>
               </Link>
             );

@@ -44,19 +44,14 @@ function IconMusic({ size = 18 }: { size?: number }) {
   );
 }
 
-const actionIcons: Record<string, React.ReactNode> = {
-  "원클릭 스트리밍": <IconMusic />,
-  "KWANGYA 119 신고하기": (
-    <img src="/images/icon/siren.png" alt="" className="relative top-[-1.5px] h-4 w-4" />
-  ),
-  "REVERXE 앨범구매": <ShoppingBag size={18} />,
-  "앨범 구매": <ShoppingBag size={18} />,
-  "라디오 신청하기": <Radio size={18} />,
-  "생방송 문자투표": <MessageSquare size={18} />,
-  "가이드": <IconBookClosed />,
-  "응원법": <Megaphone size={18} />,
-  "음악방송 사전투표": <Vote size={18} />,
-  "투표": <Vote size={18} />,
+const kindIcons: Record<string, React.ReactNode> = {
+  streamingModal: <IconMusic />,
+  albumModal: <ShoppingBag size={18} />,
+  smsVote: <MessageSquare size={18} />,
+  kwangya: <img src="/images/icon/siren.png" alt="" className="relative top-[-1.5px] h-4 w-4" />,
+  radio: <Radio size={18} />,
+  guide: <IconBookClosed />,
+  vote: <Vote size={18} />,
 };
 
 import * as React from "react";
@@ -65,11 +60,13 @@ import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { OneClickStreamingGrid, type OneClickStreamingLink } from "@/components/OneClickStreamingGrid";
 import { buildSmsHref, detectSmsPlatform } from "@/lib/sms";
+import { Link } from "@/i18n/navigation";
+import { useTranslations } from "next-intl";
 
 export type QuickAction = {
   label: string;
   href: string;
-  kind?: "streamingModal" | "albumModal" | "smsVote";
+  kind?: "streamingModal" | "albumModal" | "smsVote" | "kwangya" | "radio" | "guide" | "vote";
   smsTo?: string;
   smsBody?: string;
 };
@@ -81,16 +78,15 @@ export type QuickLink = {
 
 type ModalType = "streaming" | "album";
 
-function renderActionLabel(label: string) {
-  if (label === "KWANGYA 119 신고하기") {
+function renderActionLabel(label: string, kind?: string) {
+  if (kind === "kwangya") {
     return (
       <>
         <span className="sm:hidden">KWANGYA 119</span>
-        <span className="hidden sm:inline">KWANGYA 119 신고하기</span>
+        <span className="hidden sm:inline">{label}</span>
       </>
     );
   }
-
   return label;
 }
 
@@ -115,6 +111,7 @@ export function QuickActionsBar({
   buttonSize?: React.ComponentProps<typeof Button>["size"];
   buttonClassName?: string;
 }) {
+  const t = useTranslations("common");
   const [openModal, setOpenModal] = React.useState<ModalType | null>(null);
 
   const openSmsVote = React.useCallback((action: QuickAction) => {
@@ -186,7 +183,8 @@ export function QuickActionsBar({
         const isAlbum = action.kind === "albumModal" || legacyAlbum;
         const isSmsVote = action.kind === "smsVote";
 
-        const labelNode = renderActionLabel(action.label);
+        const icon = action.kind ? kindIcons[action.kind] : null;
+        const labelNode = renderActionLabel(action.label, action.kind);
         const shared = {
           variant: buttonVariant,
           size: buttonSize,
@@ -196,13 +194,9 @@ export function QuickActionsBar({
 
         if (isStreaming) {
           return (
-            <Button
-              key={action.label}
-              {...shared}
-              onClick={openStreamingModal}
-            >
+            <Button key={action.label} {...shared} onClick={openStreamingModal}>
               <span className="inline-flex items-center gap-2 justify-center align-middle h-[22px]">
-                <span className={action.label === "가이드" ? "flex items-center h-full relative top-[1px]" : "flex items-center h-full"}>{actionIcons[action.label]}</span>
+                <span className="flex items-center h-full">{icon}</span>
                 <span className="flex items-center h-full">{labelNode}</span>
               </span>
             </Button>
@@ -211,15 +205,8 @@ export function QuickActionsBar({
 
         if (isAlbum) {
           return (
-            <Button
-              key={action.label}
-              {...shared}
-              onClick={openAlbumModal}
-            >
-              <span className="inline-flex items-center gap-2">
-                {actionIcons[action.label]}
-                {labelNode}
-              </span>
+            <Button key={action.label} {...shared} onClick={openAlbumModal}>
+              <span className="inline-flex items-center gap-2">{icon}{labelNode}</span>
             </Button>
           );
         }
@@ -227,31 +214,38 @@ export function QuickActionsBar({
         if (isSmsVote) {
           return (
             <Button key={action.label} {...shared} onClick={() => openSmsVote(action)}>
-              <span className="inline-flex items-center gap-2">
-                {actionIcons[action.label]}
-                {labelNode}
-              </span>
+              <span className="inline-flex items-center gap-2">{icon}{labelNode}</span>
             </Button>
           );
         }
 
         const isExternal = action.href.startsWith("http") || action.href.startsWith("sms:");
 
+        if (isExternal) {
+          return (
+            <a
+              key={action.label}
+              href={action.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full"
+            >
+              <Button {...shared}>
+                <span className="inline-flex items-center gap-2">
+                  {icon}
+                  {labelNode}
+                </span>
+              </Button>
+            </a>
+          );
+        }
+
         return (
-          <a
-            key={action.label}
-            href={action.href}
-            target={isExternal && action.href.startsWith("http") ? "_blank" : undefined}
-            rel={isExternal && action.href.startsWith("http") ? "noopener noreferrer" : undefined}
-            className="w-full"
-          >
+          <Link key={action.label} href={action.href} className="w-full">
             <Button {...shared}>
-              <span className="inline-flex items-center gap-2">
-                {actionIcons[action.label]}
-                {labelNode}
-              </span>
+              <span className="inline-flex items-center gap-2">{icon}{labelNode}</span>
             </Button>
-          </a>
+          </Link>
         );
       })}
     </div>
@@ -270,7 +264,7 @@ export function QuickActionsBar({
       {openModal ? (
         <div className="fixed inset-0 z-40">
           <button
-            aria-label="닫기"
+            aria-label={t("close")}
             className="absolute inset-0 bg-black/40 backdrop-blur-sm"
             onClick={closeModal}
           />
@@ -278,15 +272,15 @@ export function QuickActionsBar({
           <div
             role="dialog"
             aria-modal="true"
-            aria-label={openModal === "streaming" ? "스트리밍 리스트" : "앨범 구매"}
+            aria-label={openModal === "streaming" ? t("streamingList") : t("albumBuy")}
             className="relative mx-auto mt-24 w-[min(520px,calc(100%-2rem))] rounded-2xl border border-foreground/10 bg-background p-4 shadow-xl"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="text-base font-semibold">
-                {openModal === "streaming" ? "스트리밍 리스트" : "앨범 구매"}
+                {openModal === "streaming" ? t("streamingList") : t("albumBuy")}
               </div>
               <Button size="sm" variant="ghost" onClick={closeModal}>
-                닫기
+                {t("close")}
               </Button>
             </div>
 
@@ -302,7 +296,7 @@ export function QuickActionsBar({
                   </div>
                 ) : (
                   <div className="mt-4 rounded-xl border border-foreground/10 bg-white p-3 text-sm text-foreground/70">
-                    원클릭 스트리밍 링크 준비중
+                    {t("streamingPreparing")}
                   </div>
                 )}
               </>

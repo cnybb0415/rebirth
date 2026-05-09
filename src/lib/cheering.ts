@@ -72,12 +72,12 @@ export type CheeringSong = {
   guideByLang: Record<LangKey, CheeringSongAsset[]>; // 언어별
 };
 
-/** 파일명 suffix로 언어 키 판별 */
+/** 파일명 suffix로 언어 키 판별 (_en/_eng, _zh/_cn, _ja/_jp 모두 지원) */
 function getLangKey(filename: string): LangKey {
   const base = path.basename(filename, path.extname(filename));
-  if (base.endsWith("_eng")) return "en";
-  if (base.endsWith("_cn"))  return "cn";
-  if (base.endsWith("_jp"))  return "jp";
+  if (base.endsWith("_en") || base.endsWith("_eng")) return "en";
+  if (base.endsWith("_zh") || base.endsWith("_cn"))  return "cn";
+  if (base.endsWith("_ja") || base.endsWith("_jp"))  return "jp";
   return "ko";
 }
 

@@ -1,7 +1,8 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import type { ChartItem, ChartsData } from "@/lib/charts";
 import { cn } from "@/lib/utils";
 import { MusicServiceIcon } from "@/components/MusicServiceIcon";
+import { getTranslations } from "next-intl/server";
 
 type ProviderKey = "melon" | "genie" | "bugs" | "flo" | "vibe";
 
@@ -97,8 +98,8 @@ function findItem(items: ChartItem[], matchLabels: string[]): ChartItem | undefi
   return items.find((item) => matchLabels.some((label) => item.label.includes(label)));
 }
 
-function getRankText(item?: ChartItem): { primary: string; suffix?: string } {
-  if (typeof item?.rank === "number") return { primary: String(item.rank), suffix: "위" };
+function getRankText(item?: ChartItem, rankSuffix?: string): { primary: string; suffix?: string } {
+  if (typeof item?.rank === "number") return { primary: String(item.rank), suffix: rankSuffix };
   if (typeof item?.status === "string" && item.status.trim().length > 0) {
     return { primary: item.status.trim() };
   }
@@ -200,7 +201,7 @@ function ClockIcon() {
   );
 }
 
-export function ChartSummaryGrid({
+export async function ChartSummaryGrid({
   trackTitle,
   charts,
   moreHref,
@@ -209,7 +210,8 @@ export function ChartSummaryGrid({
   charts: ChartsData;
   moreHref?: string;
 }) {
-  const safeTitle = trackTitle?.trim().length ? trackTitle.trim() : "노래제목";
+  const t = await getTranslations("charts");
+  const safeTitle = trackTitle?.trim().length ? trackTitle.trim() : t("title");
   const updated = formatKstTimestampTopOfHour(charts.lastUpdated);
 
   return (
@@ -217,7 +219,7 @@ export function ChartSummaryGrid({
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">
-            <span className="font-bold">{safeTitle}</span>의 실시간 차트
+            <span className="font-bold">{safeTitle}</span>{t("chartOf")}
           </h2>
           <div className="mt-1 flex items-center gap-2 text-xs text-neutral-400">
             <ClockIcon />
@@ -229,7 +231,7 @@ export function ChartSummaryGrid({
             href={moreHref}
             className="text-xs font-medium text-foreground/50 hover:text-foreground whitespace-nowrap pt-1"
           >
-            음원차트 더보기 →
+            {t("moreCharts")}
           </Link>
         ) : null}
       </div>
@@ -237,7 +239,8 @@ export function ChartSummaryGrid({
       <div className="mt-5 grid grid-cols-2 gap-1.5 sm:gap-4">
         {CARDS.map((card) => {
           const item = findItem(charts.items, card.matchLabels);
-          const rankText = getRankText(item);
+          const rankSuffix = t("rankSuffix");
+          const rankText = getRankText(item, rankSuffix || undefined);
           const change = getChange(item?.rank, item?.prevRank, item?.rankStatus, item?.changedRank);
 
           return (

@@ -1,14 +1,16 @@
-import Link from "next/link";
+import { Link } from "@/i18n/navigation";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCheeringSongs } from "@/lib/cheering";
+import { getTranslations } from "next-intl/server";
 
 export async function FanchantSongGrid({
   variant = "grid",
-  hrefBase = "/cheer",
+  hrefBase = "/concert/cheer",
 }: {
   variant?: "grid" | "list";
   hrefBase?: string;
 }) {
+  const t = await getTranslations("concert");
   const gridClassName =
     variant === "list" ? "grid gap-3" : "grid gap-3 sm:grid-cols-2";
 
@@ -51,7 +53,7 @@ export async function FanchantSongGrid({
                     {disabled ? (
                       <div className="absolute inset-0 grid place-items-center">
                         <span className="rounded-full bg-black/55 px-2 py-1 text-[11px] font-semibold text-white">
-                          준비중
+                          {t("preparing")}
                         </span>
                       </div>
                     ) : null}
@@ -64,7 +66,7 @@ export async function FanchantSongGrid({
                   </div>
 
                   <div className="mt-3 text-sm text-foreground/70">
-                    {disabled ? "준비중" : "응원법 보러가기 →"}
+                    {disabled ? t("preparing") : t("viewCheerGuide")}
                   </div>
                 </div>
               </div>

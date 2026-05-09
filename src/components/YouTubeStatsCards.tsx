@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useTranslations } from "next-intl";
+import { useLocale } from "next-intl";
 import { formatCompactNumber } from "@/lib/format";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -74,6 +76,8 @@ export function YouTubeStatsCards({
 }: {
   variant?: "cards" | "inline";
 }) {
+  const tc = useTranslations("common");
+  const locale = useLocale();
   const [state, setState] = React.useState<State>({ status: "idle" });
 
   React.useEffect(() => {
@@ -97,24 +101,24 @@ export function YouTubeStatsCards({
     return (
       <div className="grid grid-cols-2 items-center gap-3 border-t border-foreground/10 px-1 pt-3 text-sm">
         <div className="flex items-center justify-center gap-2 text-center">
-          <span className="text-foreground/60">조회수</span>
+          <span className="text-foreground/60">{tc("viewCount")}</span>
           <span className="font-semibold tabular-nums">
             {ready ? (
-              formatCompactNumber(state.data.viewCount)
+              formatCompactNumber(state.data.viewCount, locale)
             ) : errored ? (
-              "불러오기 실패"
+              tc("loadFail")
             ) : (
               <Skeleton className="h-5 w-16" />
             )}
           </span>
         </div>
         <div className="flex items-center justify-center gap-2 text-center">
-          <span className="text-foreground/60">좋아요</span>
+          <span className="text-foreground/60">{tc("likes")}</span>
           <span className="font-semibold tabular-nums">
             {ready ? (
-              formatCompactNumber(state.data.likeCount)
+              formatCompactNumber(state.data.likeCount, locale)
             ) : errored ? (
-              "불러오기 실패"
+              tc("loadFail")
             ) : (
               <Skeleton className="h-5 w-16" />
             )}
@@ -128,12 +132,12 @@ export function YouTubeStatsCards({
     <div className="mt-5 grid gap-3 sm:grid-cols-2">
       <Card>
         <CardContent className="p-4">
-          <div className="text-sm text-foreground">조회수</div>
+          <div className="text-sm text-foreground">{tc("viewCount")}</div>
           <div className="mt-1 text-xl font-semibold">
             {ready ? (
-              formatCompactNumber(state.data.viewCount)
+              formatCompactNumber(state.data.viewCount, locale)
             ) : errored ? (
-              "불러오기 실패"
+              tc("loadFail")
             ) : (
               <Skeleton className="mt-1 h-7 w-28" />
             )}
@@ -146,12 +150,12 @@ export function YouTubeStatsCards({
 
       <Card>
         <CardContent className="p-4">
-          <div className="text-sm text-foreground">좋아요</div>
+          <div className="text-sm text-foreground">{tc("likes")}</div>
           <div className="mt-1 text-xl font-semibold">
             {ready ? (
-              formatCompactNumber(state.data.likeCount)
+              formatCompactNumber(state.data.likeCount, locale)
             ) : errored ? (
-              "불러오기 실패"
+              tc("loadFail")
             ) : (
               <Skeleton className="mt-1 h-7 w-24" />
             )}

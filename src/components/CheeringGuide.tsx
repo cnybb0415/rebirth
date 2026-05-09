@@ -7,17 +7,19 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { useTranslations } from "next-intl";
 
 function EmptyState({ title, lines }: { title: string; lines: string[] }) {
+  const t = useTranslations("concert");
   return (
     <Card>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2">
-        <p className="text-sm text-foreground/80">아직 업로드된 가이드가 없어요.</p>
+        <p className="text-sm text-foreground/80">{t("noGuide")}</p>
         <div className="rounded-xl border border-foreground/10 bg-white p-3 text-xs text-foreground/80 shadow-sm">
-          <div className="font-semibold">업로드 방법</div>
+          <div className="font-semibold">Upload method</div>
           <div className="mt-1 space-y-1">
             {lines.map((line, idx) => (
               <div key={idx}>{line}</div>
@@ -40,6 +42,7 @@ function Assets({
   assets: GuideAsset[];
   emptyLines: string[];
 }) {
+  const t = useTranslations("concert");
   if (!assets.length) return <EmptyState title={title} lines={emptyLines} />;
 
   return (
@@ -59,8 +62,8 @@ function Assets({
                 className="block"
               >
                 <Button variant="secondary" className="w-full justify-between">
-                  <span>{asset.label ?? "PDF 열기"}</span>
-                  <span className="text-xs text-foreground/70">새 탭</span>
+                  <span>{asset.label ?? t("openPdf")}</span>
+                  <span className="text-xs text-foreground/70">{t("newTab")}</span>
                 </Button>
               </a>
             );
@@ -74,7 +77,7 @@ function Assets({
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={asset.src}
-                alt={asset.alt ?? `${title} 이미지 ${idx + 1}`}
+                alt={asset.alt ?? `${title} ${idx + 1}`}
                 className="h-auto w-full"
                 loading="lazy"
               />
@@ -87,13 +90,14 @@ function Assets({
 }
 
 export function CheeringGuide() {
+  const t = useTranslations("concert");
   const songs = cheeringGuideSongs;
   const defaultSong = songs[0]?.id ?? "";
 
   if (!songs.length) {
     return (
       <EmptyState
-        title="응원법"
+        title={t("cheerTitle")}
         lines={[
               "1) 파일을 public/images/concert/cheering/<song-id>/guide/ 아래에 넣기",
               "2) 커버는 public/images/concert/cheering/<song-id>/album-art/ 아래에 넣기 (선택)",
@@ -108,14 +112,14 @@ export function CheeringGuide() {
     <Tabs defaultValue={defaultSong}>
       <div className="mt-4 grid gap-4 md:grid-cols-[220px_minmax(0,1fr)]">
         <div>
-          <div className="mb-2 text-sm font-semibold text-foreground/80">곡</div>
+          <div className="mb-2 text-sm font-semibold text-foreground/80">{t("song")}</div>
           <TabsList
-            aria-label="응원법 곡"
+            aria-label={t("cheerTitle")}
             className="flex flex-col gap-1 rounded-2xl p-2"
           >
             {songs.map((song) => (
               <TabsTrigger key={song.id} value={song.id} variant="sidebar">
-                {song.label} 응원법
+                {song.label} {t("cheerTitle")}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -125,7 +129,7 @@ export function CheeringGuide() {
           {songs.map((song) => (
             <TabsContent key={song.id} value={song.id} className="mt-0">
               <Assets
-                title={`${song.label} 응원법`}
+                title={`${song.label} ${t("cheerTitle")}`}
                 idKey={`cheering-${song.id}`}
                 assets={song.assets}
                 emptyLines={[

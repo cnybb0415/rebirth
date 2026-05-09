@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 export function TossActionButton({ href, label }: { href: string; label: string }) {
   return (
@@ -23,6 +24,7 @@ export function TossActionButton({ href, label }: { href: string; label: string 
 }
 
 export function AnnouncementDetailActions() {
+  const t = useTranslations("concert");
   const [currentUrl, setCurrentUrl] = useState("");
   const [copied, setCopied] = useState(false);
 
@@ -81,14 +83,14 @@ export function AnnouncementDetailActions() {
           <span style={{ fontSize: "1.2rem", lineHeight: 1 }} aria-hidden>
             ‹
           </span>
-          뒤로가기
-        </button>
+          {t("back")}
+</button>
 
         {/* URL 복사 (공유) */}
         <button
           type="button"
           onClick={handleCopy}
-          aria-label="공지사항 URL 복사"
+          aria-label={t("copyUrl")}
           style={{
             display: "inline-flex",
             alignItems: "center",
@@ -144,7 +146,7 @@ export function AnnouncementDetailActions() {
             fontWeight: 700,
           }}
         >
-          링크 복사됨 ✓
+          {t("linkCopied")}
         </div>
       )}
     </div>

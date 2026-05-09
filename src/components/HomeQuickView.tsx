@@ -1,5 +1,6 @@
-import Link from "next/link";
 import { unstable_cache } from "next/cache";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 
 type ScheduleItem = {
   id: string;
@@ -57,7 +58,6 @@ function getKSTWeekEnd(): string {
   return `${kst.getFullYear()}-${String(kst.getMonth() + 1).padStart(2, "0")}-${String(kst.getDate()).padStart(2, "0")}`;
 }
 
-// 오늘 이후 전체 스케줄 반환 (캐시 내부에서 날짜 필터 고정 방지)
 const fetchAllFutureSchedule = unstable_cache(
   async (): Promise<ScheduleItem[]> => {
     const csvUrl = process.env.SCHEDULE_SHEET_CSV_URL;
@@ -91,7 +91,6 @@ const fetchAllFutureSchedule = unstable_cache(
   { revalidate: 7200 }
 );
 
-// 캐시: CSV 파싱만 담당 (날짜 필터 없음)
 const fetchRawVotes = unstable_cache(
   async (): Promise<VoteItem[]> => {
     const csvUrl = process.env.VOTE_SHEET_CSV_URL;
@@ -139,12 +138,12 @@ function ScheduleItemRow({ item }: { item: ScheduleItem }) {
 }
 
 export async function HomeQuickView() {
+  const t = await getTranslations("quickview");
   const [allSchedule, rawVotes] = await Promise.all([
     fetchAllFutureSchedule(),
     fetchRawVotes(),
   ]);
 
-  // 마감 여부는 항상 렌더 시점 기준으로 판단
   const now = new Date();
   const voteItems = rawVotes.filter((item) => {
     const m = item.deadline.match(/(\d{4})[.\-](\d{2})[.\-](\d{2})(?:\s+(\d{2}):(\d{2}))?/);
@@ -160,11 +159,10 @@ export async function HomeQuickView() {
   const nextUpcoming = allSchedule.filter((item) => item.date > weekEnd).slice(0, 3);
   const hasAnySchedule = allSchedule.some((item) => item.date >= today);
 
-  // 둘 다 없으면 위젯 숨김
   if (!hasAnySchedule && voteItems.length === 0) return null;
 
   const scheduleItems = thisWeek.length > 0 ? thisWeek : nextUpcoming;
-  const scheduleLabel = thisWeek.length > 0 ? "이번 주 스케줄" : "다음 스케줄";
+  const scheduleLabel = thisWeek.length > 0 ? t("thisWeekSchedule") : t("nextSchedule");
 
   return (
     <div className="grid grid-cols-2 gap-3">
@@ -174,14 +172,14 @@ export async function HomeQuickView() {
         <div className="flex items-center justify-between">
           <span className="text-[11px] font-bold tracking-tight sm:text-xs">{scheduleLabel}</span>
           <Link href="/schedule" className="text-[9px] text-foreground/40 hover:text-foreground/70 sm:text-[10px]">
-            전체 →
+            {t("viewAll")}
           </Link>
         </div>
 
         <div className="mt-2 flex flex-1 flex-col gap-1 sm:mt-2.5 sm:gap-1.5">
           {scheduleItems.length === 0 ? (
             <div className="flex flex-1 items-center justify-center rounded-xl bg-neutral-50 px-2 text-center text-[10px] text-foreground/35">
-              예정된 스케줄이 없습니다.
+              {t("noSchedule")}
             </div>
           ) : (
             <>
@@ -201,16 +199,16 @@ export async function HomeQuickView() {
       {/* 진행 중인 투표 */}
       <div className="flex flex-col overflow-hidden rounded-2xl border border-foreground/10 bg-white p-2.5 shadow-sm sm:p-3.5">
         <div className="flex items-center justify-between">
-          <span className="text-[11px] font-bold tracking-tight sm:text-xs">진행 중인 투표</span>
+          <span className="text-[11px] font-bold tracking-tight sm:text-xs">{t("activeVotes")}</span>
           <Link href="/vote" className="text-[9px] text-foreground/40 hover:text-foreground/70 sm:text-[10px]">
-            전체 →
+            {t("viewAll")}
           </Link>
         </div>
 
         <div className="mt-2 flex flex-1 flex-col gap-1 sm:mt-2.5 sm:gap-1.5">
           {voteItems.length === 0 ? (
             <div className="flex flex-1 items-center justify-center rounded-xl bg-neutral-50 px-2 text-center text-[10px] text-foreground/35">
-              진행중인 투표가 없습니다.
+              {t("noVotes")}
             </div>
           ) : (
             <>
@@ -229,7 +227,7 @@ export async function HomeQuickView() {
                         rel="noopener noreferrer"
                         className="relative z-10 shrink-0 rounded-md bg-yellow-300 px-1.5 py-0.5 text-[8px] font-bold text-yellow-900 hover:bg-yellow-400 sm:rounded-lg sm:px-2 sm:text-[9px]"
                       >
-                        투표↗
+                        {t("voteBtn")}
                       </a>
                     )}
                   </div>

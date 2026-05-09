@@ -1,7 +1,4 @@
-import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { siteConfig } from "@/config/site";
-import { ShellWrapper } from "@/components/ShellWrapper";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,24 +11,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: siteConfig.title,
-  description: "원클릭 링크, 바로가기, 차트 현황을 한 화면에.",
-  icons: {
-    icon: "/favicon.ico",
-  },
-};
-
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
-  const wallpaperSrc = siteConfig.assets.wallpaper.src?.trim();
-  const overlayOpacity = siteConfig.assets.wallpaper.overlayOpacity;
-
+}) {
   return (
-    <html lang="ko">
+    <html suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://hangeul.pstatic.net" />
         <link
@@ -41,33 +27,9 @@ export default function RootLayout({
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        suppressHydrationWarning
       >
-        {wallpaperSrc ? (
-          <>
-            <div
-              aria-hidden
-              className="fixed inset-0 z-0 bg-cover bg-center bg-no-repeat"
-              style={{ backgroundImage: `url(${wallpaperSrc})` }}
-            />
-            <div
-              aria-hidden
-              className="fixed inset-0 z-0 bg-background"
-              style={{
-                opacity:
-                  typeof overlayOpacity === "number" ? overlayOpacity : 0.9,
-              }}
-            />
-          </>
-        ) : null}
-        <div
-          className={
-            wallpaperSrc
-              ? "relative z-10 min-h-screen bg-transparent"
-              : "min-h-screen bg-transparent"
-          }
-        >
-          <ShellWrapper>{children}</ShellWrapper>
-        </div>
+        {children}
       </body>
     </html>
   );

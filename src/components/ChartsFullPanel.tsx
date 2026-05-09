@@ -4,6 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { MusicServiceIcon, resolveMusicServiceIdFromLabel } from "@/components/MusicServiceIcon";
 import type { FullChartsData, FullChartEntry, ChartSection } from "@/lib/chartsFullData";
+import { useTranslations } from "next-intl";
 
 export type { FullChartsData };
 
@@ -77,6 +78,7 @@ function SectionBlock({
   providerKey: string;
   providerLabel: string;
 }) {
+  const t = useTranslations("charts");
   const serviceId = resolveMusicServiceIdFromLabel(providerLabel);
   const color = PROVIDER_COLORS[providerKey] ?? "#111827";
 
@@ -96,13 +98,13 @@ function SectionBlock({
       </div>
       <div className="overflow-hidden rounded-xl border border-neutral-100">
         <div className="flex items-center text-xs text-neutral-400 h-9 border-b border-neutral-100 bg-neutral-50">
-          <p className="w-10 text-center">순위</p>
-          <div className="flex-1 px-3">제목</div>
-          <p className="w-12 text-center">변동</p>
+          <p className="w-10 text-center">{t("rank")}</p>
+          <div className="flex-1 px-3">{t("titleCol")}</div>
+          <p className="w-12 text-center">{t("change")}</p>
         </div>
         {section.items.length === 0 ? (
           <div className="flex h-16 items-center justify-center text-sm text-neutral-400">
-            {section.error ?? "차트 미진입"}
+            {section.error ?? t("notCharted")}
           </div>
         ) : (
           section.items.map((entry) => (

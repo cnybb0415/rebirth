@@ -1,0 +1,222 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "guide": "ガイド",
+    "streaming": "ストリーミング",
+    "charts": "音源ランキング",
+    "vote": "投票",
+    "schedule": "スケジュール",
+    "radio": "ラジオ",
+    "kwangya119": "KWANGYA 119",
+    "concert": "コンサート",
+    "concertHome": "コンサートホーム",
+    "chorus": "大合唱",
+    "cheer": "応援方法",
+    "helper": "ヘルパー募集",
+    "funding": "ファンディング",
+    "notice": "お知らせ",
+    "support": "サポート",
+    "supportTeam": "チーム紹介",
+    "supportFund": "募金公告",
+    "idDonation": "ID寄付",
+    "supportHelper": "ヘルパー支援",
+    "openMenu": "メニューを開く",
+    "closeMenu": "メニューを閉じる",
+    "close": "閉じる"
+  },
+  "home": {
+    "actionKwangya": "KWANGYA 119通報",
+    "actionStreaming": "ワンクリック配信",
+    "actionRadio": "ラジオ申請",
+    "actionSmsVote": "生放送SMS投票",
+    "actionGuide": "ガイド",
+    "actionVote": "投票",
+    "latestPost": "最新の投稿",
+    "latestPostSource": "X @weareoneEXO",
+    "goToX": "Xへ移動",
+    "noPost": "最新の投稿を読み込めませんでした。",
+    "viewPost": "投稿を見る",
+    "copyright": "Copyright ⓒ EXO RE:BIRTH All rights reserved.",
+    "prevImage": "前の画像",
+    "nextImage": "次の画像",
+    "viewImage": "画像{n}を見る"
+  },
+  "quickview": {
+    "thisWeekSchedule": "今週のスケジュール",
+    "nextSchedule": "次のスケジュール",
+    "viewAll": "全て →",
+    "noSchedule": "予定されたスケジュールがありません。",
+    "activeVotes": "進行中の投票",
+    "noVotes": "進行中の投票がありません。",
+    "voteBtn": "投票↗"
+  },
+  "vote": {
+    "title": "投票",
+    "guide": "投票ガイド",
+    "tab": {
+      "all": "全体",
+      "award": "授賞式",
+      "music": "音楽番組",
+      "other": "その他"
+    },
+    "active": "進行中",
+    "ended": "終了",
+    "goVote": "投票する",
+    "noVotes": "登録された投票がありません",
+    "endedSection": "終了した投票",
+    "rankLabel": "現在順位: {rank}位",
+    "rankLabelWithPercent": "現在順位: {rank}位 ({percent}%)"
+  },
+  "schedule": {
+    "title": "EXOスケジュール"
+  },
+  "radio": {
+    "title": "ラジオ番組表",
+    "pageTitle": "ワンクリックラジオSMS申請",
+    "timeNote": "KST {time} 基準 · 平日番組表",
+    "guideBtn": "ガイド",
+    "scheduleBtn": "番組表",
+    "guideModalTitle": "ラジオ申請ガイド",
+    "fullScheduleTitle": "全番組表",
+    "nowOnAir": "放送中",
+    "noProgram": "番組なし",
+    "noSchedule": "番組表なし",
+    "noCurrentBroadcast": "現在放送なし",
+    "smsBtn": "SMS",
+    "selectableOn": "申請可能",
+    "selectableOff": "申請不可",
+    "selectableLegend": "申請可能",
+    "smsRequest": "SMS申請",
+    "nextSelectable": "次の申請可能番組",
+    "selectProgram": "申請する番組を選択してください",
+    "sendSms": "SMSを送る",
+    "cancel": "キャンセル",
+    "prev": "前へ",
+    "next": "次へ"
+  },
+  "kwangya119": {
+    "title": "KWANGYA 119へ通報する",
+    "description": "虚偽情報・悪質な投稿の報告は下のボタンをクリックして行ってください。",
+    "reportBtn": "KWANGYA 119へ通報する",
+    "pdfTab": "PDF作成",
+    "reportTab": "KWANGYA 119へ通報する",
+    "iosTab": "iOS",
+    "androidTab": "Android",
+    "pcTab": "PC",
+    "ios": {
+      "step1": "Safariを使用",
+      "step2": "右下の三点をタップ",
+      "step3": "共有 → オプション → PDF → ファイルに保存",
+      "step4": "保存"
+    },
+    "android": {
+      "step1": "Samsungインターネットを使用",
+      "step2": "右下の三本線をクリック",
+      "step3": "印刷/PDF → 黄色のPDFをタップ",
+      "step4": "ファイルを保存"
+    },
+    "pc": {
+      "step1": "Chromeを使用",
+      "step2": "右上の三点をクリック",
+      "step3": "印刷 → PDFとして保存 → 横向き",
+      "step4": "詳細設定 - 背景のグラフィックにチェック",
+      "step5": "準備したフォルダに保存"
+    },
+    "reportGuideTitle": "KWANGYAへの通報方法",
+    "report": {
+      "step1": "KWANGYAにアクセス",
+      "step2": "SMアカウントでログイン",
+      "step3": "通報センター → アーティスト選択、内容記入 → 準備した資料をアップロード（リンク、PDFなど）",
+      "step4": "提出"
+    },
+    "imgAlt": "KWANGYA 119 ガイド",
+    "preparing": "準備中です。"
+  },
+  "concert": {
+    "chorusTitle": "大合唱曲",
+    "cheerTitle": "応援方法",
+    "helperTitle": "ヘルパー募集",
+    "fundingTitle": "ファンディング",
+    "noticeTitle": "お知らせ",
+    "preparing": "準備中",
+    "noNotice": "登録された公告がありません",
+    "helperThanks": "参加してくださったEXO-Lの皆さんありがとうございます ♥",
+    "backToList": "← 一覧",
+    "back": "戻る",
+    "copyUrl": "公告URLをコピー",
+    "linkCopied": "リンクをコピーしました ✓",
+    "melonTicket": "Melonチケット",
+    "concertList": "コンサートリスト",
+    "announcementsDesc": "コンサート関連のお知らせをご確認ください。",
+    "song": "曲",
+    "openPdf": "PDFを開く",
+    "newTab": "新しいタブ",
+    "noGuide": "まだガイドがありません。",
+    "viewCheerGuide": "応援ガイドを見る →",
+    "tab": {
+      "cheer": "応援",
+      "chorus": "大合唱",
+      "helper": "ヘルパー",
+      "funding": "募金",
+      "notice": "お知らせ"
+    }
+  },
+  "support": {
+    "fundTitle": "募金公告",
+    "teamTitle": "チーム紹介",
+    "idDonationTitle": "ID寄付",
+    "helperTitle": "ヘルパー支援",
+    "fundImgAlt": "募金公告",
+    "depositForm": "入金フォームを記入",
+    "back": "サポート"
+  },
+  "charts": {
+    "title": "音源ランキング",
+    "subtitle": "リアルタイムチャート",
+    "streamingBack": "ストリーミング",
+    "all": "全て",
+    "rank": "順位",
+    "change": "変動",
+    "chartCol": "チャート",
+    "titleCol": "タイトル",
+    "noData": "チャートデータなし",
+    "notCharted": "ランク外",
+    "updatedLabel": "更新:",
+    "chartOf": " リアルタイムチャート",
+    "moreCharts": "チャートをもっと →",
+    "rankSuffix": "位"
+  },
+  "guide": {
+    "title": "ガイド",
+    "cat": {
+      "streaming": "ストリーミング",
+      "download": "ダウンロード",
+      "signup": "アカウント作成",
+      "gift": "ギフト",
+      "mv": "ミュージックビデオ",
+      "prevote": "投票ガイド"
+    }
+  },
+  "streaming": {
+    "title": "ストリーミング",
+    "cat": {
+      "recommended": "推奨ストリーミングリスト",
+      "oneclick": "ワンクリックストリーミング",
+      "links": "音源サイトリンク"
+    }
+  },
+  "common": {
+    "loading": "読み込み中...",
+    "error": "読み込みに失敗しました。",
+    "viewMore": "もっと見る",
+    "close": "閉じる",
+    "prev": "前へ",
+    "next": "次へ",
+    "streamingList": "ストリーミングリスト",
+    "albumBuy": "アルバム購入",
+    "streamingPreparing": "ワンクリックストリーミングリンク準備中",
+    "viewCount": "再生回数",
+    "likes": "高評価",
+    "loadFail": "読み込み失敗"
+  }
+}

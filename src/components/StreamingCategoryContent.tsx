@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { siteConfig } from "@/config/site";
 import { StreamingLinksGrid } from "@/components/StreamingLinksGrid";
 import { OneClickStreamingGrid } from "@/components/OneClickStreamingGrid";
 import { type StreamingCategoryId } from "@/lib/streamingCategories";
 
-function RecommendedChecklist() {
+function RecommendedChecklist({ title }: { title: string }) {
   const [listImages, setListImages] = useState<Array<{ name: string; src: string }>>([]);
 
   useEffect(() => {
@@ -33,7 +34,7 @@ function RecommendedChecklist() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>권장 스트리밍 리스트</CardTitle>
+        <CardTitle>{title}</CardTitle>
       </CardHeader>
       <CardContent>
         {listImages.length > 0 ? (
@@ -46,22 +47,23 @@ function RecommendedChecklist() {
             ))}
           </div>
         ) : null}
-
       </CardContent>
     </Card>
   );
 }
 
 export function StreamingCategoryContent({ categoryId }: { categoryId: StreamingCategoryId }) {
+  const t = useTranslations("streaming");
+
   if (categoryId === "recommended") {
-    return <RecommendedChecklist />;
+    return <RecommendedChecklist title={t("cat.recommended")} />;
   }
 
   if (categoryId === "oneclick") {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>원클릭 스트리밍</CardTitle>
+          <CardTitle>{t("cat.oneclick")}</CardTitle>
         </CardHeader>
         <CardContent>
           <OneClickStreamingGrid
@@ -77,7 +79,7 @@ export function StreamingCategoryContent({ categoryId }: { categoryId: Streaming
   return (
     <Card>
       <CardHeader>
-        <CardTitle>음원사이트 바로가기</CardTitle>
+        <CardTitle>{t("cat.links")}</CardTitle>
       </CardHeader>
       <CardContent>
         <StreamingLinksGrid

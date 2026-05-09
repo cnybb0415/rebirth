@@ -1,23 +1,26 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { cn } from "@/lib/utils";
 
 export type VoteItem = {
   category: string;
-  organizer: string;   // 투표주최
-  name: string;        // 투표이름
-  votePage: string;    // 투표페이지
-  deadline: string;    // YYYY-MM-DD
+  organizer: string;
+  name: string;
+  votePage: string;
+  deadline: string;
   link: string;
-  candidate: string;   // 후보
-  rank?: string;       // 순위
-  percent?: string;    // 퍼센트
+  candidate: string;
+  rank?: string;
+  percent?: string;
   isActive: boolean;
 };
 
-const TABS = ["전체", "시상식", "음악방송", "기타"] as const;
-type Tab = (typeof TABS)[number];
+// CSV 카테고리 값(한국어)은 내부 필터에 그대로 사용
+const TAB_KEYS = ["전체", "시상식", "음악방송", "기타"] as const;
+type Tab = (typeof TAB_KEYS)[number];
 
 const ICON_EXTENSIONS = ["png", "webp", "jpg", "jpeg"];
 
@@ -46,6 +49,7 @@ function VotePageIcon({ votePage }: { votePage: string }) {
 }
 
 function StatusBadge({ isActive }: { isActive: boolean }) {
+  const t = useTranslations("vote");
   return (
     <span
       className={cn(
@@ -55,16 +59,19 @@ function StatusBadge({ isActive }: { isActive: boolean }) {
           : "bg-neutral-100 text-neutral-400"
       )}
     >
-      {isActive ? "진행중" : "종료"}
+      {isActive ? t("active") : t("ended")}
     </span>
   );
 }
 
 function VoteCard({ item }: { item: VoteItem }) {
+  const t = useTranslations("vote");
   const deadlineLabel = item.deadline ? item.deadline.replace(/-/g, ".") : "";
   const hasRank = item.rank && item.rank !== "";
   const rankLabel = hasRank
-    ? `현재순위: ${item.rank}위${item.percent ? ` (${item.percent}%)` : ""}`
+    ? item.percent
+      ? t("rankLabelWithPercent", { rank: item.rank, percent: item.percent })
+      : t("rankLabel", { rank: item.rank })
     : null;
 
   return (
@@ -117,7 +124,7 @@ function VoteCard({ item }: { item: VoteItem }) {
               : "pointer-events-none bg-neutral-100 text-neutral-400"
           )}
         >
-          투표 바로가기
+          {t("goVote")}
           {item.isActive && (
             <svg viewBox="0 0 24 24" className="h-3 w-3" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
@@ -130,7 +137,15 @@ function VoteCard({ item }: { item: VoteItem }) {
 }
 
 export function VotePanel({ items, guideHref }: { items: VoteItem[]; guideHref?: string }) {
+  const t = useTranslations("vote");
   const [activeTab, setActiveTab] = useState<Tab>("전체");
+
+  const TAB_LABELS: Record<Tab, string> = {
+    "전체": t("tab.all"),
+    "시상식": t("tab.award"),
+    "음악방송": t("tab.music"),
+    "기타": t("tab.other"),
+  };
 
   const filtered = useMemo(() => {
     if (activeTab === "전체") return items;
@@ -149,8 +164,8 @@ export function VotePanel({ items, guideHref }: { items: VoteItem[]; guideHref?:
             onChange={(e) => setActiveTab(e.target.value as Tab)}
             className="appearance-none rounded-full border border-foreground/15 bg-white py-2 pl-4 pr-8 text-sm font-medium text-foreground/80 shadow-sm outline-none"
           >
-            {TABS.map((tab) => (
-              <option key={tab} value={tab}>{tab}</option>
+            {TAB_KEYS.map((tab) => (
+              <option key={tab} value={tab}>{TAB_LABELS[tab]}</option>
             ))}
           </select>
           <svg viewBox="0 0 24 24" className="pointer-events-none absolute right-3 h-3.5 w-3.5 text-foreground/40" fill="none" stroke="currentColor" strokeWidth="2">
@@ -158,22 +173,22 @@ export function VotePanel({ items, guideHref }: { items: VoteItem[]; guideHref?:
           </svg>
         </div>
         {guideHref && (
-          <a
+          <Link
             href={guideHref}
             className="ml-auto shrink-0 inline-flex items-center gap-1 rounded-full border border-foreground/15 bg-white px-4 py-2 text-sm font-medium text-foreground/70 shadow-sm transition hover:bg-foreground/5"
           >
-            투표 가이드
+            {t("guide")}
             <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-          </a>
+          </Link>
         )}
       </div>
 
       <div className="mt-5">
         {active.length === 0 && ended.length === 0 ? (
           <div className="flex h-24 items-center justify-center rounded-2xl border border-foreground/10 bg-white text-sm text-neutral-400">
-            등록된 투표가 없습니다
+            {t("noVotes")}
           </div>
         ) : (
           <>
@@ -183,7 +198,7 @@ export function VotePanel({ items, guideHref }: { items: VoteItem[]; guideHref?:
               ))}
             </div>
             {ended.length > 0 && active.length > 0 && (
-              <p className="pt-4 pb-2 text-xs font-semibold text-neutral-400">종료된 투표</p>
+              <p className="pt-4 pb-2 text-xs font-semibold text-neutral-400">{t("endedSection")}</p>
             )}
             {ended.length > 0 && (
               <div className="grid grid-cols-2 gap-3">

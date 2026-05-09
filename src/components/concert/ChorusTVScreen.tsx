@@ -29,8 +29,8 @@ const DAYS: Day[] = [
     imgs: {
       ko: "/images/concert/sing-along/DAY1/run_ko.png",
       en: "/images/concert/sing-along/DAY1/run_en.png",
-      cn: "/images/concert/sing-along/DAY1/run_cn.png",
-      jp: "/images/concert/sing-along/DAY1/run_jp.png",
+      cn: "/images/concert/sing-along/DAY1/run_zh.png",
+      jp: "/images/concert/sing-along/DAY1/run_ja.png",
     },
   },
   {
@@ -40,8 +40,8 @@ const DAYS: Day[] = [
     imgs: {
       ko: "/images/concert/sing-along/DAY2/baby_ko.png",
       en: "/images/concert/sing-along/DAY2/baby_en.png",
-      cn: "/images/concert/sing-along/DAY2/baby_cn.png",
-      jp: "/images/concert/sing-along/DAY2/baby_jp.png",
+      cn: "/images/concert/sing-along/DAY2/baby_zh.png",
+      jp: "/images/concert/sing-along/DAY2/baby_ja.png",
     },
   },
   {
@@ -51,8 +51,8 @@ const DAYS: Day[] = [
     imgs: {
       ko: "/images/concert/sing-along/DAY3/flatline_ko.png",
       en: "/images/concert/sing-along/DAY3/flatline_en.png",
-      cn: "/images/concert/sing-along/DAY3/flatline_cn.png",
-      jp: "/images/concert/sing-along/DAY3/flatline_jp.png",
+      cn: "/images/concert/sing-along/DAY3/flatline_zh.png",
+      jp: "/images/concert/sing-along/DAY3/flatline_ja.png",
     },
   },
   {
@@ -62,18 +62,21 @@ const DAYS: Day[] = [
     imgs: {
       ko: "/images/concert/sing-along/월광/moonlight_ko.png",
       en: "/images/concert/sing-along/월광/moonlight_en.png",
-      cn: "/images/concert/sing-along/월광/moonlight_cn.png",
-      jp: "/images/concert/sing-along/월광/moonlight_jp.png",
+      cn: "/images/concert/sing-along/월광/moonlight_zh.png",
+      jp: "/images/concert/sing-along/월광/moonlight_ja.png",
     },
   },
 ];
 
 type DayIdx = 0 | 1 | 2 | 3;
 
-export function ChorusTVScreen() {
+const LOCALE_TO_LANG: Record<string, Lang> = { ko: "ko", en: "en", zh: "cn", ja: "jp" };
+
+export function ChorusTVScreen({ initialLang }: { initialLang?: string }) {
+  const defaultLang: Lang = initialLang ? (LOCALE_TO_LANG[initialLang] ?? "ko") : "ko";
   const [selectedDay, setSelectedDay] = useState<DayIdx | null>(null);
   const [pressed, setPressed] = useState<DayIdx | null>(null);
-  const [lang, setLang] = useState<Lang>("ko");
+  const [lang, setLang] = useState<Lang>(defaultLang);
   const [version, setVersion] = useState<Version>("음원");
 
   const currentDay = selectedDay !== null ? DAYS[selectedDay] : null;
