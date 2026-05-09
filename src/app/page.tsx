@@ -274,6 +274,30 @@ export default async function Home() {
         </section>
 
       </main>
+
+      <footer className="mt-10 border-t border-foreground/10 bg-white">
+        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
+          <div className="flex flex-col gap-3">
+            <p className="text-xs font-semibold text-foreground/70">
+              Copyright ⓒ EXO RE:BIRTH All rights reserved.
+            </p>
+            <div className="space-y-0.5 text-[11px] text-foreground/45">
+              <p><span className="font-medium text-foreground/60">MAIN</span> &nbsp;rebirth.exo@gmail.com</p>
+              <p><span className="font-medium text-foreground/60">STRM</span> &nbsp;exo.strm@gmail.com</p>
+              <p><span className="font-medium text-foreground/60">DEV</span> &nbsp;exo.dev0408@gmail.com</p>             
+            </div>
+            <a
+              href="https://x.com/EXO_REBIRTH"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label="X @EXO_REBIRTH"
+              className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-foreground/15 bg-white text-foreground/60 shadow-sm transition hover:bg-foreground/5 hover:text-foreground"
+            >
+              <XIcon />
+            </a>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
