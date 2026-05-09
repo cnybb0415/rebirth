@@ -13,6 +13,7 @@ type ScheduleItem = {
 type VoteItem = {
   name: string;
   organizer: string;
+  deadline: string;
   link: string;
 };
 
@@ -90,7 +91,8 @@ const fetchAllFutureSchedule = unstable_cache(
   { revalidate: 7200 }
 );
 
-const fetchActiveVotes = unstable_cache(
+// 캐시: CSV 파싱만 담당 (날짜 필터 없음)
+const fetchRawVotes = unstable_cache(
   async (): Promise<VoteItem[]> => {
     const csvUrl = process.env.VOTE_SHEET_CSV_URL;
     if (!csvUrl) return [];
@@ -101,16 +103,11 @@ const fetchActiveVotes = unstable_cache(
       const lines = text.trim().split("\n");
       if (lines.length < 2) return [];
 
-      const now = new Date();
       return lines.slice(1).flatMap((line) => {
         const cols = parseCSVLine(line).map((c) => c.trim());
         const [, organizer, name, , deadline, link] = cols;
-        if (!name) return [];
-        const m = deadline?.match(/(\d{4})[.\-](\d{2})[.\-](\d{2})(?:\s+(\d{2}):(\d{2}))?/);
-        if (!m) return [];
-        const deadlineDate = new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4] ?? "23"}:${m[5] ?? "59"}:00+09:00`);
-        if (now > deadlineDate) return [];
-        return [{ name, organizer: organizer ?? "", link: link ?? "" }];
+        if (!name || !deadline) return [];
+        return [{ name, organizer: organizer ?? "", deadline, link: link ?? "" }];
       });
     } catch {
       return [];
@@ -142,10 +139,19 @@ function ScheduleItemRow({ item }: { item: ScheduleItem }) {
 }
 
 export async function HomeQuickView() {
-  const [allSchedule, voteItems] = await Promise.all([
+  const [allSchedule, rawVotes] = await Promise.all([
     fetchAllFutureSchedule(),
-    fetchActiveVotes(),
+    fetchRawVotes(),
   ]);
+
+  // 마감 여부는 항상 렌더 시점 기준으로 판단
+  const now = new Date();
+  const voteItems = rawVotes.filter((item) => {
+    const m = item.deadline.match(/(\d{4})[.\-](\d{2})[.\-](\d{2})(?:\s+(\d{2}):(\d{2}))?/);
+    if (!m) return false;
+    const deadlineDate = new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4] ?? "23"}:${m[5] ?? "59"}:00+09:00`);
+    return now <= deadlineDate;
+  });
 
   const today = getKSTToday();
   const weekEnd = getKSTWeekEnd();
