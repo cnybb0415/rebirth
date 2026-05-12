@@ -15,6 +15,7 @@ export default async function SupportPage({
   const supportItems = [
     { id: "team", label: t("supportTeam"), href: "/support/team" as const },
     { id: "fund", label: t("supportFund"), href: "/support/fund" as const },
+    { id: "recruit", label: t("supportRecruit"), href: "/support/recruit" as const },
     { id: "id-donation", label: t("idDonation"), href: "/support/id-donation" as const },
     { id: "helper", label: t("supportHelper"), href: "/support/helper" as const },
   ];

@@ -20,6 +20,7 @@
     "supportFund": "募款公告",
     "idDonation": "账号捐赠",
     "supportHelper": "志愿者申请",
+    "supportRecruit": "加入团队",
     "openMenu": "打开菜单",
     "closeMenu": "关闭菜单",
     "close": "关闭"
@@ -168,6 +169,9 @@
     "helperTitle": "志愿者申请",
     "fundImgAlt": "募款公告",
     "depositForm": "填写汇款表格",
+    "recruitTitle": "加入团队",
+    "recruitImgAlt": "招募公告",
+    "recruitFormBtn": "填写申请表",
     "back": "应援"
   },
   "charts": {

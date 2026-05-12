@@ -20,6 +20,7 @@
     "supportFund": "Fundraising Notice",
     "idDonation": "ID Donation",
     "supportHelper": "Helper Application",
+    "supportRecruit": "Join the Team",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "close": "Close"
@@ -168,6 +169,9 @@
     "helperTitle": "Helper Application",
     "fundImgAlt": "Fundraising Notice",
     "depositForm": "Fill in Deposit Form",
+    "recruitTitle": "Join the Team",
+    "recruitImgAlt": "Recruitment Announcement",
+    "recruitFormBtn": "Apply Now",
     "back": "Support"
   },
   "charts": {

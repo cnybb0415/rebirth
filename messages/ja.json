@@ -20,6 +20,7 @@
     "supportFund": "募金公告",
     "idDonation": "ID寄付",
     "supportHelper": "ヘルパー支援",
+    "supportRecruit": "チームに参加",
     "openMenu": "メニューを開く",
     "closeMenu": "メニューを閉じる",
     "close": "閉じる"
@@ -168,6 +169,9 @@
     "helperTitle": "ヘルパー支援",
     "fundImgAlt": "募金公告",
     "depositForm": "入金フォームを記入",
+    "recruitTitle": "チームに参加",
+    "recruitImgAlt": "募集公告",
+    "recruitFormBtn": "応募フォームを記入",
     "back": "サポート"
   },
   "charts": {

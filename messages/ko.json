@@ -20,6 +20,7 @@
     "supportFund": "모금 공지",
     "idDonation": "아이디 기부",
     "supportHelper": "헬퍼 지원",
+    "supportRecruit": "팀원 모집",
     "openMenu": "메뉴 열기",
     "closeMenu": "메뉴 닫기",
     "close": "닫기"
@@ -168,6 +169,9 @@
     "helperTitle": "헬퍼 지원",
     "fundImgAlt": "모금 공지",
     "depositForm": "입금 폼 작성",
+    "recruitTitle": "팀원 모집",
+    "recruitImgAlt": "팀원 모집 공고",
+    "recruitFormBtn": "지원 폼 작성",
     "back": "서포트"
   },
   "charts": {
