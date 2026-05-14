@@ -9,7 +9,7 @@ import { HomeQuickView } from "@/components/HomeQuickView";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 900;
 
 function SocialIcon({ children }: { children: ReactNode }) {
   return (
