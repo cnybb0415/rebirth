@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/voteDb";
+import { del } from "@vercel/blob";
 import path from "path";
 import fs from "fs";
 
@@ -26,9 +27,14 @@ export async function DELETE(
 
   await db.execute({ sql: "DELETE FROM candidates WHERE id = ?", args: [numId] });
 
-  const filePath = path.join(process.cwd(), "public", candidate.image_path);
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
+  // Blob URL이면 Vercel Blob에서 삭제, 로컬 경로면 파일 삭제 (하위 호환)
+  if (candidate.image_path.startsWith("https://")) {
+    try { await del(candidate.image_path); } catch {}
+  } else {
+    const filePath = path.join(process.cwd(), "public", candidate.image_path);
+    if (fs.existsSync(filePath)) {
+      try { fs.unlinkSync(filePath); } catch {}
+    }
   }
 
   return NextResponse.json({ ok: true });

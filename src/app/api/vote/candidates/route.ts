@@ -1,10 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/voteDb";
 import { translateText } from "@/lib/translate";
-import path from "path";
-import fs from "fs";
+import { put } from "@vercel/blob";
 
-const UPLOAD_DIR = path.join(process.cwd(), "public", "vote-uploads");
 const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024;
 
@@ -40,22 +38,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "파일 크기는 5MB 이하여야 합니다." }, { status: 400 });
     }
 
-    if (!fs.existsSync(UPLOAD_DIR)) {
-      fs.mkdirSync(UPLOAD_DIR, { recursive: true });
-    }
-
     const ext = file.name.split(".").pop() ?? "jpg";
-    const fileName = `${Date.now()}.${ext}`;
-    const filePath = path.join(UPLOAD_DIR, fileName);
-    const buffer = Buffer.from(await file.arrayBuffer());
-    fs.writeFileSync(filePath, buffer);
+    const fileName = `vote-uploads/${Date.now()}.${ext}`;
+    const blob = await put(fileName, file, { access: "public" });
 
-    // 심사 모드이면 pending, 아니면 approved
     const status = config?.approval_mode === 1 ? "pending" : "approved";
 
     const result = await db.execute({
       sql: "INSERT INTO candidates (title, member, description, image_path, status) VALUES (?, ?, ?, ?, ?)",
-      args: [title, member, description, `/vote-uploads/${fileName}`, status],
+      args: [title, member, description, blob.url, status],
     });
     const newId = Number(result.lastInsertRowid);
 

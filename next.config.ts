@@ -9,6 +9,14 @@ const nextConfig: NextConfig = {
   outputFileTracingExcludes: {
     "*": ["./public/images/**", "./public/font/**"],
   },
+  images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.public.blob.vercel-storage.com",
+      },
+    ],
+  },
 };
 
 export default withNextIntl(nextConfig);
