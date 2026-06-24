@@ -45,6 +45,14 @@ export const BINDER_CATEGORIES = [
     tabColor: "#c084fc",
     textColor: "#0d0020",
   },
+  {
+    id: "vote",
+    title: "아바타스타",
+    emoji: "🗳️",
+    href: "/concert/vote",
+    tabColor: "#a3e635",
+    textColor: "#0d1a00",
+  },
 ] as const;
 
 export type CategoryId = (typeof BINDER_CATEGORIES)[number]["id"];
@@ -91,6 +99,7 @@ export async function BinderPage({ children, activeTab, pixelFontFamily, locale 
     helper: t("tab.helper"),
     funding: t("tab.funding"),
     notice: t("tab.notice"),
+    vote: t("tab.vote"),
   };
   return (
     /* 바깥 여백 — 모바일에서 사방 숨쉬기 */
@@ -134,7 +143,7 @@ export async function BinderPage({ children, activeTab, pixelFontFamily, locale 
                 className="group flex flex-col items-center select-none"
                 style={{
                   flex: "none",               /* 고정 크기 — 절대 늘어나지 않음 */
-                  height: `${TAB_H}px`,
+                  height: cat.id === "vote" ? "108px" : `${TAB_H}px`,
                   paddingTop: "10px",
                   paddingBottom: "8px",
                   gap: "6px",
@@ -172,6 +181,10 @@ export async function BinderPage({ children, activeTab, pixelFontFamily, locale 
                     WebkitFontSmoothing: "none",
                     fontWeight: 800,
                     ...getTabTextStyle(locale),
+                    // vote 탭 ko: 108px 높이에 맞게 폰트·자간 조정
+                    ...(cat.id === "vote" && locale === "ko"
+                      ? { fontSize: "0.65rem", letterSpacing: "0.22em" }
+                      : {}),
                     color: isActive ? cat.textColor : "#1a1020",
                   }}
                 >
