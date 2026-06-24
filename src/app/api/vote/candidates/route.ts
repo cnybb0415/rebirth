@@ -40,7 +40,8 @@ export async function POST(req: NextRequest) {
 
     const ext = file.name.split(".").pop() ?? "jpg";
     const fileName = `vote-uploads/${Date.now()}.${ext}`;
-    const blob = await put(fileName, file, { access: "public" });
+    const buffer = await file.arrayBuffer();
+    const blob = await put(fileName, buffer, { access: "public", contentType: file.type });
 
     const status = config?.approval_mode === 1 ? "pending" : "approved";
 
