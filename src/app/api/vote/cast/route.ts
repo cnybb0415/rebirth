@@ -49,6 +49,19 @@ export async function POST(req: NextRequest) {
     const ip = getIp(req);
     const today = todayKst();
 
+    // 같은 후보 중복 투표 방지
+    const existingResult = await db.execute({
+      sql: "SELECT id FROM votes WHERE voter_ip = ? AND candidate_id = ? AND date(voted_at, '+9 hours') = ?",
+      args: [ip, candidateId, today],
+    });
+    if (existingResult.rows[0]) {
+      return NextResponse.json(
+        { error: "오늘 이미 이 후보에 투표하셨습니다." },
+        { status: 409 }
+      );
+    }
+
+    // 멤버당 하루 3표 제한
     const memberVoteResult = await db.execute({
       sql: `SELECT COUNT(*) as cnt
             FROM votes v

@@ -29,30 +29,50 @@ interface VoteConfig {
   end_at: string;
 }
 
-// localStorage로 오늘 멤버별 투표 횟수 저장/복원 (날짜 바뀌면 자동 초기화)
+// localStorage: 멤버별 투표한 후보 ID 목록 관리 (날짜 바뀌면 자동 초기화)
 const MAX_VOTES_PER_MEMBER = 3;
 
 function todayKey(): string {
   return new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Seoul" });
 }
 
-function loadMemberVoteCounts(): Record<string, number> {
+interface VoteStorage {
+  date: string;
+  memberVotes: Record<string, number[]>; // member -> 투표한 candidate id 목록
+}
+
+function loadVoteStorage(): VoteStorage {
   try {
-    const raw = localStorage.getItem("exo_vote_member_counts");
-    if (!raw) return {};
-    const { date, counts } = JSON.parse(raw) as { date: string; counts: Record<string, number> };
-    if (date !== todayKey()) return {};
-    return counts;
+    const raw = localStorage.getItem("exo_vote_v2");
+    if (!raw) return { date: todayKey(), memberVotes: {} };
+    const data = JSON.parse(raw) as VoteStorage;
+    if (data.date !== todayKey()) return { date: todayKey(), memberVotes: {} };
+    return data;
   } catch {
-    return {};
+    return { date: todayKey(), memberVotes: {} };
   }
 }
 
-function saveMemberVote(member: string) {
+function loadVotedIds(): Set<number> {
+  const storage = loadVoteStorage();
+  return new Set(Object.values(storage.memberVotes).flat());
+}
+
+function loadMemberVoteCounts(): Record<string, number> {
+  const storage = loadVoteStorage();
+  return Object.fromEntries(
+    Object.entries(storage.memberVotes).map(([m, ids]) => [m, ids.length])
+  );
+}
+
+function saveVote(candidateId: number, member: string) {
   try {
-    const counts = loadMemberVoteCounts();
-    counts[member] = (counts[member] ?? 0) + 1;
-    localStorage.setItem("exo_vote_member_counts", JSON.stringify({ date: todayKey(), counts }));
+    const storage = loadVoteStorage();
+    if (!storage.memberVotes[member]) storage.memberVotes[member] = [];
+    if (!storage.memberVotes[member].includes(candidateId)) {
+      storage.memberVotes[member].push(candidateId);
+    }
+    localStorage.setItem("exo_vote_v2", JSON.stringify(storage));
   } catch {}
 }
 
@@ -97,6 +117,7 @@ export function VoteBinderClient() {
   const [toast, setToast] = useState<{ msg: string; ok: boolean } | null>(null);
   const [voting, setVoting] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
+  const [votedIds, setVotedIds] = useState<Set<number>>(new Set());
   const [memberVoteCounts, setMemberVoteCounts] = useState<Record<string, number>>({});
   const [showAll, setShowAll] = useState<Partial<Record<MemberName, boolean>>>({});
   const [openDescId, setOpenDescId] = useState<number | null>(null);
@@ -112,6 +133,7 @@ export function VoteBinderClient() {
       : (d > 0 ? t("voteRemDay", { d, h, m }) : h > 0 ? t("voteRemHour", { h, m, s }) : t("voteRemMin", { m, s }));
 
   useEffect(() => {
+    setVotedIds(loadVotedIds());
     setMemberVoteCounts(loadMemberVoteCounts());
   }, []);
 
@@ -146,7 +168,8 @@ export function VoteBinderClient() {
       });
       const data = await res.json();
       if (res.ok) {
-        saveMemberVote(member);
+        saveVote(candidateId, member);
+        setVotedIds((prev) => new Set([...prev, candidateId]));
         setMemberVoteCounts((prev) => ({ ...prev, [member]: (prev[member] ?? 0) + 1 }));
         showToast(t("voteSuccess"), true);
         fetchResults();
@@ -190,24 +213,25 @@ export function VoteBinderClient() {
 
   // ── 카드 렌더 ────────────────────────────────────────────
   const renderCard = (c: Candidate, rank?: number) => {
+    const alreadyVoted = votedIds.has(c.id);
     const memberCount = memberVoteCounts[c.member] ?? 0;
     const memberVoteFull = memberCount >= MAX_VOTES_PER_MEMBER;
     const isVoting = voting === c.id;
 
-    let btnLabel = `VOTE`;
+    let btnLabel = `VOTE (${memberCount}/${MAX_VOTES_PER_MEMBER})`;
     if (isVoting) btnLabel = "...";
-    else if (memberVoteFull) btnLabel = "VOTED ✓";
+    else if (alreadyVoted) btnLabel = "VOTED ✓";
+    else if (memberVoteFull) btnLabel = "FULL";
     else if (!isActive) btnLabel = isEnded ? "ENDED" : "WAIT";
-    else btnLabel = `VOTE (${memberCount}/${MAX_VOTES_PER_MEMBER})`;
 
-    const btnActive = isActive && !memberVoteFull && voting === null;
+    const btnActive = isActive && !alreadyVoted && !memberVoteFull && voting === null;
 
     return (
       <div
         key={c.id}
         style={{
           background: "rgba(0,0,0,0.45)",
-          border: `1.5px solid ${memberVoteFull ? ACCENT + "66" : ACCENT + "28"}`,
+          border: `1.5px solid ${alreadyVoted ? ACCENT + "66" : ACCENT + "28"}`,
           overflow: "hidden",
         }}
       >
@@ -336,7 +360,7 @@ export function VoteBinderClient() {
           )}
 
           {/* 투표 완료 오버레이 */}
-          {memberVoteFull && (
+          {alreadyVoted && (
             <div
               style={{
                 position: "absolute",
@@ -408,13 +432,13 @@ export function VoteBinderClient() {
                 fontSize: "0.42rem",
                 fontWeight: 800,
                 letterSpacing: "0.18em",
-                border: `1.5px solid ${btnActive ? ACCENT : memberVoteFull ? ACCENT + "55" : "rgba(255,255,255,0.12)"}`,
+                border: `1.5px solid ${btnActive ? ACCENT : alreadyVoted ? ACCENT + "55" : "rgba(255,255,255,0.12)"}`,
                 background: btnActive
                   ? ACCENT
-                  : memberVoteFull
+                  : alreadyVoted
                   ? `${ACCENT}18`
                   : "rgba(255,255,255,0.04)",
-                color: btnActive ? "#0d1a00" : memberVoteFull ? ACCENT : "rgba(255,255,255,0.25)",
+                color: btnActive ? "#0d1a00" : alreadyVoted ? ACCENT : "rgba(255,255,255,0.25)",
                 cursor: btnActive ? "pointer" : "default",
                 transition: "all 0.15s",
                 fontFamily: "'PFStarDust', monospace",
