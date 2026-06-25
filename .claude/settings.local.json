@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run dev -- --port 3000)",
+      "Bash(npm install)",
+      "Bash(npx tsc --noEmit)",
+      "WebFetch(domain:noonnu.cc)",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "WebFetch(domain:www.jsdelivr.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:api.github.com)"
+    ]
+  }
+}

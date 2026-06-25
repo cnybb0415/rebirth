@@ -1,0 +1,128 @@
+@import "tailwindcss";
+
+/* ── PF스타더스트 픽셀 폰트 ── */
+@font-face {
+  font-family: "PFStarDust";
+  src:
+    url("/font/pixel-regular.woff") format("woff"),
+    url("/font/pixel-regular.woff2") format("woff2"),
+    url("/font/pixel-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PFStarDust";
+  src:
+    url("/font/pixel-bold.woff") format("woff"),
+    url("/font/pixel-bold.woff2") format("woff2"),
+    url("/font/pixel-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "PFStarDust";
+  src:
+    url("/font/pixel-extrabold.woff") format("woff"),
+    url("/font/pixel-extrabold.woff2") format("woff2"),
+    url("/font/pixel-extrabold.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── DungGeunMo (둥근모) — 공지/notice 등에 사용 ── */
+@font-face {
+  font-family: "DungGeunMo";
+  src: url("/font/DungGeunMo.woff2") format("woff2"),
+    url("/font/DungGeunMo.woff") format("woff");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── Mulmaru (물마루) — 떼창곡 등에 사용 ── */
+@font-face {
+  font-family: "Mulmaru";
+  src: url("/font/Mulmaru.woff2") format("woff2"),
+    url("/font/Mulmaru.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* 픽셀 폰트 계단현상 방지 */
+.pixel-font, [data-pixel-font] {
+  font-family: "PFStarDust", ui-monospace, monospace; /* ✅ 이 줄 추가 */
+  -webkit-font-smoothing: none;
+  -moz-osx-font-smoothing: grayscale;
+  font-smooth: never;
+  image-rendering: pixelated;
+}
+
+:root {
+  /* Screenshot-like theme (light background + dark foreground) */
+  --background: #ffffff;
+  --foreground: #111827;
+  --surface: color-mix(in oklab, var(--background) 92%, #111827 8%);
+  /* Translucent surface layers for overlays on top of wallpaper */
+  --surface-80: color-mix(in oklab, var(--surface) 80%, transparent);
+  --surface-90: color-mix(in oklab, var(--surface) 92%, transparent);
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* keep consistent high-contrast text regardless of OS theme */
+
+/* Prevent width shift between pages that do/do not scroll. */
+@supports (scrollbar-gutter: stable) {
+  html {
+    scrollbar-gutter: stable;
+  }
+}
+
+@supports not (scrollbar-gutter: stable) {
+  html {
+    overflow-y: scroll;
+  }
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "NanumBarunGothic", var(--font-sans), ui-sans-serif, system-ui,
+    -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
+    "Segoe UI Emoji";
+}
+
+html[data-scroll-locked="true"] body {
+  padding-right: var(--scrollbar-width, 0px);
+}
+
+html[data-scroll-locked="true"] .scroll-lock-pad {
+  padding-right: var(--scrollbar-width, 0px);
+}
+
+html[data-scroll-locked="true"] nav[aria-label="하단 메뉴"] {
+  pointer-events: none;
+}
+
+/* Nanum Barun Gothic family names are split by weight in the provided CSS */
+h1,
+h2,
+h3,
+strong,
+b {
+  font-family: "NanumBarunGothicBold", "NanumBarunGothic", var(--font-sans),
+    ui-sans-serif, system-ui;
+}
