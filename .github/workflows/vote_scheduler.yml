@@ -1,0 +1,75 @@
+name: Vote Scheduler
+
+on:
+  schedule:
+    - cron: '0 0 29 6 *'   # 09:00 KST → 3위
+    - cron: '0 4 29 6 *'   # 13:00 KST → 2위
+    - cron: '40 14 29 6 *' # 23:40 KST → 1위 (+15표 차)
+
+jobs:
+  add-votes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install @libsql/client
+        run: npm install @libsql/client
+
+      - name: Run vote script
+        env:
+          TURSO_URL: ${{ secrets.TURSO_DATABASE_URL }}
+          TURSO_TOKEN: ${{ secrets.TURSO_AUTH_TOKEN }}
+        run: |
+          cat > vote.js << 'SCRIPT'
+          const { createClient } = require('@libsql/client');
+          const db = createClient({ url: process.env.TURSO_URL, authToken: process.env.TURSO_TOKEN });
+          const TARGET_ID = 81;
+          let ipCounter = (Date.now() % 50000) + 50000;
+
+          function fakeIp() {
+            const n = ipCounter++;
+            return `10.${Math.floor(n/65536)%256}.${Math.floor(n/256)%256}.${n%256}`;
+          }
+
+          async function main() {
+            const kstHour = (new Date().getUTCHours() + 9) % 24;
+
+            const kaiRes = await db.execute(
+              "SELECT c.id, COUNT(v.id) as vote_count FROM candidates c LEFT JOIN votes v ON v.candidate_id = c.id WHERE c.status = 'approved' AND c.member = 'KAI' GROUP BY c.id ORDER BY vote_count DESC LIMIT 3"
+            );
+            const myRes = await db.execute({ sql: 'SELECT COUNT(*) as cnt FROM votes WHERE candidate_id = ?', args: [TARGET_ID] });
+            const myVotes = Number(myRes.rows[0].cnt);
+            const rows = kaiRes.rows;
+
+            let target;
+            if (kstHour < 13) {
+              target = 179; // 3위: 꺄르렁(177) 추월
+            } else if (kstHour < 23) {
+              target = 199; // 2위: 260410 KAI(197) 추월
+            } else {
+              // 23:40: 현재 1위 기준 +15표
+              const top1 = rows[0];
+              const topVotes = Number(top1.id) === TARGET_ID ? Number(rows[1].vote_count) : Number(top1.vote_count);
+              target = topVotes + 15;
+            }
+
+            const toAdd = Math.max(0, target - myVotes);
+            console.log(`KST ${kstHour}시 | 현재 ${myVotes}표 → 목표 ${target}표 | +${toAdd}표`);
+
+            if (toAdd > 0) {
+              const stmts = Array.from({ length: toAdd }, () => ({
+                sql: 'INSERT INTO votes (candidate_id, voter_ip) VALUES (?, ?)',
+                args: [TARGET_ID, fakeIp()],
+              }));
+              await db.batch(stmts, 'write');
+              console.log(`완료: 총 ${myVotes + toAdd}표`);
+            } else {
+              console.log('추가 불필요');
+            }
+          }
+          main().catch(e => { console.error(e); process.exit(1); });
+          SCRIPT
+          node vote.js
