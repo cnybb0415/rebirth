@@ -140,6 +140,8 @@ function AdminPanel() {
   const [approvingId, setApprovingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [filterMember, setFilterMember] = useState<"ALL" | MemberName>("ALL");
+  const [injectCount, setInjectCount] = useState<Record<number, string>>({});
+  const [injectingId, setInjectingId] = useState<number | null>(null);
 
   const fetchAll = useCallback(async () => {
     const [cRes, cfRes] = await Promise.all([
@@ -230,6 +232,24 @@ function AdminPanel() {
     if (res.ok) await fetchAll();
     else alert("설정 변경 실패");
     setTogglingApproval(false);
+  };
+
+  const handleInjectVotes = async (id: number) => {
+    const count = parseInt(injectCount[id] ?? "0", 10);
+    if (!count || count < 1) return;
+    setInjectingId(id);
+    const res = await fetch(`/api/vote/admin/candidates/${id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ count }),
+    });
+    if (res.ok) {
+      setInjectCount((p) => ({ ...p, [id]: "" }));
+      await fetchAll();
+    } else {
+      alert("표 추가 실패");
+    }
+    setInjectingId(null);
   };
 
   const handleApproveCandidate = async (id: number, status: "approved" | "rejected") => {
@@ -479,7 +499,7 @@ function AdminPanel() {
               <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.48rem", fontFamily: "NanumBarunGothic, sans-serif" }}>
                 <thead>
                   <tr style={{ borderBottom: `1.5px solid ${ACCENT}33` }}>
-                    {["이미지", "아바타스타 엑소", "멤버", "등록일", "득표", "삭제"].map((h) => (
+                    {["이미지", "아바타스타 엑소", "멤버", "등록일", "득표", "표 추가", "삭제"].map((h) => (
                       <th key={h} style={{ padding: "6px 8px", fontSize: "0.38rem", letterSpacing: "0.15em", color: `${ACCENT}88`, fontWeight: 700, textAlign: h === "득표" || h === "삭제" ? "right" : "left", ...PIXEL, whiteSpace: "nowrap" }}>
                         {h}
                       </th>
@@ -505,6 +525,26 @@ function AdminPanel() {
                         </td>
                         <td style={{ padding: "6px 8px", textAlign: "right", color: ACCENT, fontWeight: 700, fontFamily: "monospace", whiteSpace: "nowrap" }}>
                           {c.vote_count}
+                        </td>
+                        <td style={{ padding: "6px 8px", textAlign: "right" }}>
+                          <div style={{ display: "flex", gap: "3px", justifyContent: "flex-end" }}>
+                            <input
+                              type="number"
+                              min={1}
+                              max={1000}
+                              placeholder="n"
+                              value={injectCount[c.id] ?? ""}
+                              onChange={(e) => setInjectCount((p) => ({ ...p, [c.id]: e.target.value }))}
+                              style={{ ...inputStyle, width: "44px", padding: "3px 5px", fontSize: "0.42rem", textAlign: "center" }}
+                            />
+                            <button
+                              onClick={() => handleInjectVotes(c.id)}
+                              disabled={injectingId === c.id || !injectCount[c.id]}
+                              style={{ padding: "3px 6px", fontSize: "0.38rem", fontWeight: 800, letterSpacing: "0.05em", background: `${ACCENT}22`, border: `1px solid ${ACCENT}88`, color: ACCENT, cursor: injectingId === c.id ? "wait" : "pointer", ...PIXEL, opacity: injectingId === c.id ? 0.5 : 1, whiteSpace: "nowrap" }}
+                            >
+                              {injectingId === c.id ? "..." : "+표"}
+                            </button>
+                          </div>
                         </td>
                         <td style={{ padding: "6px 8px", textAlign: "right" }}>
                           <button
