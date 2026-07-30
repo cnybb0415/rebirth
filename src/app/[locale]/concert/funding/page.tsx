@@ -66,7 +66,7 @@ export default async function ConcertFundingPage({
         <p style={{ fontSize: "0.85rem", fontWeight: 800, letterSpacing: "0.3em", color: "#ffd700", textShadow: "0 0 16px #ffd70066", marginBottom: "10px" }}>COMING SOON</p>
       </div>
 
-      {false && (notice ? (
+      {(false as boolean) && (notice ? (
         <div className="pb-6">
           {/* ══ D-day + 픽셀 배터리 ══ */}
           <div
