@@ -178,7 +178,8 @@ export default async function ConcertPage({
             color: "#00e5ff",
           }}
         >
-          {stop.subtitle}
+          {/* 앵콜콘 확정 시 복구: {stop.subtitle} */}
+          COMING SOON
         </div>
 
         {/* ── 픽셀 구분선 ── */}
@@ -217,7 +218,8 @@ export default async function ConcertPage({
               DATE
             </div>
             <div className="text-white" style={{ fontSize: "0.78rem", fontWeight: 400 }}>
-              {stop.dateDisplay}
+              {/* 앵콜콘 확정 시 복구: {stop.dateDisplay} */}
+              COMING SOON
             </div>
           </div>
 
@@ -241,16 +243,15 @@ export default async function ConcertPage({
               VENUE
             </div>
             <div className="text-white" style={{ fontSize: "0.78rem", fontWeight: 400 }}>
-              {stop.venue}
+              {/* 앵콜콘 확정 시 복구: {stop.venue} */}
+              COMING SOON
             </div>
+            {/* 앵콜콘 확정 시 복구:
             {stop.venueDetail && (
-              <div
-                className="text-white/60"
-                style={{ fontSize: "0.6rem", fontWeight: 400, marginTop: "2px" }}
-              >
+              <div className="text-white/60" style={{ fontSize: "0.6rem", fontWeight: 400, marginTop: "2px" }}>
                 {stop.venueDetail}
               </div>
-            )}
+            )} */}
           </div>
         </div>
 

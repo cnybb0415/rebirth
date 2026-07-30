@@ -60,7 +60,13 @@ export default async function ConcertFundingPage({
         accentColor={ACCENT}
       />
 
-      {notice ? (
+      {/* 앵콜콘 확정 시 복구 */}
+      <div style={{ padding: "48px 0", textAlign: "center" }}>
+        <p style={{ fontSize: "0.42rem", letterSpacing: "0.45em", color: "rgba(255,255,255,0.2)", marginBottom: "14px" }}>· · · · ·</p>
+        <p style={{ fontSize: "0.85rem", fontWeight: 800, letterSpacing: "0.3em", color: "#ffd700", textShadow: "0 0 16px #ffd70066", marginBottom: "10px" }}>COMING SOON</p>
+      </div>
+
+      {false && (notice ? (
         <div className="pb-6">
           {/* ══ D-day + 픽셀 배터리 ══ */}
           <div
@@ -268,7 +274,7 @@ export default async function ConcertFundingPage({
         >
           {t("noNotice")}
         </p>
-      )}
+      ))}
     </BinderPage>
   );
 }
