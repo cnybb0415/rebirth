@@ -77,7 +77,9 @@ function PasswordGate({ onSuccess }: { onSuccess: () => void }) {
         body: JSON.stringify({ password: pw }),
       });
       if (res.ok) {
+        const data = await res.json();
         sessionStorage.setItem("exo_admin_authed", "1");
+        if (data.token) sessionStorage.setItem("exo_admin_token", data.token);
         onSuccess();
       } else {
         setError("비밀번호가 올바르지 않습니다.");
@@ -123,6 +125,11 @@ function PasswordGate({ onSuccess }: { onSuccess: () => void }) {
       </div>
     </div>
   );
+}
+
+function adminHeaders(extra?: Record<string, string>): Record<string, string> {
+  const token = sessionStorage.getItem("exo_admin_token") ?? "";
+  return { "Content-Type": "application/json", "x-admin-token": token, ...extra };
 }
 
 // ── 어드민 본체 ────────────────────────────────────────────
@@ -187,7 +194,7 @@ function AdminPanel() {
     try {
       const res = await fetch("/api/vote/config", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: adminHeaders(),
         body: JSON.stringify({
           start_at: startDate.toISOString(),
           end_at: endDate.toISOString(),
@@ -213,7 +220,7 @@ function AdminPanel() {
     setTogglingReg(true);
     const res = await fetch("/api/vote/config", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: adminHeaders(),
       body: JSON.stringify({ registration_open: config.registration_open !== 1 }),
     });
     if (res.ok) await fetchAll();
@@ -226,7 +233,7 @@ function AdminPanel() {
     setTogglingApproval(true);
     const res = await fetch("/api/vote/config", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: adminHeaders(),
       body: JSON.stringify({ approval_mode: config.approval_mode !== 1 }),
     });
     if (res.ok) await fetchAll();
@@ -240,7 +247,7 @@ function AdminPanel() {
     setInjectingId(id);
     const res = await fetch(`/api/vote/admin/candidates/${id}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: adminHeaders(),
       body: JSON.stringify({ count }),
     });
     if (res.ok) {
@@ -256,7 +263,7 @@ function AdminPanel() {
     setApprovingId(id);
     const res = await fetch(`/api/vote/admin/candidates/${id}`, {
       method: "PATCH",
-      headers: { "Content-Type": "application/json" },
+      headers: adminHeaders(),
       body: JSON.stringify({ status }),
     });
     if (res.ok) await fetchAll();

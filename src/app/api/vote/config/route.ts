@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/voteDb";
+import { checkAdminAuth } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +21,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const authErr = checkAdminAuth(req);
+  if (authErr) return authErr;
+
   try {
     const body = await req.json();
     const { start_at, end_at, registration_open, approval_mode } = body as {
@@ -64,7 +68,6 @@ export async function POST(req: NextRequest) {
     const regOpen = registration_open !== undefined ? (registration_open ? 1 : 0) : (existing?.registration_open ?? 1);
     const appMode = approval_mode !== undefined ? (approval_mode ? 1 : 0) : (existing?.approval_mode ?? 0);
 
-    console.log("[vote/config POST] saving:", { start_at, end_at, regOpen, appMode });
     await db.execute({
       sql: `INSERT INTO vote_config (id, start_at, end_at, registration_open, approval_mode) VALUES (1, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET
@@ -74,8 +77,6 @@ export async function POST(req: NextRequest) {
               approval_mode = excluded.approval_mode`,
       args: [start_at, end_at, regOpen, appMode],
     });
-    const saved = await db.execute("SELECT * FROM vote_config WHERE id = 1");
-    console.log("[vote/config POST] saved row:", saved.rows[0]);
 
     return NextResponse.json({ ok: true });
   } catch (e) {

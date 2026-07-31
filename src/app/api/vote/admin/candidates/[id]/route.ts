@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/voteDb";
+import { checkAdminAuth } from "@/lib/adminAuth";
 
 export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authErr = checkAdminAuth(req);
+  if (authErr) return authErr;
+
   const { id } = await params;
   const numId = parseInt(id, 10);
   if (isNaN(numId)) {
@@ -43,6 +47,9 @@ export async function PATCH(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const authErr = checkAdminAuth(req);
+  if (authErr) return authErr;
+
   const { id } = await params;
   const numId = parseInt(id, 10);
   if (isNaN(numId)) {
