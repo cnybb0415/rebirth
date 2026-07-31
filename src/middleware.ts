@@ -10,9 +10,16 @@ const BLOCKED_PATHS = new Set([
   "/wp-admin/setup-config.php",
 ]);
 
+const AI_BOT_PATTERN =
+  /ClaudeBot|Claude-Web|anthropic-ai|GPTBot|ChatGPT-User|OAI-SearchBot|CCBot|Google-Extended|PerplexityBot|YouBot|Meta-ExternalAgent|AmazonBot|Bytespider|Diffbot|ImagesiftBot|Omgili|Applebot-Extended|cohere-ai/i;
+
 export function middleware(request: NextRequest) {
   if (BLOCKED_PATHS.has(request.nextUrl.pathname)) {
     return new NextResponse("Not Found", { status: 404 });
+  }
+  const ua = request.headers.get("user-agent") ?? "";
+  if (AI_BOT_PATTERN.test(ua)) {
+    return new NextResponse("Forbidden", { status: 403 });
   }
   return i18nMiddleware(request);
 }
