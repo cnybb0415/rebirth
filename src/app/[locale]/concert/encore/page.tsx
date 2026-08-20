@@ -2,21 +2,22 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useLocale } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import s from "./encore.module.css";
 
 const MENU_ITEMS = [
-  { id: "cheer",   ko: "응원법",    en: "CHEER",   href: "/concert/cheer"   },
-  { id: "funding", ko: "모금",      en: "FUNDING", href: "/concert/funding" },
-  { id: "notice",  ko: "공지",      en: "NOTICE",  href: "/concert/notice"  },
-  { id: "chorus",  ko: "떼창곡",    en: "CHORUS",  href: "/concert/chorus"  },
-  { id: "helper",  ko: "헬퍼모집",  en: "HELPER",  href: "/concert/helper"  },
+  { id: "cheer",   navKey: "cheer",   en: "CHEER",   href: "/concert/cheer"   },
+  { id: "funding", navKey: "funding", en: "FUNDING", href: "/concert/funding" },
+  { id: "notice",  navKey: "notice",  en: "NOTICE",  href: "/concert/notice"  },
+  { id: "chorus",  navKey: "chorus",  en: "CHORUS",  href: "/concert/chorus"  },
+  { id: "helper",  navKey: "helper",  en: "HELPER",  href: "/concert/helper"  },
 ] as const;
 
 export default function EncorePage() {
   const [activeIdx, setActiveIdx] = useState(0);
   const router = useRouter();
   const locale = useLocale();
+  const tnav = useTranslations("nav");
 
   const navigate = (href: string) => router.push(`/${locale}${href}`);
 
@@ -77,7 +78,7 @@ export default function EncorePage() {
                       }}
                     >
                       <span className={s.menuCursor} aria-hidden>►</span>
-                      <span className={s.menuKo}>{item.ko}</span>
+                      <span className={s.menuKo}>{tnav(item.navKey)}</span>
                       <span className={s.menuEn}>{item.en}</span>
                     </li>
                   );

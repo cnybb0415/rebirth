@@ -21,6 +21,11 @@ export function middleware(request: NextRequest) {
   if (AI_BOT_PATTERN.test(ua)) {
     return new NextResponse("Forbidden", { status: 403 });
   }
+  // Non-ASCII path (e.g. un-encoded Korean) → next-intl would put it in the
+  // Location header as-is, triggering a ByteString TypeError on Vercel Edge.
+  if (/[^\x00-\x7F]/.test(request.nextUrl.pathname)) {
+    return new NextResponse("Not Found", { status: 404 });
+  }
   return i18nMiddleware(request);
 }
 
