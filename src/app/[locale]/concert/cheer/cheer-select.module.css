@@ -1,0 +1,200 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: clamp(3px, 1%, 6px);
+  font-family: 'PFStarDust', 'DungGeunMo', monospace;
+  -webkit-font-smoothing: none;
+}
+
+/* ── Header ── */
+.header {
+  font-size: clamp(5px, 1.5vw, 9px);
+  color: rgba(255, 77, 141, 0.7);
+  letter-spacing: 0.2em;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ── Main layout ── */
+.layout {
+  display: flex;
+  gap: clamp(4px, 1.5%, 8px);
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── Song list (left) ── */
+.list {
+  list-style: none;
+  flex: 0 0 55%;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.list::-webkit-scrollbar { width: 2px; }
+.list::-webkit-scrollbar-thumb { background: rgba(255, 77, 141, 0.3); }
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: clamp(2px, 0.8vw, 5px);
+  padding: clamp(2px, 0.8%, 4px) clamp(3px, 1%, 6px);
+  cursor: pointer;
+  border-bottom: 1px solid rgba(255, 77, 141, 0.08);
+  transition: background 0.06s;
+  outline: none;
+}
+
+.item:hover,
+.item:focus {
+  background: rgba(255, 77, 141, 0.07);
+}
+
+.itemLocked {
+  opacity: 0.35;
+  cursor: default;
+}
+.itemLocked:hover { background: transparent; }
+
+.cursor {
+  font-size: clamp(5px, 1.4vw, 8px);
+  color: #ff4d8d;
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.06s;
+  width: clamp(7px, 2vw, 12px);
+}
+
+.songName {
+  font-size: clamp(5.5px, 1.6vw, 10px);
+  color: rgba(255, 255, 255, 0.55);
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  letter-spacing: 0.04em;
+  transition: color 0.06s, text-shadow 0.06s;
+}
+
+.lock {
+  font-size: clamp(4px, 1.1vw, 7px);
+  color: rgba(255, 255, 255, 0.2);
+  letter-spacing: 0.08em;
+  flex-shrink: 0;
+}
+
+/* Active item */
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.itemActive .cursor {
+  opacity: 1;
+  animation: cursorBlink 0.75s step-start infinite;
+}
+
+.itemActive .songName {
+  color: #ff4d8d;
+  text-shadow: 0 0 8px rgba(255, 77, 141, 0.5), 1px 1px 0 rgba(0,0,0,0.8);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .itemActive .cursor { animation: none; }
+}
+
+/* ── Character card (right) ── */
+.preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(3px, 1%, 6px);
+  min-width: 0;
+}
+
+.previewFrame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border: 1px solid rgba(255, 77, 141, 0.35);
+  box-shadow:
+    0 0 16px rgba(255, 77, 141, 0.25),
+    inset 0 0 10px rgba(0,0,0,0.6);
+  overflow: hidden;
+  flex-shrink: 0;
+  background: rgba(255, 77, 141, 0.04);
+}
+
+/* Corner brackets */
+.corner {
+  position: absolute;
+  width: clamp(6px, 2vw, 12px);
+  height: clamp(6px, 2vw, 12px);
+  border-color: #ff4d8d;
+  border-style: solid;
+  z-index: 2;
+}
+.cornerTL { top: -1px; left: -1px;  border-width: 2px 0 0 2px; }
+.cornerTR { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+.cornerBL { bottom: -1px; left: -1px;  border-width: 0 0 2px 2px; }
+.cornerBR { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+
+.previewImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  image-rendering: pixelated;
+  display: block;
+}
+
+.previewEmpty {
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    rgba(255, 77, 141, 0.06) 0px, rgba(255, 77, 141, 0.06) 2px,
+    transparent 2px, transparent 8px
+  );
+}
+
+/* ── Song name below frame ── */
+.previewName {
+  font-size: clamp(4.5px, 1.3vw, 8px);
+  color: rgba(255, 77, 141, 0.7);
+  letter-spacing: 0.08em;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+/* ── Bottom prompt ── */
+@keyframes blink {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 0; }
+}
+
+.prompt {
+  font-size: clamp(4.5px, 1.3vw, 8px);
+  color: rgba(255, 77, 141, 0.5);
+  letter-spacing: 0.2em;
+  text-align: center;
+  animation: blink 1.2s step-start infinite;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .header      { font-size: 2.6vw; }
+  .songName    { font-size: 3vw; }
+  .cursor      { font-size: 2.6vw; }
+  .lock        { font-size: 2vw; }
+  .prompt      { font-size: 2.4vw; }
+  .previewName { font-size: 2.4vw; }
+  .corner      { width: 3.5vw; height: 3.5vw; }
+}

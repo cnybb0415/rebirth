@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
+/* ── 모니터 스크린 영역 공통 변수 ──
+   video_screen_transparent.png 기준 좌표.
+   위치가 안 맞으면 여기만 수정하세요. */
+:root {
+  --monitor-screen-top:    11.5%;
+  --monitor-screen-left:   18.5%;
+  --monitor-screen-width:  61%;
+  --monitor-screen-height: 48.5%;
+  --monitor-mobile-size:   140vw; /* 모바일에서 모니터 크기 */
+}
+
 /* ── PF스타더스트 픽셀 폰트 ── */
 @font-face {
   font-family: "PFStarDust";

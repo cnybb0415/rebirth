@@ -1,0 +1,256 @@
+/* CheerGuideViewer — Windows 98 Y2K dialog */
+
+.viewer {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  font-family: 'PFStarDust', 'DungGeunMo', monospace;
+  -webkit-font-smoothing: none;
+}
+
+/* ── Outer window shell ── */
+.window {
+  border: 2px solid;
+  border-color: #f4b8d8 #6e2248 #6e2248 #f4b8d8;
+  background: #c478a4;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+/* ── Title bar ── */
+.titleBar {
+  background: linear-gradient(90deg, #882860 0%, #d0508c 45%, #a83868 100%);
+  display: flex;
+  align-items: center;
+  padding: 2px 3px;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.titleIcon {
+  font-size: clamp(5px, 1.4vw, 8px);
+  color: #ffddef;
+  flex-shrink: 0;
+}
+
+.titleText {
+  flex: 1;
+  font-size: clamp(5px, 1.4vw, 8px);
+  color: #fff;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.35);
+}
+
+.winBtns {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.winBtn {
+  width: clamp(11px, 2.6vw, 17px);
+  height: clamp(11px, 2.6vw, 17px);
+  border: 1px solid;
+  border-color: #f4b8d8 #6e2248 #6e2248 #f4b8d8;
+  background: #c478a4;
+  font-family: inherit;
+  -webkit-font-smoothing: none;
+  font-size: clamp(4px, 1vw, 6px);
+  color: #1a0010;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  padding: 0;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.winBtnActive {
+  cursor: pointer;
+}
+.winBtnActive:hover:not(:disabled) { background: #d890bc; }
+.winBtnActive:disabled { opacity: 0.4; cursor: default; }
+
+.winBtnClose {
+  background: #c02848;
+  border-color: #ff9090 #601020 #601020 #ff9090;
+  color: #fff;
+  cursor: pointer;
+}
+.winBtnClose:hover { background: #d83060; }
+
+/* ── Menu bar ── */
+.menuBar {
+  background: #d890bc;
+  border: 1px solid;
+  border-color: #f4b8d8 #6e2248 #6e2248 #f4b8d8;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.menuItem {
+  font-family: 'PFStarDust', 'DungGeunMo', monospace;
+  -webkit-font-smoothing: none;
+  font-size: clamp(4.5px, 1.3vw, 8px);
+  color: #3a0828;
+  padding: 2px 6px;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  background: transparent;
+  border: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: background 0.06s;
+  white-space: nowrap;
+}
+.menuItem:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.menuItemActive {
+  color: #6e2248;
+  text-decoration: underline;
+  cursor: default;
+}
+.menuItemActive:hover { background: transparent; }
+
+.menuItemOn {
+  background: rgba(110, 34, 72, 0.15);
+  color: #6e2248;
+}
+
+.menuItemVideo {
+  margin-left: auto;
+  color: #6e2248;
+}
+
+/* ── Canvas / image area ── */
+.canvas {
+  border: 2px solid;
+  border-color: #6e2248 #f4b8d8 #f4b8d8 #6e2248;
+  background:
+    repeating-linear-gradient(
+      rgba(196, 120, 164, 0.15) 0px, rgba(196, 120, 164, 0.15) 1px,
+      transparent 1px, transparent 18px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      rgba(196, 120, 164, 0.15) 0px, rgba(196, 120, 164, 0.15) 1px,
+      transparent 1px, transparent 18px
+    ),
+    #fff4f9;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.guideImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── Navigation ── */
+.navArea {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+}
+
+.navBtn {
+  font-family: 'PFStarDust', 'DungGeunMo', monospace;
+  -webkit-font-smoothing: none;
+  font-size: clamp(5px, 1.4vw, 8px);
+  color: #1a0010;
+  background: #c478a4;
+  border: 2px solid;
+  border-color: #f4b8d8 #6e2248 #6e2248 #f4b8d8;
+  padding: 3px 8px;
+  cursor: pointer;
+  letter-spacing: 0.1em;
+  flex-shrink: 0;
+}
+.navBtn:hover:not(:disabled) { background: #d090bc; }
+.navBtn:active:not(:disabled) {
+  border-color: #6e2248 #f4b8d8 #f4b8d8 #6e2248;
+  padding: 4px 7px 2px 9px;
+}
+.navBtn:disabled { opacity: 0.35; cursor: default; }
+
+.pageInfo {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  flex: 1;
+  justify-content: center;
+}
+
+.dotOn  { color: #6e2248; font-size: 0.7em; }
+.dotOff { color: rgba(110, 34, 72, 0.25); font-size: 0.7em; }
+
+.pageNum {
+  font-size: clamp(4.5px, 1.2vw, 7px);
+  color: rgba(26, 0, 16, 0.45);
+  letter-spacing: 0.12em;
+  margin-left: 4px;
+}
+
+/* ── Coming soon ── */
+.comingSoon {
+  padding: 24px;
+  text-align: center;
+  font-size: clamp(7px, 2vw, 11px);
+  letter-spacing: 0.25em;
+  color: rgba(110, 34, 72, 0.45);
+}
+
+/* ── Video floating popup (no overlay) ── */
+.videoSide {
+  position: fixed;
+  bottom: 90px;
+  right: 16px;
+  width: min(280px, calc(100vw - 32px));
+  z-index: 200;
+  border: 2px solid;
+  border-color: #f4b8d8 #6e2248 #6e2248 #f4b8d8;
+  background: #c478a4;
+  padding: 3px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.videoTitleBar {
+  background: linear-gradient(90deg, #882860 0%, #d0508c 45%, #a83868 100%);
+  display: flex;
+  align-items: center;
+  padding: 2px 3px;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.videoInset {
+  border: 2px solid;
+  border-color: #6e2248 #f4b8d8 #f4b8d8 #6e2248;
+  background: #000;
+  overflow: hidden;
+}
+
+.playerIframe {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  display: block;
+  border: none;
+}
+

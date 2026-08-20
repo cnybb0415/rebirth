@@ -1,0 +1,278 @@
+/* EXhOrizon Hub — encore page styles */
+
+.pageBg {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: #0a0818 url('/images/concert/encore/background.png') center / cover no-repeat;
+  pointer-events: none;
+}
+
+.page {
+  position: relative;
+  z-index: 11;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 0;
+  overflow-x: hidden;
+  font-family: 'PFStarDust', 'DungGeunMo', monospace;
+  -webkit-font-smoothing: none;
+}
+
+.monitorWrap {
+  position: relative;
+  width:  min(100vw, calc(100svh - 60px), 900px);
+  height: min(100vw, calc(100svh - 60px), 900px);
+  flex-shrink: 0;
+  /* 스크린 영역(~35% 지점)이 뷰포트 중앙에 오도록 모니터를 아래로 이동 */
+  transform: translateX(8px);
+}
+
+.monitorImg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: auto;
+  display: block;
+  pointer-events: none;
+  user-select: none;
+  z-index: 2;
+  filter:
+    drop-shadow(0 12px 48px rgba(196, 168, 232, 0.22))
+    drop-shadow(0  4px 12px rgba(196, 168, 232, 0.10));
+}
+
+/* ── Screen ── */
+.screen {
+  position: absolute;
+  top:    var(--monitor-screen-top);
+  left:   var(--monitor-screen-left);
+  width:  var(--monitor-screen-width);
+  height: var(--monitor-screen-height);
+  background: url('/images/concert/encore/video_background.png') center / cover no-repeat;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(5, 2, 20, 0.60);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0) 0px, rgba(0, 0, 0, 0) 2px,
+    rgba(0, 0, 0, 0.18) 2px, rgba(0, 0, 0, 0.18) 4px
+  );
+  pointer-events: none;
+  z-index: 20;
+}
+
+/* Boot animation */
+@keyframes screenBoot {
+  0%   { opacity: 0; clip-path: inset(50% 0 50% 0); filter: brightness(5); }
+  15%  { opacity: 1; clip-path: inset(50% 0 50% 0); filter: brightness(5); }
+  35%  { clip-path: inset(2% 0 2% 0); filter: brightness(2); }
+  50%  { clip-path: inset(0% 0 0% 0); filter: brightness(1.3); }
+  100% { clip-path: inset(0% 0 0% 0); filter: brightness(1); }
+}
+
+.screenInner {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 3% 6% 3%;
+  animation: screenBoot 0.9s cubic-bezier(0.25, 0, 0.75, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screenInner { animation: none; }
+}
+
+/* ── HUD ── */
+.hud {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: clamp(5px, 1.5vw, 9px);
+  letter-spacing: 0.12em;
+  padding-bottom: 2%;
+  border-bottom: 1px solid rgba(196, 168, 232, 0.2);
+}
+
+.hudHp     { color: #ff6b8a; }
+.hudCenter { color: rgba(196, 168, 232, 0.6); }
+.hudScore  { color: #f0c84a; }
+
+/* ── Title block ── */
+.titleBlock {
+  text-align: center;
+  line-height: 1;
+}
+
+.screenTitle {
+  font-size: clamp(7px, 2.2vw, 14px);
+  color: #c4a8e8;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 12px rgba(196, 168, 232, 0.6), 2px 2px 0 rgba(0,0,0,0.8);
+  white-space: nowrap;
+  margin-bottom: 2%;
+}
+
+.screenSubtitle {
+  font-size: clamp(5px, 1.4vw, 9px);
+  color: rgba(196, 168, 232, 0.5);
+  letter-spacing: 0.2em;
+  white-space: nowrap;
+}
+
+/* ── Pixel divider ── */
+.pixelDivider {
+  display: flex;
+  align-items: center;
+  gap: clamp(1px, 0.5%, 3px);
+  width: 90%;
+}
+
+.pixelDot {
+  display: inline-block;
+  flex: 1;
+  height: clamp(2px, 0.6vw, 4px);
+  background: rgba(196, 168, 232, 0.3);
+}
+
+.pixelDot:nth-child(even) {
+  background: rgba(240, 200, 74, 0.25);
+  height: clamp(1px, 0.4vw, 3px);
+}
+
+/* ── Menu ── */
+.menuList {
+  list-style: none;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1px, 0.4%, 3px);
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  gap: clamp(3px, 1vw, 7px);
+  padding: clamp(2px, 0.6%, 4px) clamp(5px, 2%, 10px);
+  cursor: pointer;
+  outline: none;
+  background: transparent;
+  border: 1px solid transparent;
+  transition: background 0.08s, border-color 0.08s;
+}
+
+.menuCursor {
+  font-size: clamp(6px, 1.8vw, 11px);
+  color: #ffb3c9;
+  width: clamp(9px, 2.4vw, 14px);
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.08s;
+}
+
+.menuKo {
+  font-size: clamp(7px, 2.1vw, 13px);
+  color: rgba(224, 216, 244, 0.6);
+  flex: 1;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  transition: color 0.08s, text-shadow 0.08s;
+}
+
+.menuEn {
+  font-size: clamp(5px, 1.4vw, 9px);
+  color: rgba(224, 216, 244, 0.25);
+  letter-spacing: 0.14em;
+  white-space: nowrap;
+  transition: color 0.08s;
+}
+
+/* Active state */
+@keyframes cursorBlink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+.menuItemActive {
+  background: rgba(240, 200, 74, 0.08);
+  border-color: rgba(240, 200, 74, 0.3);
+}
+
+.menuItemActive .menuCursor {
+  opacity: 1;
+  animation: cursorBlink 0.75s step-start infinite;
+}
+
+.menuItemActive .menuKo {
+  color: #f0c84a;
+  text-shadow: 0 0 10px rgba(240, 200, 74, 0.5), 1px 1px 0 rgba(0,0,0,0.8);
+}
+
+.menuItemActive .menuEn {
+  color: rgba(240, 200, 74, 0.6);
+}
+
+.menuItem:hover:not(.menuItemActive) .menuCursor { opacity: 0.5; }
+.menuItem:hover:not(.menuItemActive) .menuKo     { color: rgba(224, 216, 244, 0.9); }
+
+@media (prefers-reduced-motion: reduce) {
+  .menuItemActive .menuCursor { animation: none; opacity: 1; }
+}
+
+/* ── INSERT COIN ── */
+@keyframes blink {
+  0%, 100% { opacity: 0.7; }
+  50%       { opacity: 0; }
+}
+
+.insertCoin {
+  font-size: clamp(4.5px, 1.3vw, 8px);
+  color: rgba(196, 168, 232, 0.55);
+  letter-spacing: 0.22em;
+  text-align: center;
+  animation: blink 1.2s step-start infinite;
+  white-space: nowrap;
+}
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+  .page {
+    height: 100svh;
+    overflow: hidden;
+  }
+  .monitorWrap {
+    width:  140vw;
+    height: 140vw;
+  }
+  .hud         { font-size: 2.4vw; }
+  .screenTitle { font-size: 3.6vw; }
+  .screenSubtitle { font-size: 2.2vw; }
+  .menuKo      { font-size: 3.4vw; }
+  .menuEn      { font-size: 2.2vw; }
+  .menuCursor  { font-size: 2.8vw; }
+  .insertCoin  { font-size: 2.2vw; }
+}
