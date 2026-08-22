@@ -23,20 +23,48 @@ export function getAnnouncementTitle(item: AnnouncementItem, locale: string): st
   return item.title;
 }
 
+const ENCORE_IMAGES = [
+  {
+    src: "/images/concert/notice/encore/01-1 좌배도.jpg",
+    alt: "EXO PLANET #6 - EXhOrizon [dot] 좌석배치도",
+  },
+  {
+    src: "/images/concert/notice/encore/01-2 타임테이블.jpg",
+    alt: "EXO PLANET #6 - EXhOrizon [dot] 타임테이블",
+  },
+];
+
 export const announcements: AnnouncementItem[] = [
   {
     id: "1",
     title: "[공지] EXO PLANET #6 - EXhOrizon [dot] INFO",
+    localizedTitles: {
+      en: "[Notice] EXO PLANET #6 - EXhOrizon [dot] INFO",
+      zh: "[公告] EXO PLANET #6 - EXhOrizon [dot] INFO",
+      ja: "[お知らせ] EXO PLANET #6 - EXhOrizon [dot] INFO",
+    },
     date: "2026.08.23",
     content: ["좌석배치도 및 타임테이블 일정 공유"],
-    images: [
+    localizedImages: [
       {
-        src: "/images/concert/notice/encore/01-1 좌배도.jpg",
-        alt: "EXO PLANET #6 - EXhOrizon [dot] 좌석배치도",
+        label: "한국어",
+        content: ["좌석배치도 및 타임테이블 일정 공유"],
+        images: ENCORE_IMAGES,
       },
       {
-        src: "/images/concert/notice/encore/01-2 타임테이블.jpg",
-        alt: "EXO PLANET #6 - EXhOrizon [dot] 타임테이블",
+        label: "English",
+        content: ["Seat map and timetable schedule for EXO PLANET #6 - EXhOrizon [dot]."],
+        images: ENCORE_IMAGES,
+      },
+      {
+        label: "中文",
+        content: ["EXO PLANET #6 - EXhOrizon [dot] 座位图及时间表日程分享。"],
+        images: ENCORE_IMAGES,
+      },
+      {
+        label: "日本語",
+        content: ["EXO PLANET #6 - EXhOrizon [dot] の座席配置図とタイムテーブルのご案内です。"],
+        images: ENCORE_IMAGES,
       },
     ],
   },
