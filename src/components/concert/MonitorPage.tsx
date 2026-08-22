@@ -34,18 +34,20 @@ export function MonitorPage({
                 ◄ MENU
               </Link>
               <span className={s.pageTitle}>{title}</span>
-              {subtitle && (
+              <div className={s.backRight}>
+                {subtitle && (
+                  <span
+                    className={s.headingSubtitle}
+                    style={{ color: accentColor }}
+                  >
+                    {subtitle}
+                  </span>
+                )}
                 <span
-                  className={s.headingSubtitle}
-                  style={{ color: accentColor, flexShrink: 0 }}
-                >
-                  {subtitle}
-                </span>
-              )}
-              <span
-                className={s.accentDot}
-                style={{ background: accentColor }}
-              />
+                  className={s.accentDot}
+                  style={{ background: accentColor }}
+                />
+              </div>
             </div>
 
             {/* Scrollable content */}

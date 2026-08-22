@@ -87,9 +87,9 @@
   position: relative;
   z-index: 10;
   flex-shrink: 0;
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  gap: clamp(5px, 2%, 12px);
   padding: clamp(3px, 1.2%, 6px) clamp(8px, 5%, 20px);
   border-bottom: 1px solid rgba(196, 168, 232, 0.15);
 }
@@ -100,20 +100,25 @@
   letter-spacing: 0.15em;
   text-decoration: none;
   opacity: 0.7;
-  flex-shrink: 0;
   transition: opacity 0.1s;
+  justify-self: start;
 }
 .backBtn:hover { opacity: 1; }
+
 
 .pageTitle {
   font-size: clamp(6px, 1.8vw, 11px);
   color: #fff;
   letter-spacing: 0.08em;
-  flex: 1;
   text-align: center;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+}
+
+.backRight {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(3px, 0.8%, 6px);
 }
 
 .accentDot {
