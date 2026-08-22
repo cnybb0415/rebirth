@@ -39,7 +39,7 @@ export default function EncorePage() {
 
               {/* ── HUD 상단 ── */}
               <div className={s.hud}>
-                <span className={s.hudHp}>♥ ♥ ♥</span>
+                <span className={s.hudHp}>♥ ♥ ♥ ♥ ♥ ♥</span>
                 <span className={s.hudCenter}>EXO-L</span>
                 <span className={s.hudScore}>★ 120408</span>
               </div>

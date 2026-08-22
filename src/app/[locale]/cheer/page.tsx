@@ -18,7 +18,7 @@ export default async function CheerPage({
             <h1 className="text-2xl font-bold">{t("cheerTitle")}</h1>
           </div>
           <Link
-            href="/concert"
+            href="/concert/encore"
             className="inline-flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-foreground"
           >
             <span className="text-sm sm:text-xl" aria-hidden>

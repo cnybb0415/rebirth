@@ -11,7 +11,7 @@ export default function NoticePage() {
             <p className="mt-2 text-base text-black">콘서트 관련 공지사항을 확인해주세요.</p>
           </div>
           <Link
-            href="/concert"
+            href="/concert/encore"
             className="inline-flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-foreground"
           >
             <span className="text-sm sm:text-xl" aria-hidden>

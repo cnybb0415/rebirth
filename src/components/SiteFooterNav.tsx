@@ -39,7 +39,7 @@ const NAV_ITEMS = [
   { key: "schedule" as const, href: "/schedule", Icon: CalendarDays },
   { key: "streaming" as const, href: "/streaming", Icon: IconMusic },
   { key: "home" as const, href: "/", Icon: IconHome },
-  { key: "concert" as const, href: "/concert", Icon: Ticket },
+  { key: "concert" as const, href: "/concert/encore", Icon: Ticket },
   { key: "support" as const, href: "/support", Icon: IconHeart },
 ] as const;
 

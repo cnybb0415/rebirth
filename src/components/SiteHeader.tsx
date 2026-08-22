@@ -164,7 +164,7 @@ export function SiteHeader() {
                   </button>
                   {openConcert ? (
                     <div className="mt-1 space-y-1 pl-3 text-sm text-foreground/70">
-                      <Link href="/concert" className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
+                      <Link href="/concert/encore" className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
                         {t("concertHome")}
                       </Link>
                       <Link href="/concert/chorus" className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
