@@ -6,6 +6,8 @@ interface MonitorPageProps {
   title: string;
   subtitle?: string;
   accentColor?: string;
+  backHref?: string;
+  noPadding?: boolean;
 }
 
 export function MonitorPage({
@@ -13,6 +15,8 @@ export function MonitorPage({
   title,
   subtitle,
   accentColor = "#c4a8e8",
+  backHref = "/concert/encore",
+  noPadding = false,
 }: MonitorPageProps) {
   return (
     <>
@@ -30,7 +34,7 @@ export function MonitorPage({
           <div className={s.screen}>
             {/* Top bar: back button + title */}
             <div className={s.backRow}>
-              <Link href="/concert/encore" className={s.backBtn}>
+              <Link href={backHref} className={s.backBtn}>
                 ◄ MENU
               </Link>
               <span className={s.pageTitle}>{title}</span>
@@ -51,7 +55,9 @@ export function MonitorPage({
             </div>
 
             {/* Scrollable content */}
-            <div className={s.screenContent}>{children}</div>
+            <div className={`${s.screenContent}${noPadding ? ` ${s.screenContentNoPadding}` : ""}`}>
+              {children}
+            </div>
           </div>
         </div>
       </div>
