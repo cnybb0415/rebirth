@@ -63,8 +63,8 @@ export function NoticeImageTabs({ item, accentColor, locale }: Props) {
         </p>
       )}
 
-      {/* 탭 바 */}
-      {tabs.length > 1 && (
+      {/* localizedImages는 locale 자동 선택 — 탭 미표시 */}
+      {!hasLocalized && tabs.length > 1 && (
         <div className={s.tabBar}>
           {tabs.map((tab, i) => (
             <button
