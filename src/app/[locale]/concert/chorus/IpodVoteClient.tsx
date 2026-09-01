@@ -50,8 +50,13 @@ function VoteInfoBar() {
   function getCountdown(): string {
     const now = new Date();
     if (now < VOTE_START) {
-      const days = Math.ceil((VOTE_START.getTime() - now.getTime()) / 86400000);
-      return tc("chorusVote.voteStartsIn", { n: days });
+      const diff = VOTE_START.getTime() - now.getTime();
+      const d = Math.floor(diff / 86400000);
+      const h = Math.floor((diff % 86400000) / 3600000);
+      const m = Math.floor((diff % 3600000) / 60000);
+      if (d >= 1) return tc("chorusVote.voteStartsIn", { n: Math.ceil(diff / 86400000) }); // 24h+ → D-N
+      if (h > 0) return tc("chorusVote.voteStartsHourMin", { h, m });
+      return tc("chorusVote.voteStartsMin", { m });
     }
     if (now <= VOTE_END) {
       const diff = VOTE_END.getTime() - now.getTime();

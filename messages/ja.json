@@ -212,7 +212,9 @@
       "nowPlaying": "Now Playing",
       "notice": "お知らせ",
       "day1Label": "非主流クラブ",
-      "day2Label": "メリークリスマス早取り"
+      "day2Label": "メリークリスマス早取り",
+      "voteStartsHourMin": "{h}時間{m}分後に開始",
+      "voteStartsMin": "{m}分後に開始"
     }
   },
   "support": {

@@ -212,7 +212,9 @@
       "nowPlaying": "Now Playing",
       "notice": "알림",
       "day1Label": "비주류 클럽",
-      "day2Label": "미리메리크리스마스"
+      "day2Label": "미리메리크리스마스",
+      "voteStartsHourMin": "{h}시간 {m}분 후 시작",
+      "voteStartsMin": "{m}분 후 시작"
     }
   },
   "support": {
