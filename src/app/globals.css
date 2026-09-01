@@ -55,6 +55,15 @@
   font-display: swap;
 }
 
+/* ── ChicagoFLF — iPod 화면 UI 폰트 (GPL) ── */
+@font-face {
+  font-family: "ChicagoFLF";
+  src: url("/font/ChicagoFLF.woff2") format("woff2");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ── Mulmaru (물마루) — 떼창곡 등에 사용 ── */
 @font-face {
   font-family: "Mulmaru";

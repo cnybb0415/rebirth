@@ -68,15 +68,6 @@ export function CheerGuideViewer({ guideByLang, songLabel, locale, embedUrl, bac
               <a href={backHref} className={s.menuItem}>← LIST</a>
             )}
             <span className={`${s.menuItem} ${s.menuItemActive}`}>GUIDE</span>
-            {availableLangs.length > 1 && availableLangs.map((lang) => (
-              <button
-                key={lang}
-                className={`${s.menuItem} ${activeLang === lang ? s.menuItemOn : ""}`}
-                onClick={() => switchLang(lang)}
-              >
-                {LANG_SHORT[lang]}
-              </button>
-            ))}
             {embedUrl && (
               <button
                 className={`${s.menuItem} ${s.menuItemVideo}`}

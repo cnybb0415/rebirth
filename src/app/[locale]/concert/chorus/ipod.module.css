@@ -1,0 +1,453 @@
+/* ── iPod 투표 페이지 ── */
+
+/*
+  스크린/휠 좌표는 ipod_screen_transparent.png 기준.
+  이미지 교체 후 아래 변수만 조정하면 됨.
+*/
+:root {
+  --ipod-screen-top:    3.7%;
+  --ipod-screen-left:   7.6%;
+  --ipod-screen-width:  85%;
+  --ipod-screen-height: 39.6%;
+
+  --ipod-wheel-top:    52%;
+  --ipod-wheel-left:   20%;
+  --ipod-wheel-size:   60%;
+}
+
+/* ── Outer wrapper ── */
+.ipodWrap {
+  position: relative;
+  width:  min(88vw, calc((100svh - 60px) * 0.563), 520px);
+  flex-shrink: 0;
+}
+
+.ipodImg {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+  position: relative;
+  z-index: 2;
+
+}
+
+/* ── Screen overlay ── */
+.screen {
+  position: absolute;
+  z-index: 1;
+  top:    var(--ipod-screen-top);
+  left:   var(--ipod-screen-left);
+  width:  var(--ipod-screen-width);
+  height: var(--ipod-screen-height);
+  background: #d4d8e8;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  font-family: 'ChicagoFLF', 'DungGeunMo', monospace;
+  -webkit-font-smoothing: none;
+}
+
+/* ── Title bar ── */
+.titleBar {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: clamp(1px, 0.4%, 3px) clamp(3px, 1%, 6px);
+  background: linear-gradient(to bottom, #8090c0 0%, #4860a8 100%);
+  flex-shrink: 0;
+}
+
+.titleText {
+  flex: 1;
+  font-size: clamp(9px, 1.6vw, 12px);
+  color: #fff;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 0 rgba(0,0,0,0.4);
+}
+
+.titleClock {
+  font-size: clamp(8px, 1.3vw, 11px);
+  color: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+}
+
+.titleBattery {
+  width: clamp(14px, 2.5vw, 22px);
+  height: auto;
+  color: #7dff7d;
+  flex-shrink: 0;
+}
+
+/* ── List (menu + song list) ── */
+.list {
+  list-style: none;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.listScrollable {
+  overflow-y: scroll;
+  scrollbar-width: none;
+  display: block;
+}
+.listScrollable::-webkit-scrollbar { display: none; }
+
+.listItem {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  gap: clamp(2px, 0.8%, 5px);
+  padding: 0 clamp(4px, 1.2%, 8px);
+  border-bottom: 1px solid rgba(0, 0, 80, 0.08);
+  cursor: pointer;
+}
+
+.listItemActive {
+  background: linear-gradient(to bottom, #2060d8 0%, #1448b8 100%);
+}
+.listItemActive .listLabel,
+.listItemActive .listDate,
+.listItemActive .listArrow,
+.listItemActive .songTitle,
+.listItemActive .songNum {
+  color: #fff;
+}
+.listItemActive .songArtist {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.listLabel {
+  font-size: clamp(11px, 2.2vw, 16px);
+  color: #1a1a3a;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.listDate {
+  font-size: clamp(9px, 1.6vw, 12px);
+  color: rgba(26, 26, 58, 0.55);
+  flex: 1;
+  padding-left: 4px;
+}
+
+.listArrow {
+  font-size: clamp(11px, 2.2vw, 16px);
+  color: rgba(26, 26, 58, 0.4);
+  flex-shrink: 0;
+}
+
+.listItemSong {
+  flex: none;
+  gap: clamp(3px, 0.8%, 5px);
+  padding: 0 clamp(3px, 0.8%, 6px);
+  min-height: clamp(28px, 5.5vw, 40px);
+}
+
+.songThumb {
+  flex-shrink: 0;
+  width: clamp(22px, 4.5vw, 34px);
+  height: clamp(22px, 4.5vw, 34px);
+  object-fit: cover;
+  background: #b8bcd4;
+  display: block;
+}
+
+.songTitleBlock {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+  gap: clamp(1px, 0.15%, 2px);
+}
+
+.songNum {
+  font-size: clamp(9px, 1.6vw, 12px);
+  color: rgba(26, 26, 58, 0.4);
+  flex-shrink: 0;
+  width: clamp(20px, 3.5vw, 26px);
+}
+
+.songTitle {
+  font-size: clamp(10px, 2vw, 15px);
+  color: #1a1a3a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.songArtist {
+  font-size: clamp(8px, 1.4vw, 11px);
+  color: rgba(26, 26, 58, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Now Playing ── */
+.nowPlaying {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  overflow: hidden;
+}
+
+.nowPlayingMain {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: clamp(28px, 2vw, 20px);
+  padding: clamp(4px, 1vw, 10px) clamp(6px, 1.5vw, 14px);
+  overflow: hidden;
+  align-items: center;
+  justify-content: center;
+}
+
+.artwork {
+  flex-shrink: 0;
+  width: 44%;
+  aspect-ratio: 1;
+  background: #e8e8e8;
+  position: relative;
+  transform: perspective(400px) rotateY(12deg);
+  box-shadow: 4px 6px 16px rgba(0,0,0,0.22);
+}
+
+.artworkLoading {
+  width: 100%;
+  height: 100%;
+  background: repeating-linear-gradient(
+    45deg,
+    #c0c8e0 0px, #c0c8e0 4px,
+    #d4d8e8 4px, #d4d8e8 8px
+  );
+  animation: shimmer 1s linear infinite;
+}
+
+@keyframes shimmer {
+  from { background-position: 0 0; }
+  to   { background-position: 16px 0; }
+}
+
+.artworkImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.artworkPlaceholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(9px, 2.7vw, 18px);
+  color: rgba(26, 26, 58, 0.3);
+}
+
+.nowPlayingMeta {
+  width: 28%;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(2px, 0.5vw, 5px);
+  justify-content: center;
+  overflow: hidden;
+}
+
+.nowPlayingTitle {
+  font-size: clamp(11px, 2.2vw, 16px);
+  color: #111;
+  font-weight: bold;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nowPlayingArtist {
+  font-size: clamp(9px, 1.6vw, 12px);
+  color: #666;
+}
+
+.nowPlayingAlbum {
+  font-size: clamp(8px, 1.4vw, 11px);
+  color: #888;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nowPlayingVoteHint {
+  font-size: clamp(8px, 1.3vw, 11px);
+  color: #888;
+  white-space: nowrap;
+}
+.nowPlayingVoteHint:first-of-type {
+  margin-top: auto;
+}
+
+/* ── Progress row ── */
+.nowPlayingBottom {
+  display: flex;
+  align-items: center;
+  gap: clamp(3px, 0.8vw, 6px);
+  padding: clamp(3px, 0.6vw, 6px) clamp(4px, 1vw, 8px);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  flex-shrink: 0;
+}
+
+.nowPlayingTime {
+  font-size: clamp(8px, 1.4vw, 11px);
+  color: #333;
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.progressBar {
+  flex: 1;
+  height: clamp(4px, 0.8vw, 7px);
+  background: #ddd;
+  overflow: hidden;
+  border-radius: 999px;
+}
+
+.progressFill {
+  height: 100%;
+  background: #4a90d8;
+  border-radius: 999px;
+  transition: width 0.5s linear;
+}
+
+/* ── Center content (confirm / result / already-voted) ── */
+.centerContent {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(2px, 0.6%, 4px);
+  padding: clamp(4px, 1.2%, 8px);
+  background: #e8ecf8;
+}
+
+.confirmTitle {
+  font-size: clamp(11px, 2.2vw, 16px);
+  color: #1a1a3a;
+  font-weight: bold;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+}
+
+.confirmSub {
+  font-size: clamp(9px, 1.6vw, 12px);
+  color: rgba(26, 26, 58, 0.7);
+  text-align: center;
+}
+
+.confirmHint {
+  font-size: clamp(9px, 1.6vw, 12px);
+  color: rgba(26, 26, 58, 0.4);
+  text-align: center;
+}
+
+.resultIcon {
+  font-size: clamp(10px, 3vw, 18px);
+  color: #2060d8;
+  text-align: center;
+}
+
+/* ── Vote info bar ── */
+.voteInfoBar {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1px, 0.2%, 2px);
+  padding: clamp(2px, 0.5%, 4px) clamp(5px, 1.5%, 8px);
+  border-top: 1px solid rgba(0, 0, 80, 0.18);
+  background: linear-gradient(to bottom, #c4c8dc 0%, #cdd1e2 100%);
+}
+
+.voteInfoRow {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(3px, 0.6vw, 5px);
+}
+
+.voteInfoLabel {
+  font-size: clamp(6px, 0.95vw, 8px);
+  color: rgba(26, 26, 58, 0.38);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.voteInfoPeriod {
+  font-size: clamp(6px, 0.95vw, 8px);
+  color: rgba(26, 26, 58, 0.58);
+  white-space: nowrap;
+}
+
+.voteInfoSep { display: none; }
+
+.voteInfoCountdown {
+  font-size: clamp(7px, 1.15vw, 9px);
+  color: rgba(26, 26, 58, 0.85);
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+/* ── Click wheel overlay ── */
+.wheel {
+  position: absolute;
+  top:   var(--ipod-wheel-top);
+  left:  var(--ipod-wheel-left);
+  width: var(--ipod-wheel-size);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.wheelCenter {
+  position: absolute;
+  width:  32%;
+  height: 32%;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.wheelTop,
+.wheelLeft,
+.wheelRight,
+.wheelBottom {
+  position: absolute;
+  font-size: clamp(3px, 0.8vw, 5px);
+  color: rgba(120, 120, 140, 0.5);
+  pointer-events: none;
+  font-family: 'PFStarDust', monospace;
+  letter-spacing: 0.05em;
+}
+.wheelTop    { top: 8%;   left: 50%; transform: translateX(-50%); }
+.wheelLeft   { left: 4%;  top:  50%; transform: translateY(-50%); }
+.wheelRight  { right: 4%; top:  50%; transform: translateY(-50%); }
+.wheelBottom { bottom: 8%; left: 50%; transform: translateX(-50%); }
+
+/* ── Mobile ── */
+@media (max-width: 600px) {
+  .ipodWrap {
+    width: min(92vw, calc((100svh - 60px) * 0.563));
+  }
+}

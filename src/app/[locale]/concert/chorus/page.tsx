@@ -1,5 +1,6 @@
-import { MonitorPage, MonitorComingSoon } from "@/components/concert/MonitorPage";
 import { setRequestLocale } from "next-intl/server";
+import { IpodVoteClient } from "./IpodVoteClient";
+import s from "../../concert/encore/encore.module.css"; // pageBg 재사용
 
 export default async function ConcertChorusPage({
   params,
@@ -10,8 +11,25 @@ export default async function ConcertChorusPage({
   setRequestLocale(locale);
 
   return (
-    <MonitorPage title="떼창곡" subtitle="SING-ALONG" accentColor="#00e5ff">
-      <MonitorComingSoon accentColor="#00e5ff" />
-    </MonitorPage>
+    <>
+      <div className={s.pageBg} aria-hidden />
+      <div
+        style={{
+          position: "relative",
+          zIndex: 11,
+          height: "calc(100svh - 60px)",
+          marginBottom: "-96px",
+          paddingTop: "clamp(8px, 1vh, 24px)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "flex-start",
+          overflowX: "hidden",
+          overflowY: "clip",
+        }}
+      >
+        <IpodVoteClient />
+      </div>
+    </>
   );
 }

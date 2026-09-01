@@ -7,9 +7,9 @@ import s from "./encore.module.css";
 
 const MENU_ITEMS = [
   { id: "cheer",   navKey: "cheer",   en: "CHEER",   href: "/concert/cheer"   },
+  { id: "chorus",  navKey: "chorus",  en: "CHORUS",  href: "/concert/chorus"  },
   { id: "funding", navKey: "funding", en: "FUNDING", href: "/concert/funding" },
   { id: "notice",  navKey: "notice",  en: "NOTICE",  href: "/concert/notice"  },
-  { id: "chorus",  navKey: "chorus",  en: "CHORUS",  href: "/concert/chorus"  },
   { id: "helper",  navKey: "helper",  en: "HELPER",  href: "/concert/helper"  },
 ] as const;
 
