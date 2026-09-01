@@ -13,7 +13,7 @@ export type ChorusDay = {
 };
 
 // 투표 기간: 9월 2일 12:00 KST ~ 9월 4일 23:59 KST
-export const VOTE_START = new Date("2026-09-02T03:00:00Z"); // 12:00 KST
+export const VOTE_START = new Date("2026-09-01T00:00:00Z"); // 테스트용 — 원래: 9/2 12:00 KST
 export const VOTE_END   = new Date("2026-09-04T14:59:59Z"); // 23:59:59 KST
 
 export function isVotingOpen(): boolean {
