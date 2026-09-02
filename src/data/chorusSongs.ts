@@ -24,7 +24,7 @@ export function isVotingOpen(): boolean {
 export const chorusDays: ChorusDay[] = [
   {
     day: 1,
-    label: "비주류 클럽",
+    label: "E주류 클럽",
     date: "",
     songs: [
       { id: "back-pocket",      title: "Back Pocket",               artist: "EXO", itunesQuery: "EXO-CBX Back Pocket" },
