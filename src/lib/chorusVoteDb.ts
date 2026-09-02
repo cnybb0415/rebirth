@@ -46,15 +46,16 @@ export async function adjustVoteCount(day: number, songId: string, amount: numbe
   if (error) throw new Error(error.message);
 }
 
+const MAX_VOTES_PER_DAY = 2;
+
 export async function hasVotedToday(day: number, voterId: string): Promise<boolean> {
   const db = getDb();
   const { data } = await db
     .from("chorus_votes")
     .select("id")
     .eq("day", day)
-    .eq("voter_id", voterId)
-    .limit(1);
-  return (data?.length ?? 0) > 0;
+    .eq("voter_id", voterId);
+  return (data?.length ?? 0) >= MAX_VOTES_PER_DAY;
 }
 
 export type ChorusVoteResult = { day: number; song_id: string; count: number };
