@@ -18,7 +18,6 @@ export type VoteItem = {
   isActive: boolean;
 };
 
-// CSV 카테고리 값(한국어)은 내부 필터에 그대로 사용
 const TAB_KEYS = ["전체", "시상식", "음악방송", "기타"] as const;
 type Tab = (typeof TAB_KEYS)[number];
 
@@ -35,7 +34,7 @@ function VotePageIcon({ votePage }: { votePage: string }) {
     );
   }
 
-  const src = `/images/vote/투표/${votePage}.${ICON_EXTENSIONS[extIndex]}`;
+  const src = `/images/guides/vote/투표/${votePage}.${ICON_EXTENSIONS[extIndex]}`;
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -76,7 +75,6 @@ function VoteCard({ item }: { item: VoteItem }) {
 
   return (
     <div className="flex flex-col rounded-2xl border border-foreground/10 bg-white p-3.5 shadow-sm">
-      {/* Row 1: 카테고리 + 상태 */}
       <div className="flex items-center gap-1">
         {item.category && (
           <span className="rounded-full bg-foreground/8 px-1.5 py-0.5 text-[10px] text-foreground/60">
@@ -86,16 +84,13 @@ function VoteCard({ item }: { item: VoteItem }) {
         <StatusBadge isActive={item.isActive} />
       </div>
 
-      {/* Row 2: 투표주최 */}
       <p className="mt-1 text-xs font-semibold leading-tight text-foreground/70">{item.organizer || ""}</p>
 
-      {/* Row 3: 아이콘 + 투표페이지 */}
       <div className="mt-1.5 flex items-center gap-1.5">
         <VotePageIcon votePage={item.votePage} />
         <span className="text-xs text-neutral-500">{item.votePage || "-"}</span>
       </div>
 
-      {/* Row 4: 투표이름 + 후보 */}
       <p className="mt-1 text-sm font-bold leading-snug">{item.name}</p>
       {item.candidate && (
         <span className="mt-1 self-start rounded-full bg-yellow-100 px-2 py-0.5 text-xs font-semibold text-yellow-800">
@@ -103,7 +98,6 @@ function VoteCard({ item }: { item: VoteItem }) {
         </span>
       )}
 
-      {/* Row 5: 마감날짜 + 순위 */}
       {deadlineLabel && (
         <p className="mt-1.5 text-[11px] text-neutral-400">~{deadlineLabel} (KST)</p>
       )}
@@ -111,7 +105,6 @@ function VoteCard({ item }: { item: VoteItem }) {
         <p className="mt-0.5 text-[11px] font-medium text-neutral-500">{rankLabel}</p>
       )}
 
-      {/* Row 6: 투표 바로가기 버튼 */}
       {item.link ? (
         <a
           href={item.link}
