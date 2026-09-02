@@ -1,18 +1,28 @@
 import { notFound } from "next/navigation";
+import { getNoticeByIdForSite, getPublishedNoticesForSite, type AnnouncementItem } from "@/lib/adminDb";
 import { announcements } from "@/data/announcements";
 import { AnnouncementDetailActions } from "@/components/AnnouncementDetailActions";
+
+export const revalidate = 1800;
+
+export async function generateStaticParams() {
+  const dbItems = await getPublishedNoticesForSite();
+  const items = dbItems.length > 0 ? dbItems : announcements;
+  return items.map((a) => ({ id: a.id }));
+}
 
 export default async function AnnouncementDetailPage({
   params,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string; locale: string }>;
 }) {
   const { id } = await params;
-  const item = announcements.find((entry) => entry.id === id);
 
-  if (!item) {
-    notFound();
-  }
+  const dbItem = await getNoticeByIdForSite(id);
+  const item: AnnouncementItem | undefined =
+    dbItem ?? (announcements.find((entry) => entry.id === id) as AnnouncementItem | undefined);
+
+  if (!item) notFound();
 
   return (
     <div className="min-h-screen bg-transparent text-foreground">
@@ -27,39 +37,26 @@ export default async function AnnouncementDetailPage({
           <div className="space-y-3 text-sm text-foreground/80">
             {item.content.map((line, idx) => {
               if (typeof line === "string") {
-                return line.trim().length === 0 ? (
-                  <div key={`${item.id}-spacer-${idx}`} className="h-3" aria-hidden />
-                ) : (
-                  <p key={`${item.id}-line-${idx}`}>{line}</p>
-                );
+                return line.trim().length === 0
+                  ? <div key={`${item.id}-spacer-${idx}`} className="h-3" aria-hidden />
+                  : <p key={`${item.id}-line-${idx}`}>{line}</p>;
               }
-
-              return line.text.trim().length === 0 ? (
-                <div key={`${item.id}-spacer-${idx}`} className="h-3" aria-hidden />
-              ) : (
-                <p key={`${item.id}-line-${idx}`} className={line.emphasis ? "font-semibold" : undefined}>
-                  {line.text}
-                </p>
-              );
+              return line.text.trim().length === 0
+                ? <div key={`${item.id}-spacer-${idx}`} className="h-3" aria-hidden />
+                : <p key={`${item.id}-line-${idx}`} className={line.emphasis ? "font-semibold" : undefined}>{line.text}</p>;
             })}
           </div>
           {item.actions && item.actions.length > 0 ? (
             <div className="mt-6 flex flex-wrap gap-2">
               {item.actions.map((action, idx) => (
-                <a
-                  key={`${item.id}-action-${idx}`}
-                  href={action.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center justify-center rounded-full bg-black px-4 py-2 text-xs font-semibold text-white transition hover:bg-black/90"
-                >
+                <a key={`${item.id}-action-${idx}`} href={action.href} target="_blank" rel="noreferrer"
+                  className="inline-flex items-center justify-center rounded-full bg-black px-4 py-2 text-xs font-semibold text-white transition hover:bg-black/90">
                   {action.label}
                 </a>
               ))}
             </div>
           ) : null}
         </section>
-
         <AnnouncementDetailActions />
       </main>
     </div>

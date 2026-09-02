@@ -1,7 +1,13 @@
 import { Link } from "@/i18n/navigation";
+import { getPublishedNoticesForSite } from "@/lib/adminDb";
 import { announcements } from "@/data/announcements";
 
-export default function NoticePage() {
+export const revalidate = 1800;
+
+export default async function NoticePage() {
+  const dbItems = await getPublishedNoticesForSite();
+  const items = dbItems.length > 0 ? dbItems : announcements;
+
   return (
     <div className="min-h-screen bg-transparent text-foreground">
       <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -14,17 +20,15 @@ export default function NoticePage() {
             href="/concert/encore"
             className="inline-flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-foreground"
           >
-            <span className="text-sm sm:text-xl" aria-hidden>
-              ‹
-            </span>
+            <span className="text-sm sm:text-xl" aria-hidden>‹</span>
             콘서트 목록
           </Link>
         </div>
 
         <section className="mt-6 rounded-2xl border border-foreground/10 bg-white p-5 shadow-sm">
-          {announcements.length ? (
+          {items.length ? (
             <ul className="divide-y divide-foreground/10">
-              {announcements.map((item) => (
+              {items.map((item) => (
                 <li key={item.id} className="py-4">
                   <Link href={`/notice/${item.id}`} className="block">
                     <div className="text-sm font-semibold text-foreground">{item.title}</div>
