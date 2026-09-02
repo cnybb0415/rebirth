@@ -1,4 +1,4 @@
-export type PrevoteCategoryId = "음악방송" | "시상식" | "기타";
+export type PrevoteCategoryId = "음악방송" | "시상식";
 
 export type PrevoteCategory = {
   id: PrevoteCategoryId;
@@ -15,11 +15,6 @@ export const prevoteCategories: PrevoteCategory[] = [
   {
     id: "시상식",
     label: "시상식",
-    description: "",
-  },
-  {
-    id: "기타",
-    label: "기타",
     description: "",
   },
 ];

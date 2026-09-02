@@ -7,13 +7,10 @@ import { guideCategories, getGuideCategory, GuideCategoryId } from "@/lib/guideC
 
 export default async function GuideCategoryPage({
   params,
-  searchParams,
 }: {
   params: Promise<{ locale: string; category: string }>;
-  searchParams?: Record<string, string | string[] | undefined> | Promise<Record<string, string | string[] | undefined>>;
 }) {
   const resolvedParams = await params;
-  const resolvedSearch = await searchParams;
   setRequestLocale(resolvedParams.locale);
   const category = getGuideCategory(resolvedParams.category);
   if (!category) return notFound();
@@ -28,9 +25,6 @@ export default async function GuideCategoryPage({
     mv: tguide("cat.mv"),
     prevote: tguide("cat.prevote"),
   };
-
-  const tabParam = resolvedSearch?.tab;
-  const initialTab = typeof tabParam === "string" ? tabParam : undefined;
 
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
@@ -49,7 +43,7 @@ export default async function GuideCategoryPage({
       <p className="mt-2 text-sm text-foreground/70">{category.description}</p>
 
       <div className="mt-6">
-        <GuideCategoryContent categoryId={category.id} initialTab={initialTab} />
+        <GuideCategoryContent categoryId={category.id} />
       </div>
     </main>
   );

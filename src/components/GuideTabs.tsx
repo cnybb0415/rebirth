@@ -313,11 +313,11 @@ function VoteTabs() {
 export function VoteTabsWithSidebar({ guides }: { guides?: VoteGuide[] } = {}) {
   // 프로그램별 로고 경로 매핑
   const logoMap: Record<string, string> = {
-    musicbank: "/images/vote/뮤직뱅크/logo/뮤직뱅크_logo.png",
-    showchampion: "/images/vote/쇼챔피언/logo/쇼챔피언_logo.png",
-    mcountdown: "/images/vote/엠카운트다운/logo/엠카운트다운_logo.png",
-    musiccore: "/images/vote/음악중심/logo/음악중심_logo.png",
-    inkigayo: "/images/vote/인기가요/logo/인기가요_logo.png",
+    musicbank: "/images/guides/vote/뮤직뱅크/logo/뮤직뱅크_logo.png",
+    showchampion: "/images/guides/vote/쇼챔피언/logo/쇼챔피언_logo.png",
+    mcountdown: "/images/guides/vote/엠카운트다운/logo/엠카운트다운_logo.png",
+    musiccore: "/images/guides/vote/음악중심/logo/음악중심_logo.png",
+    inkigayo: "/images/guides/vote/인기가요/logo/인기가요_logo.png",
   };
   const data = guides ?? voteGuides;
   const defaultGuide = data[0]?.id ?? "";

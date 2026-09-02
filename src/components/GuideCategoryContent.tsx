@@ -177,7 +177,7 @@ const buildMvServiceEmptyLines = (partId: "pcver" | "mobilever", partLabel: stri
   `2) src/data/guides.ts 에서 뮤직비디오 > ${partLabel} assets에 경로 추가`,
 ];
 
-export function GuideCategoryContent({ categoryId, initialTab }: { categoryId: GuideCategoryId; initialTab?: string }) {
+export function GuideCategoryContent({ categoryId }: { categoryId: GuideCategoryId }) {
   const services = streamingGuideServices;
   const normalServices = services.filter((service) => service.id !== "mv");
 
@@ -221,8 +221,7 @@ export function GuideCategoryContent({ categoryId, initialTab }: { categoryId: G
   }
 
   if (categoryId === "prevote") {
-    const validTab = prevoteCategories.find((c) => c.id === initialTab)?.id;
-    const defaultTab = validTab ?? prevoteCategories[0]?.id ?? "";
+    const defaultTab = prevoteCategories[0]?.id ?? "";
     return (
       <Tabs defaultValue={defaultTab}>
         <div className="border-b border-foreground/10 pb-2">

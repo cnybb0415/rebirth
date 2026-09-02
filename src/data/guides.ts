@@ -23,7 +23,7 @@ export const voteAppLinks: VoteAppLink[] = [
   {
     id: "showchampion",
     label: "쇼챔피언",
-    logoSrc: "/images/vote/쇼챔피언/logo/쇼챔피언_logo.png",
+    logoSrc: "/images/guides/vote/쇼챔피언/logo/쇼챔피언_logo.png",
     actions: [
       {
         id: "app",
@@ -40,7 +40,7 @@ export const voteAppLinks: VoteAppLink[] = [
   {
     id: "mcountdown",
     label: "엠카운트다운",
-    logoSrc: "/images/vote/엠카운트다운/logo/엠카운트다운_logo.png",
+    logoSrc: "/images/guides/vote/엠카운트다운/logo/엠카운트다운_logo.png",
     actions: [
       {
         id: "app",
@@ -55,7 +55,7 @@ export const voteAppLinks: VoteAppLink[] = [
   {
     id: "musicbank",
     label: "뮤직뱅크",
-    logoSrc: "/images/vote/뮤직뱅크/logo/뮤직뱅크_logo.png",
+    logoSrc: "/images/guides/vote/뮤직뱅크/logo/뮤직뱅크_logo.png",
     actions: [
       {
         id: "app",
@@ -70,7 +70,7 @@ export const voteAppLinks: VoteAppLink[] = [
   {
     id: "musiccore",
     label: "음악중심",
-    logoSrc: "/images/vote/음악중심/logo/음악중심_logo.png",
+    logoSrc: "/images/guides/vote/음악중심/logo/음악중심_logo.png",
     actions: [
       {
         id: "app",
@@ -83,7 +83,7 @@ export const voteAppLinks: VoteAppLink[] = [
   {
     id: "inkigayo",
     label: "인기가요",
-    logoSrc: "/images/vote/인기가요/logo/인기가요_logo.png",
+    logoSrc: "/images/guides/vote/인기가요/logo/인기가요_logo.png",
     actions: [
       { id: "link", label: "링크", href: "https://app.linc.fan/31TL/01KF9VV0VVE7GNAN51SAWHRTT6" },
       { id: "higher", label: "하이어", href: "https://myhigher.chottu.link/UGgDXQ" },
@@ -96,51 +96,52 @@ export const voteGuides: VoteGuide[] = [
     id: "common",
     label: "공통",
     assets: [
-      { type: "image", src: "/images/vote/공통/음악방송/01.음악방송_사전투표.jpg", alt: "음악방송 사전투표 공통 가이드" },
-      { type: "image", src: "/images/vote/공통/음악방송/02.음악방송_반영비율.png", alt: "음악방송 반영비율 공통 가이드" },
+      { type: "image", src: "/images/guides/vote/공통/음악방송/01.음악방송_사전투표.jpg", alt: "음악방송 사전투표 공통 가이드" },
+      { type: "image", src: "/images/guides/vote/공통/음악방송/02.음악방송_반영비율.png", alt: "음악방송 반영비율 공통 가이드" },
     ],
   },
   {
     id: "award",
     label: "시상식",
     assets: [
-      { type: "image", src: "/images/vote/공통/시상식/투표가이드.png", alt: "시상식 투표 가이드" },
+      { type: "image", src: "/images/guides/vote/공통/시상식/JMA_2026.jpg", alt: "JMA 2026 시상식 투표 가이드" },
+      { type: "image", src: "/images/guides/vote/공통/시상식/ASEA_2026.png", alt: "ASEA 2026 시상식 투표 가이드" },
     ],
   },
   {
     id: "showchampion",
     label: "쇼챔피언",
     assets: [
-      { type: "image", src: "/images/vote/쇼챔피언/guide/아이돌챔프.png", alt: "쇼챔피언 아이돌챔프 사전투표 가이드" },
+      { type: "image", src: "/images/guides/vote/쇼챔피언/guide/아이돌챔프.png", alt: "쇼챔피언 아이돌챔프 사전투표 가이드" },
     ],
   },
   {
     id: "mcountdown",
     label: "엠카운트다운",
     assets: [
-      { type: "image", src: "/images/vote/엠카운트다운/guide/엠넷플러스.png", alt: "엠카운트다운 엠넷플러스 사전투표 가이드" },
+      { type: "image", src: "/images/guides/vote/엠카운트다운/guide/엠넷플러스.png", alt: "엠카운트다운 엠넷플러스 사전투표 가이드" },
     ],
   },
   {
     id: "musicbank",
     label: "뮤직뱅크",
     assets: [
-      { type: "image", src: "/images/vote/뮤직뱅크/guide/팬캐스트.png", alt: "뮤직뱅크 팬캐스트 사전투표 가이드" },
+      { type: "image", src: "/images/guides/vote/뮤직뱅크/guide/팬캐스트.png", alt: "뮤직뱅크 팬캐스트 사전투표 가이드" },
     ],
   },
   {
     id: "musiccore",
     label: "음악중심",
     assets: [
-      { type: "image", src: "/images/vote/음악중심/guide/뮤빗.png", alt: "음악중심 뮤빗 사전투표 가이드" },
+      { type: "image", src: "/images/guides/vote/음악중심/guide/뮤빗.png", alt: "음악중심 뮤빗 사전투표 가이드" },
     ],
   },
   {
     id: "inkigayo",
     label: "인기가요",
     assets: [
-      { type: "image", src: "/images/vote/인기가요/guide/링크.png", alt: "인기가요 링크 사전투표 가이드" },
-      { type: "image", src: "/images/vote/인기가요/guide/하이어.png", alt: "인기가요 하이어 사전투표 가이드" },
+      { type: "image", src: "/images/guides/vote/인기가요/guide/링크.png", alt: "인기가요 링크 사전투표 가이드" },
+      { type: "image", src: "/images/guides/vote/인기가요/guide/하이어.png", alt: "인기가요 하이어 사전투표 가이드" },
     ],
   },
 ];
