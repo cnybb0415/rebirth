@@ -11,6 +11,7 @@ const LOCALE_KEYWORDS: Record<string, string[]> = {
   ko: ["한국어", "_ko", "notice_ko", "ko_"],
   zh: ["중국어", "_zh", "notice_zh", "zh_"],
   en: ["영어", "_en", "notice_en", "en_"],
+  ja: ["일본어", "_ja", "_jp", "notice_ja", "notice_jp", "ja_", "jp_"],
 };
 
 function getNoticeImages(locale: string): { src: string; alt?: string }[] {
