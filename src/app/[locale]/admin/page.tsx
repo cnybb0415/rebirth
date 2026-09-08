@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "next-intl";
 import { chorusDays } from "@/data/chorusSongs";
@@ -30,6 +30,7 @@ const MENU: AdminGroup[] = [
       { id: "notice",    icon: "📢", label: "공지사항",  desc: "일반 공지 작성 및 관리",          ready: false },
       { id: "schedule",  icon: "📅", label: "스케줄",    desc: "캘린더 일정 추가 · 수정 · 삭제",  ready: true },
       { id: "streaming", icon: "▶",  label: "스트리밍",  desc: "스트리밍 링크 · 카테고리 관리",   ready: false },
+      { id: "vote",      icon: "🗳", label: "투표 관리", desc: "진행중 투표 항목 추가 · 수정 · 삭제", ready: true },
     ],
   },
   {
@@ -38,7 +39,7 @@ const MENU: AdminGroup[] = [
       { id: "chorus-vote",    icon: "🎤", label: "떼창 투표", desc: "후보곡 득표 현황",          ready: true },
       { id: "concert-cheer",  icon: "📣", label: "응원법",    desc: "응원법 곡 · 영상 관리",     ready: false },
       { id: "concert-notice", icon: "📋", label: "공지",      desc: "콘서트 공지 작성 및 관리",  ready: true },
-      { id: "concert-fund",   icon: "💰", label: "펀딩",      desc: "펀딩 현황 · 링크 관리",     ready: false },
+      { id: "concert-fund",   icon: "💰", label: "모금",      desc: "달성률 · 마감일 · 공지 이미지 관리",  ready: true },
     ],
   },
   {
@@ -168,7 +169,9 @@ export default function AdminHubPage() {
           {active === "chorus-vote"    && <ChorusVotePanel token={token!} />}
           {active === "concert-notice" && <ConcertNoticePanel token={token!} />}
           {active === "schedule"       && <SchedulePanel token={token!} />}
-          {!["home","chorus-vote","concert-notice","schedule"].includes(active) && (
+          {active === "vote"           && <VoteItemPanel token={token!} />}
+          {active === "concert-fund"  && <FundingAdminPanel token={token!} />}
+          {!["home","chorus-vote","concert-notice","schedule","vote","concert-fund"].includes(active) && (
             <div className={s.comingSoon}>
               <span className={s.comingSoonIcon}>🚧</span>
               <p className={s.comingSoonText}>준비 중입니다</p>
@@ -799,6 +802,397 @@ function SchedulePanel({ token }: { token: string }) {
       {items === null && !form && (
         <div className={s.comingSoon}>
           <span className={s.comingSoonIcon}>📅</span>
+          <p className={s.comingSoonText}>로딩 중...</p>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── 모금 패널 ─────────────────────────────────────────────
+type FundingForm = {
+  percent: number;
+  deadline: string;
+  form_url: string;
+};
+
+function FundingAdminPanel({ token }: { token: string }) {
+  const [form, setForm] = useState<FundingForm | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [err, setErr] = useState("");
+  const [saved, setSaved] = useState(false);
+
+  const headers = { "x-admin-token": token, "Content-Type": "application/json" };
+
+  async function load() {
+    setErr("");
+    const res = await fetch("/api/admin/funding", { headers: { "x-admin-token": token } });
+    if (!res.ok) { setErr("불러오기 실패"); return; }
+    const data = await res.json() as FundingForm;
+    setForm({
+      percent: data.percent ?? 0,
+      deadline: data.deadline ?? "",
+      form_url: data.form_url ?? "",
+    });
+  }
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, []);
+
+  async function save() {
+    if (!form) return;
+    setSaving(true); setSaved(false); setErr("");
+    const res = await fetch("/api/admin/funding", {
+      method: "PATCH", headers, body: JSON.stringify(form),
+    });
+    setSaving(false);
+    if (!res.ok) { setErr("저장 실패"); return; }
+    setSaved(true);
+    setTimeout(() => setSaved(false), 3000);
+  }
+
+  if (!form) {
+    return (
+      <div className={s.comingSoon}>
+        <span className={s.comingSoonIcon}>💰</span>
+        <p className={s.comingSoonText}>로딩 중...</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className={s.crudPanel}>
+      <div className={s.crudTop}>
+        <button className={s.loadBtn} onClick={load}>새로고침</button>
+        {saved && <span style={{ fontSize: "0.8rem", color: "var(--foreground)", opacity: 0.6 }}>✓ 저장됨 (최대 30초 후 반영)</span>}
+      </div>
+      {err && <p className={s.crudErr}>{err}</p>}
+
+      <div className={s.formCard}>
+        <h3 className={s.formTitle}>모금 설정</h3>
+        <div className={s.formGrid}>
+          {/* Percent */}
+          <label className={s.formLabel}>달성률 (%)</label>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <input
+              type="range" min={0} max={100} step={1}
+              value={form.percent}
+              onChange={e => setForm({ ...form, percent: Number(e.target.value) })}
+              style={{ flex: 1 }}
+            />
+            <input
+              type="number" min={0} max={100}
+              value={form.percent}
+              onChange={e => setForm({ ...form, percent: Math.min(100, Math.max(0, Number(e.target.value))) })}
+              className={s.formInput}
+              style={{ width: 64 }}
+            />
+            <span style={{ fontSize: "0.85rem" }}>%</span>
+          </div>
+
+          {/* Deadline */}
+          <label className={s.formLabel}>마감 날짜</label>
+          <input
+            className={s.formInput}
+            value={form.deadline}
+            onChange={e => setForm({ ...form, deadline: e.target.value })}
+            placeholder="예: 2026-09-30 23:59"
+          />
+
+          {/* Form URL */}
+          <label className={s.formLabel}>구글폼 URL</label>
+          <input
+            className={s.formInput}
+            value={form.form_url}
+            onChange={e => setForm({ ...form, form_url: e.target.value })}
+            placeholder="https://forms.gle/..."
+          />
+        </div>
+
+        {/* Notice images info */}
+        <div className={s.formSection}>
+          <p className={s.formSectionTitle}>모금 공지 이미지</p>
+          <p className={s.formHint}>
+            공지 이미지는 서버 파일에서 자동으로 로드됩니다.<br />
+            <code style={{ fontSize: "0.78rem" }}>public/images/concert/funding/</code> 폴더에<br />
+            파일명에 <strong>한국어</strong> / <strong>중국어</strong> / <strong>영어</strong> 또는 <strong>_ko</strong> / <strong>_zh</strong> / <strong>_en</strong> 포함 시 해당 언어 페이지에 자동 표시됩니다.
+          </p>
+        </div>
+
+        <div className={s.formActions}>
+          <button className={s.saveBtn} onClick={save} disabled={saving}>{saving ? "저장중..." : "저장"}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── 투표 항목 패널 ────────────────────────────────────────
+type VoteDbItem = {
+  id: string;
+  category: string;
+  organizer: string;
+  name: string;
+  vote_page: string;
+  deadline: string;
+  link: string;
+  candidate: string;
+  rank: string;
+  percent: string;
+  published: boolean;
+};
+
+type VoteForm = Omit<VoteDbItem, "id">;
+
+const VOTE_CATEGORIES = ["시상식", "음악방송", "기타"];
+
+const EMPTY_VOTE_FORM: VoteForm = {
+  category: "시상식", organizer: "", name: "", vote_page: "",
+  deadline: "", link: "", candidate: "", rank: "", percent: "", published: true,
+};
+
+function parseVoteCSVLine(line: string): string[] {
+  const result: string[] = [];
+  let current = "";
+  let inQuotes = false;
+  for (let i = 0; i < line.length; i++) {
+    const ch = line[i];
+    if (ch === '"') {
+      if (inQuotes && line[i + 1] === '"') { current += '"'; i++; }
+      else inQuotes = !inQuotes;
+    } else if (ch === "," && !inQuotes) {
+      result.push(current); current = "";
+    } else {
+      current += ch;
+    }
+  }
+  result.push(current);
+  return result;
+}
+
+function deadlineIsActive(deadline: string): boolean {
+  if (!deadline) return false;
+  const m = deadline.match(/(\d{4})[-.](\d{2})[-.](\d{2})(?:\s+(\d{2}):(\d{2}))?/);
+  if (!m) return false;
+  return new Date() <= new Date(`${m[1]}-${m[2]}-${m[3]}T${m[4] ?? "23"}:${m[5] ?? "59"}:00+09:00`);
+}
+
+function VoteItemPanel({ token }: { token: string }) {
+  const [items, setItems] = useState<VoteDbItem[] | null>(null);
+  const [err, setErr] = useState("");
+  const [form, setForm] = useState<VoteForm | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [saving, setSaving] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [importMsg, setImportMsg] = useState("");
+  const csvRef = useRef<HTMLInputElement>(null);
+
+  const headers = { "x-admin-token": token, "Content-Type": "application/json" };
+
+  const load = async () => {
+    setErr("");
+    const res = await fetch("/api/admin/vote-items", { headers: { "x-admin-token": token } });
+    if (!res.ok) { setErr("불러오기 실패"); return; }
+    setItems(await res.json() as VoteDbItem[]);
+  };
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => { load(); }, []);
+
+  async function save() {
+    if (!form) return;
+    setSaving(true); setErr("");
+    const method = editId ? "PATCH" : "POST";
+    const body = editId ? { id: editId, ...form } : { id: crypto.randomUUID(), ...form };
+    const res = await fetch("/api/admin/vote-items", { method, headers, body: JSON.stringify(body) });
+    setSaving(false);
+    if (!res.ok) { setErr("저장 실패"); return; }
+    setForm(null); setEditId(null);
+    load();
+  }
+
+  async function remove(id: string) {
+    if (!confirm("삭제하시겠습니까?")) return;
+    await fetch("/api/admin/vote-items", { method: "DELETE", headers, body: JSON.stringify({ id }) });
+    load();
+  }
+
+  async function togglePublished(item: VoteDbItem) {
+    await fetch("/api/admin/vote-items", {
+      method: "PATCH", headers,
+      body: JSON.stringify({ id: item.id, published: !item.published }),
+    });
+    load();
+  }
+
+  function startEdit(item: VoteDbItem) {
+    setEditId(item.id);
+    setForm({
+      category: item.category, organizer: item.organizer, name: item.name,
+      vote_page: item.vote_page, deadline: item.deadline, link: item.link,
+      candidate: item.candidate, rank: item.rank, percent: item.percent,
+      published: item.published,
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  function startDuplicate(item: VoteDbItem) {
+    setEditId(null);
+    setForm({
+      category: item.category, organizer: item.organizer, name: item.name,
+      vote_page: item.vote_page, deadline: item.deadline, link: item.link,
+      candidate: item.candidate, rank: item.rank, percent: item.percent,
+      published: item.published,
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+
+  async function handleCSVImport(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const text = await file.text();
+    const lines = text.trim().split(/\r?\n/);
+    if (lines.length < 2) return;
+
+    const parsed: VoteDbItem[] = [];
+    for (const line of lines.slice(1)) {
+      const cols = parseVoteCSVLine(line);
+      const [category, organizer, name, vote_page, deadline, link, candidate, rank, percent] = cols.map(c => c.trim());
+      if (!name) continue;
+      parsed.push({
+        id: crypto.randomUUID(),
+        category: category ?? "", organizer: organizer ?? "", name,
+        vote_page: vote_page ?? "", deadline: deadline ?? "", link: link ?? "",
+        candidate: candidate ?? "", rank: rank ?? "", percent: percent ?? "",
+        published: true,
+      });
+    }
+
+    if (parsed.length === 0) { setImportMsg("파싱된 항목 없음"); return; }
+    if (!confirm(`${parsed.length}개 항목을 가져오시겠습니까?\n(기존 항목은 유지됩니다)`)) {
+      e.target.value = ""; return;
+    }
+
+    setImporting(true); setImportMsg("");
+    let ok = 0;
+    for (const item of parsed) {
+      const res = await fetch("/api/admin/vote-items", {
+        method: "POST", headers, body: JSON.stringify(item),
+      });
+      if (res.ok) ok++;
+    }
+    setImporting(false);
+    setImportMsg(`✓ ${ok}/${parsed.length}개 가져오기 완료`);
+    e.target.value = "";
+    load();
+  }
+
+  return (
+    <div className={s.crudPanel}>
+      <div className={s.crudTop}>
+        <button className={s.loadBtn} onClick={load}>새로고침</button>
+        <button className={s.addBtn} onClick={() => { setForm({ ...EMPTY_VOTE_FORM }); setEditId(null); }}>+ 새 투표</button>
+        <label className={s.loadBtn} style={{ cursor: "pointer" }} title="CSV 파일로 일괄 가져오기">
+          {importing ? "가져오는 중..." : "CSV 가져오기"}
+          <input ref={csvRef} type="file" accept=".csv" hidden onChange={handleCSVImport} disabled={importing} />
+        </label>
+      </div>
+      {err && <p className={s.crudErr}>{err}</p>}
+      {importMsg && <p style={{ fontSize: "0.8rem", color: "var(--foreground)", opacity: 0.6, margin: "4px 0" }}>{importMsg}</p>}
+
+      {form && (
+        <div className={s.formCard}>
+          <h3 className={s.formTitle}>{editId ? "투표 수정" : form && (form.name || form.organizer) ? "투표 복사 · 새 등록" : "새 투표 추가"}</h3>
+          <div className={s.formGrid}>
+            <label className={s.formLabel}>카테고리</label>
+            <select className={s.formSelect} value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
+              {VOTE_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+            </select>
+            <label className={s.formLabel}>투표 주최</label>
+            <input className={s.formInput} value={form.organizer} onChange={e => setForm({ ...form, organizer: e.target.value })} placeholder="예: [35th SMA] 서울가요대상" />
+            <label className={s.formLabel}>투표 이름 *</label>
+            <input className={s.formInput} value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} placeholder="예: The Best Award (본상) 1차" />
+            <label className={s.formLabel}>투표 페이지</label>
+            <input className={s.formInput} value={form.vote_page} onChange={e => setForm({ ...form, vote_page: e.target.value })} placeholder="예: 아이돌챔프" />
+            <label className={s.formLabel}>마감 날짜</label>
+            <input className={s.formInput} value={form.deadline} onChange={e => setForm({ ...form, deadline: e.target.value })} placeholder="예: 2026-09-10 23:59" />
+            <label className={s.formLabel}>링크</label>
+            <input className={s.formInput} value={form.link} onChange={e => setForm({ ...form, link: e.target.value })} placeholder="https://..." />
+            <label className={s.formLabel}>후보</label>
+            <input className={s.formInput} value={form.candidate} onChange={e => setForm({ ...form, candidate: e.target.value })} placeholder="예: EXO(엑소)" />
+            <label className={s.formLabel}>순위</label>
+            <input className={s.formInput} value={form.rank} onChange={e => setForm({ ...form, rank: e.target.value })} placeholder="예: 1" />
+            <label className={s.formLabel}>퍼센트</label>
+            <input className={s.formInput} value={form.percent} onChange={e => setForm({ ...form, percent: e.target.value })} placeholder="예: 42.3" />
+            <label className={s.formLabel}>공개</label>
+            <label className={s.toggleLabel}>
+              <input type="checkbox" checked={form.published} onChange={e => setForm({ ...form, published: e.target.checked })} />
+              <span>{form.published ? "공개" : "비공개"}</span>
+            </label>
+          </div>
+          <div className={s.formActions}>
+            <button className={s.cancelBtn} onClick={() => { setForm(null); setEditId(null); }}>취소</button>
+            <button className={s.saveBtn} onClick={save} disabled={saving || !form.name}>{saving ? "저장중..." : "저장"}</button>
+          </div>
+        </div>
+      )}
+
+      {items !== null && (
+        <div className={s.tableWrap}>
+          <table className={s.table}>
+            <thead>
+              <tr>
+                <th>카테고리</th>
+                <th>투표 주최</th>
+                <th>투표 이름</th>
+                <th>페이지</th>
+                <th>후보</th>
+                <th>순위</th>
+                <th>마감날짜 ↑</th>
+                <th>상태</th>
+                <th>공개</th>
+                <th>작업</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.length === 0 && <tr><td colSpan={10} className={s.tableEmpty}>등록된 투표 없음</td></tr>}
+              {items.map(item => (
+                <tr key={item.id}>
+                  <td><span className={s.catBadge}>{item.category}</span></td>
+                  <td className={s.tdDate} style={{ maxWidth: 140, whiteSpace: "normal" }}>{item.organizer || "-"}</td>
+                  <td className={s.tdTitle}>{item.name}</td>
+                  <td className={s.tdDate}>{item.vote_page || "-"}</td>
+                  <td className={s.tdDate}>{item.candidate || "-"}</td>
+                  <td className={s.tdDate} style={{ textAlign: "center" }}>
+                    {item.rank ? `${item.rank}위${item.percent ? ` (${item.percent}%)` : ""}` : "-"}
+                  </td>
+                  <td className={s.tdDate}>{item.deadline || "-"}</td>
+                  <td><span className={deadlineIsActive(item.deadline) ? s.badgeOn : s.badgeOff}>{deadlineIsActive(item.deadline) ? "진행중" : "종료"}</span></td>
+                  <td>
+                    <button
+                      className={item.published ? s.badgeOn : s.badgeOff}
+                      style={{ cursor: "pointer", border: "none", background: "none", padding: 0 }}
+                      onClick={() => togglePublished(item)}
+                      title="클릭하여 전환"
+                    >
+                      {item.published ? "공개" : "비공개"}
+                    </button>
+                  </td>
+                  <td className={s.tdActions}>
+                    <button className={s.editBtn} onClick={() => startEdit(item)}>수정</button>
+                    <button className={s.loadBtn} onClick={() => startDuplicate(item)} title="이 항목 복사해서 새로 등록">복사</button>
+                    <button className={s.delBtn} onClick={() => remove(item.id)}>삭제</button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {items === null && !form && (
+        <div className={s.comingSoon}>
+          <span className={s.comingSoonIcon}>🗳</span>
           <p className={s.comingSoonText}>로딩 중...</p>
         </div>
       )}

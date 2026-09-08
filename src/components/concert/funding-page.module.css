@@ -1,0 +1,412 @@
+/* funding-page.module.css — WinXP Luna Pink */
+
+.desktop {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 14px 80px;
+  font-family: 'PFStarDust', 'DungGeunMo', monospace;
+  -webkit-font-smoothing: none;
+  gap: 16px;
+}
+
+/* ── WinXP dialog window ── */
+.dialog {
+  border: 3px solid;
+  border-color: #ffccee #7a1a50 #7a1a50 #ffccee;
+  background: #c860a0;
+  padding: 4px;
+  box-shadow:
+    inset 1px 1px 0 rgba(255, 200, 230, 0.6),
+    4px 4px 0 rgba(0, 0, 0, 0.28);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  max-width: 520px;
+}
+
+/* ── WinXP title bar (top-to-bottom gradient, taller) ── */
+.titleBar {
+  background: linear-gradient(
+    180deg,
+    #f8a0d0 0%,
+    #c83880 20%,
+    #d04890 70%,
+    #b02068 100%
+  );
+  display: flex;
+  align-items: center;
+  padding: 5px 6px;
+  gap: 7px;
+  flex-shrink: 0;
+  min-height: 28px;
+}
+
+.titleIcon {
+  font-size: 13px;
+  filter: drop-shadow(1px 1px 0 rgba(0,0,0,0.3));
+}
+
+.titleText {
+  flex: 1;
+  font-size: 10px;
+  color: #fff;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.45);
+}
+
+.winBtns {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.winBtn {
+  width: 18px;
+  height: 16px;
+  border: 1px solid;
+  border-color: #ffccee #882060 #882060 #ffccee;
+  background: #d878b8;
+  font-size: 7px;
+  color: #1a0010;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  cursor: default;
+  text-shadow: none;
+}
+
+.winBtnClose {
+  width: 18px;
+  height: 16px;
+  border: 1px solid;
+  border-color: #ff8888 #601020 #601020 #ff8888;
+  background: #c82040;
+  font-size: 8px;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  cursor: default;
+  font-weight: bold;
+}
+
+/* ── Window body (inset, XP style) ── */
+.body {
+  border: 2px solid;
+  border-color: #7a1a50 #ffccee #ffccee #7a1a50;
+  background: #fff0f8;
+  padding: 20px 18px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── File label ── */
+.fileLabel {
+  font-size: 9px;
+  color: rgba(80, 10, 45, 0.45);
+  letter-spacing: 0.18em;
+  text-align: center;
+  margin-bottom: -6px;
+}
+
+.fileName {
+  font-size: 13px;
+  color: #901858;
+  letter-spacing: 0.1em;
+  text-align: center;
+}
+
+/* ── Icon row: [img01] [fly zone] [img02] ── */
+.iconRow {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  justify-content: center;
+}
+
+.sideImg {
+  width: 96px;
+  height: 96px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  flex-shrink: 0;
+}
+
+/* ── Curved track: rocket follows offset-path ── */
+.track {
+  flex: 1;
+  position: relative;
+  height: 90px;
+  min-width: 60px;
+}
+
+.trackSvg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.trackPath {
+  fill: none;
+  stroke: #e898c8;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 6 7;
+}
+
+/* 중간 중간 점 — stroke-linecap:round + 짧은 dash로 원형 점 생성 */
+.trackDots {
+  fill: none;
+  stroke: #d060a0;
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-dasharray: 0.1 50;
+}
+
+.trackDot {
+  fill: #c83880;
+}
+
+/* rocket travels via CSS offset-path / offset-distance */
+.trackRocket {
+  display: inline-block;
+  font-size: 24px;
+  line-height: 1;
+  offset-rotate: 0deg;     /* keep upright, don't tilt with path */
+  offset-anchor: 50% 50%;
+  transition: offset-distance 1s ease;
+  filter: drop-shadow(1px 1px 0 rgba(0, 0, 0, 0.18));
+  pointer-events: none;
+}
+
+/* ── Progress bar (striped fill) ── */
+.progressSection {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.progressTrack {
+  height: 24px;
+  border: 2px solid;
+  border-color: #7a1a50 #ffccee #ffccee #7a1a50;
+  background: #fff0f8;
+  padding: 2px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: repeating-linear-gradient(
+    90deg,
+    #c83878 0px,
+    #c83878 10px,
+    #e888c0 10px,
+    #e888c0 11px
+  );
+  transition: width 0.9s ease;
+}
+
+.progressMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.progressLabel {
+  font-size: 8px;
+  color: rgba(80, 10, 45, 0.45);
+  letter-spacing: 0.14em;
+}
+
+.progressPct {
+  font-size: 14px;
+  color: #901858;
+}
+
+/* ── Countdown ── */
+.countdownWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.countdownLabel {
+  font-size: 8px;
+  color: rgba(80, 10, 45, 0.4);
+  letter-spacing: 0.2em;
+}
+
+.countdownSpecial {
+  font-size: 20px;
+  color: #901858;
+  letter-spacing: 0.2em;
+}
+
+.clockRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+}
+
+.clockCell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 50px;
+}
+
+.clockNum {
+  font-size: 32px;
+  color: #901858;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  text-shadow: 2px 2px 0 rgba(144, 24, 88, 0.12);
+}
+
+.clockSub {
+  font-size: 6px;
+  color: rgba(80, 10, 45, 0.38);
+  letter-spacing: 0.18em;
+}
+
+.clockSep {
+  font-size: 24px;
+  color: rgba(80, 10, 45, 0.25);
+  padding: 3px 1px 0;
+  line-height: 1;
+  align-self: flex-start;
+}
+
+/* ── Status bar ── */
+.statusBar {
+  border: 1px solid;
+  border-color: #7a1a50 #ffccee #ffccee #7a1a50;
+  background: #fff4f9;
+  font-size: 8px;
+  color: rgba(80, 10, 45, 0.5);
+  padding: 4px 8px;
+  letter-spacing: 0.07em;
+}
+
+/* ── Button row ── */
+.btnRow {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  padding-top: 2px;
+}
+
+.btn {
+  font-family: 'PFStarDust', 'DungGeunMo', monospace;
+  -webkit-font-smoothing: none;
+  font-size: 10px;
+  padding: 8px 32px;
+  background: linear-gradient(180deg, #e898cc 0%, #c83880 60%, #b02868 100%);
+  border: 2px solid;
+  border-color: #ffccee #7a1a50 #7a1a50 #ffccee;
+  color: #fff;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.3);
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.15);
+  white-space: nowrap;
+  transition: filter 0.08s;
+}
+.btn:hover { filter: brightness(1.12); }
+.btn:active {
+  border-color: #7a1a50 #ffccee #ffccee #7a1a50;
+  box-shadow: none;
+  transform: translate(1px, 1px);
+}
+
+.btnCancel {
+  font-family: 'PFStarDust', 'DungGeunMo', monospace;
+  -webkit-font-smoothing: none;
+  font-size: 10px;
+  padding: 8px 32px;
+  background: linear-gradient(180deg, #d888be 0%, #b06090 100%);
+  border: 2px solid;
+  border-color: #ffccee #7a1a50 #7a1a50 #ffccee;
+  color: #ffeef7;
+  letter-spacing: 0.1em;
+  cursor: default;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, 0.2);
+  opacity: 0.6;
+}
+
+/* ── Notice image dialog ── */
+.imageBody {
+  border: 2px solid;
+  border-color: #7a1a50 #ffccee #ffccee #7a1a50;
+  background: #fff0f8;
+  display: flex;
+  flex-direction: column;
+}
+
+.imageCanvas {
+  background: #1a0010;
+  overflow: hidden;
+}
+
+.noticeImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.navRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 10px;
+}
+
+.navBtn {
+  font-family: 'PFStarDust', 'DungGeunMo', monospace;
+  -webkit-font-smoothing: none;
+  font-size: 9px;
+  background: linear-gradient(180deg, #d888be 0%, #b83878 100%);
+  border: 2px solid;
+  border-color: #ffccee #7a1a50 #7a1a50 #ffccee;
+  color: #fff;
+  padding: 4px 12px;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.25);
+}
+.navBtn:hover:not(:disabled) { filter: brightness(1.1); }
+.navBtn:active:not(:disabled) { border-color: #7a1a50 #ffccee #ffccee #7a1a50; }
+.navBtn:disabled { opacity: 0.32; cursor: default; }
+
+.pageInfo {
+  font-size: 9px;
+  color: rgba(80, 10, 45, 0.5);
+  letter-spacing: 0.1em;
+}
+
+/* ── Divider ── */
+.divider {
+  border: none;
+  border-top: 1px dashed rgba(80, 10, 45, 0.13);
+  margin: 0;
+}

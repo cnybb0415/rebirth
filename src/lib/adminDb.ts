@@ -168,3 +168,86 @@ export async function deleteAllScheduleItems(): Promise<void> {
   const { error } = await getDb().from("schedule_items").delete().neq("id", "00000000-0000-0000-0000-000000000000");
   if (error) throw new Error(error.message);
 }
+
+// ── Funding Config ───────────────────────────────────────
+export type FundingConfig = {
+  id: string;
+  percent: number;
+  deadline: string;
+  form_url: string;
+  notice_images: { src: string; alt: string }[];
+};
+
+export async function getFundingConfig(): Promise<FundingConfig | null> {
+  const { data, error } = await getDb()
+    .from("funding_config")
+    .select("*")
+    .limit(1)
+    .maybeSingle();
+  if (error) throw new Error(error.message);
+  return data as FundingConfig | null;
+}
+
+export async function upsertFundingConfig(patch: Partial<Omit<FundingConfig, "id">>): Promise<void> {
+  const { data: existing } = await getDb().from("funding_config").select("id").limit(1).maybeSingle();
+  if (existing) {
+    const { error } = await getDb().from("funding_config").update(patch).eq("id", existing.id);
+    if (error) throw new Error(error.message);
+  } else {
+    const { error } = await getDb().from("funding_config").insert({
+      percent: 0, deadline: "", form_url: "", notice_images: [],
+      ...patch,
+    });
+    if (error) throw new Error(error.message);
+  }
+}
+
+// ── Vote Items ────────────────────────────────────────────
+export type VoteDbItem = {
+  id: string;
+  category: string;
+  organizer: string;
+  name: string;
+  vote_page: string;
+  deadline: string;
+  link: string;
+  candidate: string;
+  rank: string;
+  percent: string;
+  published: boolean;
+  created_at: string;
+};
+
+export async function getVoteItems(): Promise<VoteDbItem[]> {
+  const { data, error } = await getDb()
+    .from("vote_items")
+    .select("*")
+    .order("deadline", { ascending: true });
+  if (error) throw new Error(error.message);
+  return data as VoteDbItem[];
+}
+
+export async function getPublishedVoteItems(): Promise<VoteDbItem[]> {
+  const { data, error } = await getDb()
+    .from("vote_items")
+    .select("*")
+    .eq("published", true)
+    .order("created_at", { ascending: false });
+  if (error) throw new Error(error.message);
+  return data as VoteDbItem[];
+}
+
+export async function createVoteItem(item: Omit<VoteDbItem, "created_at">): Promise<void> {
+  const { error } = await getDb().from("vote_items").insert(item);
+  if (error) throw new Error(error.message);
+}
+
+export async function updateVoteItem(id: string, patch: Partial<VoteDbItem>): Promise<void> {
+  const { error } = await getDb().from("vote_items").update(patch).eq("id", id);
+  if (error) throw new Error(error.message);
+}
+
+export async function deleteVoteItem(id: string): Promise<void> {
+  const { error } = await getDb().from("vote_items").delete().eq("id", id);
+  if (error) throw new Error(error.message);
+}
