@@ -165,27 +165,29 @@ export function IpodVoteClient() {
   }, [screen]);
 
   // ── Navigation handlers ──────────────────────────────
+  const MENU_TOTAL = chorusDays.length + 1; // +1 for EXhOrizon setlist
+
   const goUp = useCallback(() => {
     setScreen((prev) => {
-      if (prev.kind === "menu") return { ...prev, cursor: (prev.cursor - 1 + chorusDays.length) % chorusDays.length };
+      if (prev.kind === "menu") return { ...prev, cursor: (prev.cursor - 1 + MENU_TOTAL) % MENU_TOTAL };
       if (prev.kind === "list") {
         const len = chorusDays[prev.dayIdx]?.songs.length ?? 0;
         return { ...prev, cursor: (prev.cursor - 1 + len) % len };
       }
       return prev;
     });
-  }, []);
+  }, [MENU_TOTAL]);
 
   const goDown = useCallback(() => {
     setScreen((prev) => {
-      if (prev.kind === "menu") return { ...prev, cursor: (prev.cursor + 1) % chorusDays.length };
+      if (prev.kind === "menu") return { ...prev, cursor: (prev.cursor + 1) % MENU_TOTAL };
       if (prev.kind === "list") {
         const len = chorusDays[prev.dayIdx]?.songs.length ?? 0;
         return { ...prev, cursor: (prev.cursor + 1) % len };
       }
       return prev;
     });
-  }, []);
+  }, [MENU_TOTAL]);
 
   const goMenu = useCallback(() => {
     if (screen.kind === "menu") {
@@ -202,6 +204,11 @@ export function IpodVoteClient() {
   }, [screen.kind, router, locale]);
 
   const goSelect = useCallback(() => {
+    // EXhOrizon 셋리스트 항목 (마지막 메뉴)
+    if (screen.kind === "menu" && screen.cursor === chorusDays.length) {
+      router.push(`/${locale}/concert/chorus/setlist`);
+      return;
+    }
     setScreen((prev) => {
       if (prev.kind === "menu") return { kind: "list", dayIdx: prev.cursor, cursor: 0 };
       if (prev.kind === "list") return { kind: "now-playing", dayIdx: prev.dayIdx, songIdx: prev.cursor, info: null, loading: true };
@@ -214,7 +221,7 @@ export function IpodVoteClient() {
       if (prev.kind === "result" || prev.kind === "already-voted") return { kind: "list", dayIdx: prev.dayIdx, cursor: 0 };
       return prev;
     });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [screen, router, locale]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const goPrev = useCallback(() => {
     setScreen((prev) => {
@@ -266,26 +273,23 @@ export function IpodVoteClient() {
     }
   }
 
-  // ── Click wheel handler ──────────────────────────────
-  function handleWheelClick(e: React.MouseEvent<HTMLDivElement>) {
-    const rect = e.currentTarget.getBoundingClientRect();
+  // ── Click wheel: tap zone logic ─────────────────────
+  function fireWheelTap(clientX: number, clientY: number, target: Element) {
+    const rect = target.getBoundingClientRect();
     const cx = rect.width / 2;
     const cy = rect.height / 2;
-    const dx = e.clientX - rect.left - cx;
-    const dy = e.clientY - rect.top - cy;
+    const dx = clientX - rect.left - cx;
+    const dy = clientY - rect.top - cy;
     const dist = Math.sqrt(dx * dx + dy * dy);
     const outerR = rect.width / 2;
 
     if (dist > outerR) return;
 
-    // 중앙 원: 반지름의 25% 이내 → 투표/선택
-    if (dist < outerR * 0.25) {
-      goSelect();
-      return;
-    }
+    // center 25%: select/vote
+    if (dist < outerR * 0.25) { goSelect(); return; }
 
-    const angle = (Math.atan2(dy, dx) * 180) / Math.PI; // -180 to 180
-    // 상단 = MENU, 우측 = 다음/아래, 하단 = 재생/일시정지, 좌측 = 이전/위
+    const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
+    // top=MENU, right=next/down, bottom=play, left=prev/up
     if (angle >= -135 && angle < -45) goMenu();
     else if (angle >= -45 && angle < 45) {
       if (screen.kind === "now-playing") goNext(); else goDown();
@@ -294,6 +298,66 @@ export function IpodVoteClient() {
     else {
       if (screen.kind === "now-playing") goPrev(); else goUp();
     }
+  }
+
+  // ── Rotation scroll ──────────────────────────────────
+  const dragRef = useRef<{
+    startX: number; startY: number;
+    lastAngle: number; accum: number; moved: boolean;
+  } | null>(null);
+
+  function getWheelAngle(rect: DOMRect, clientX: number, clientY: number) {
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    return Math.atan2(clientY - cy, clientX - cx) * (180 / Math.PI);
+  }
+
+  function handlePointerDown(e: React.PointerEvent<HTMLDivElement>) {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    const rect = e.currentTarget.getBoundingClientRect();
+    dragRef.current = {
+      startX: e.clientX, startY: e.clientY,
+      lastAngle: getWheelAngle(rect, e.clientX, e.clientY),
+      accum: 0, moved: false,
+    };
+  }
+
+  function handlePointerMove(e: React.PointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current;
+    if (!drag) return;
+
+    const dx = e.clientX - drag.startX;
+    const dy = e.clientY - drag.startY;
+    if (Math.sqrt(dx * dx + dy * dy) > 6) drag.moved = true;
+    if (!drag.moved) return;
+
+    const rect = e.currentTarget.getBoundingClientRect();
+    const angle = getWheelAngle(rect, e.clientX, e.clientY);
+
+    let delta = angle - drag.lastAngle;
+    if (delta > 180) delta -= 360;
+    if (delta < -180) delta += 360;
+
+    drag.accum += delta;
+    drag.lastAngle = angle;
+
+    const STEP = 18;
+    while (drag.accum >= STEP) {
+      drag.accum -= STEP;
+      if (screen.kind === "now-playing") goNext(); else goDown();
+    }
+    while (drag.accum <= -STEP) {
+      drag.accum += STEP;
+      if (screen.kind === "now-playing") goPrev(); else goUp();
+    }
+  }
+
+  function handlePointerUp(e: React.PointerEvent<HTMLDivElement>) {
+    const drag = dragRef.current;
+    dragRef.current = null;
+    if (!drag) return;
+    e.currentTarget.releasePointerCapture(e.pointerId);
+    if (!drag.moved) fireWheelTap(e.clientX, e.clientY, e.currentTarget);
   }
 
   // Keyboard support
@@ -330,13 +394,17 @@ export function IpodVoteClient() {
           submitting={submitting}
           nowPlayingInfo={nowPlayingInfo}
           setScreen={setScreen}
+          onSetlistSelect={() => router.push(`/${locale}/concert/chorus/setlist`)}
         />
       </div>
 
       {/* Click wheel */}
       <div
         className={s.wheel}
-        onClick={handleWheelClick}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={() => { dragRef.current = null; }}
         onContextMenu={(e) => e.preventDefault()}
         role="group"
         aria-label="클릭 휠"
@@ -411,6 +479,7 @@ function ScreenContent({
   submitting,
   nowPlayingInfo,
   setScreen,
+  onSetlistSelect,
 }: {
   screen: Screen;
   clock: string;
@@ -419,6 +488,7 @@ function ScreenContent({
   submitting: boolean;
   nowPlayingInfo: { dayIdx: number; songIdx: number; info: ItunesInfo | null; loading: boolean } | null;
   setScreen: React.Dispatch<React.SetStateAction<Screen>>;
+  onSetlistSelect: () => void;
 }) {
   const tc = useTranslations("concert");
 
@@ -435,7 +505,15 @@ function ScreenContent({
               <span className={s.listArrow}>›</span>
             </li>
           ))}
-          {Array.from({ length: Math.max(0, 6 - chorusDays.length) }).map((_, i) => (
+          <li
+            className={`${s.listItem} ${screen.cursor === chorusDays.length ? s.listItemActive : ""}`}
+            onClick={onSetlistSelect}
+          >
+            <span className={s.listLabel}>EXO PLANET #6 - EXhOrizon</span>
+            <span className={s.listDate} />
+            <span className={s.listArrow}>›</span>
+          </li>
+          {Array.from({ length: Math.max(0, 6 - (chorusDays.length + 1)) }).map((_, i) => (
             <li key={`empty-${i}`} className={s.listItem} style={{ pointerEvents: "none" }} />
           ))}
         </ul>

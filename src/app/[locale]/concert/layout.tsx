@@ -4,7 +4,7 @@ export default function ConcertLayout({ children }: { children: React.ReactNode 
       className="min-h-screen"
       style={{
         backgroundImage:
-          "url('/images/concert/design/pixel%20art%20space%20wallpapers.jfif')",
+          "url('/images/concert/encore/background.png')",
         backgroundSize: "cover",
         backgroundPosition: "center",
         backgroundAttachment: "fixed",

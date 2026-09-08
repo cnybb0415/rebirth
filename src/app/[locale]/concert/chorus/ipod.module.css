@@ -153,7 +153,7 @@
 .songThumb {
   flex-shrink: 0;
   width: clamp(22px, 4.5vw, 34px);
-  height: clamp(22px, 4.5vw, 34px);
+  aspect-ratio: 1;
   object-fit: cover;
   background: #b8bcd4;
   display: block;
@@ -419,6 +419,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  touch-action: none;
+  user-select: none;
 }
 
 .wheelCenter {
@@ -464,8 +466,8 @@
   /* 곡 목록 항목 */
   .listItemSong { min-height: clamp(38px, 9.5vw, 52px); }
   .songThumb {
-    width:  clamp(30px, 7.5vw, 42px);
-    height: clamp(30px, 7.5vw, 42px);
+    width: clamp(30px, 7.5vw, 42px);
+    aspect-ratio: 1;
   }
   .songTitle  { font-size: clamp(13px, 3.4vw, 16px); }
   .songArtist { font-size: clamp(10px, 2.6vw, 13px); }
