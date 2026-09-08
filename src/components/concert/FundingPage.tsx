@@ -229,7 +229,7 @@ export function FundingPage({ config }: { config: FundingConfig }) {
         </div>
       </div>
 
-      {/* ── Notice images dialog ── */}
+      {/* ── Notice images dialog (별도 창) ── */}
       {images.length > 0 && (
         <div className={s.dialog}>
           <TitleBar icon="📋" title="NOTICE.png — 모금 공지" />
