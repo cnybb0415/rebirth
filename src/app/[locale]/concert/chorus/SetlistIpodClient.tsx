@@ -184,12 +184,21 @@ export function SetlistIpodClient() {
     const song = items[activeIdx];
     if (!song || song.kind !== "song") return;
     const videoId = song.youtubeId;
+    let cancelled = false;
 
     const initPlayer = () => {
-      const container = playerContainerRef.current;
-      if (!container) return;
-      ytPlayerRef.current?.destroy();
-      ytPlayerRef.current = new window.YT.Player(container, {
+      if (cancelled) return;
+      const wrapper = playerContainerRef.current;
+      if (!wrapper) return;
+      // YT API는 전달한 요소를 iframe으로 교체(replace)함
+      // → wrapper는 React가 관리하므로 건드리면 안 됨
+      // → wrapper 안에 target을 새로 만들어 YT API가 그것만 교체하게 함
+      try { ytPlayerRef.current?.destroy(); } catch { /* ignore */ }
+      ytPlayerRef.current = null;
+      wrapper.innerHTML = "";
+      const target = document.createElement("div");
+      wrapper.appendChild(target);
+      ytPlayerRef.current = new window.YT.Player(target, {
         videoId,
         width: "100%",
         height: "100%",
@@ -202,7 +211,7 @@ export function SetlistIpodClient() {
         },
         events: {
           onStateChange: (e) => {
-            if (e.data === window.YT.PlayerState.ENDED) goNext();
+            if (e.data === 0 /* YT.PlayerState.ENDED */) goNext();
           },
         },
       });
@@ -215,7 +224,8 @@ export function SetlistIpodClient() {
     }
 
     return () => {
-      ytPlayerRef.current?.destroy();
+      cancelled = true;
+      try { ytPlayerRef.current?.destroy(); } catch { /* 이미 제거된 경우 무시 */ }
       ytPlayerRef.current = null;
     };
   // eslint-disable-next-line react-hooks/exhaustive-deps
