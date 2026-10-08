@@ -6,7 +6,7 @@ import { SiteFooterNav } from "@/components/SiteFooterNav";
 
 export function ShellWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isQR = pathname.startsWith("/QR");
+  const isQR = pathname.startsWith("/QR") || /^\/concert\/encore\/day\d+$/.test(pathname);
 
   if (isQR) {
     return <>{children}</>;
