@@ -447,6 +447,29 @@
 .wheelRight  { right: 4%; top:  50%; transform: translateY(-50%); }
 .wheelBottom { bottom: 8%; left: 50%; transform: translateX(-50%); }
 
+/* ── 가사지 팝업 ── */
+.lyricsOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(12px, 4vw, 32px);
+}
+
+/* 스크롤은 되지만 스크롤바는 숨김 */
+.lyricsCanvasScroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.lyricsCanvasScroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 /* ── Mobile ── */
 @media (max-width: 600px) {
   .ipodWrap {

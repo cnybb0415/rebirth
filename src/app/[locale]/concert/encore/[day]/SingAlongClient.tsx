@@ -49,7 +49,7 @@ export function SingAlongClient({
               <CardContent className="overflow-hidden rounded-2xl p-0">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={`${LYRICS_DIR}/${songId}_${l.code}.png`}
+                  src={`${LYRICS_DIR}/${encodeURIComponent(`${songId}_${l.code}`)}.png`}
                   alt={`${title} 가사지 (${l.label})`}
                   className="block h-auto w-full"
                 />

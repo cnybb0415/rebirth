@@ -1,10 +1,17 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { chorusDays, VOTE_START, VOTE_END, isVotingOpen, type ChorusSong } from "@/data/chorusSongs";
+import { singAlongDays, type SingAlongDay } from "@/data/singAlongDays";
+import { useYouTubePlayer } from "@/hooks/useYouTubePlayer";
+import cheerStyles from "@/components/cheer-guide.module.css";
 import s from "./ipod.module.css";
+
+const LYRICS_DIR = "/images/concert/encore/sing-along/" + encodeURIComponent("가사지");
+const LYRICS_LANG_CODES = ["ko", "en", "ja", "zh"] as const;
 
 // ── iTunes ──────────────────────────────────────────────
 type ItunesInfo = { previewUrl: string | null; artworkUrl: string | null; albumName: string | null };
@@ -36,6 +43,7 @@ async function fetchItunes(query: string): Promise<ItunesInfo> {
 // ── State ───────────────────────────────────────────────
 type Screen =
   | { kind: "menu"; cursor: number }
+  | { kind: "sing-along"; dayIdx: number }
   | { kind: "list"; dayIdx: number; cursor: number }
   | { kind: "now-playing"; dayIdx: number; songIdx: number; info: ItunesInfo | null; loading: boolean }
   | { kind: "confirm"; dayIdx: number; songIdx: number }
@@ -136,6 +144,7 @@ function useAudio(src: string | null) {
 export function IpodVoteClient() {
   const [screen, setScreen] = useState<Screen>({ kind: "menu", cursor: 0 });
   const [submitting, setSubmitting] = useState(false);
+  const [showLyrics, setShowLyrics] = useState(false);
   const clock = useClock();
   const router = useRouter();
   const locale = useLocale();
@@ -165,7 +174,7 @@ export function IpodVoteClient() {
   }, [screen]);
 
   // ── Navigation handlers ──────────────────────────────
-  const MENU_TOTAL = chorusDays.length + 1; // +1 for EXhOrizon setlist
+  const MENU_TOTAL = singAlongDays.length + 1; // +1 for EXhOrizon setlist
 
   const goUp = useCallback(() => {
     setScreen((prev) => {
@@ -190,27 +199,39 @@ export function IpodVoteClient() {
   }, [MENU_TOTAL]);
 
   const goMenu = useCallback(() => {
+    if (showLyrics) { setShowLyrics(false); return; }
     if (screen.kind === "menu") {
       router.push(`/${locale}/concert/encore`);
       return;
     }
     setScreen((prev) => {
+      if (prev.kind === "sing-along") return { kind: "menu", cursor: prev.dayIdx };
       if (prev.kind === "list") return { kind: "menu", cursor: prev.dayIdx };
       if (prev.kind === "now-playing") return { kind: "list", dayIdx: prev.dayIdx, cursor: prev.songIdx };
       if (prev.kind === "confirm") return { kind: "now-playing", dayIdx: prev.dayIdx, songIdx: prev.songIdx, info: null, loading: true };
       if (prev.kind === "result" || prev.kind === "already-voted" || prev.kind === "voting-closed") return { kind: "list", dayIdx: prev.dayIdx, cursor: 0 };
       return prev;
     });
-  }, [screen.kind, router, locale]);
+  }, [showLyrics, screen.kind, router, locale]);
 
   const goSelect = useCallback(() => {
+    if (showLyrics) return;
     // EXhOrizon 셋리스트 항목 (마지막 메뉴)
-    if (screen.kind === "menu" && screen.cursor === chorusDays.length) {
+    if (screen.kind === "menu" && screen.cursor === singAlongDays.length) {
       router.push(`/${locale}/concert/chorus/setlist`);
       return;
     }
+    if (screen.kind === "menu") {
+      setScreen({ kind: "sing-along", dayIdx: screen.cursor });
+      return;
+    }
+    if (screen.kind === "sing-along") {
+      // 재생 중 CENTER → YouTube 링크 열기
+      const day = singAlongDays[screen.dayIdx];
+      if (day) window.open(`https://youtu.be/${day.youtubeId}`, "_blank");
+      return;
+    }
     setScreen((prev) => {
-      if (prev.kind === "menu") return { kind: "list", dayIdx: prev.cursor, cursor: 0 };
       if (prev.kind === "list") return { kind: "now-playing", dayIdx: prev.dayIdx, songIdx: prev.cursor, info: null, loading: true };
       if (prev.kind === "now-playing") return { kind: "confirm", dayIdx: prev.dayIdx, songIdx: prev.songIdx };
       if (prev.kind === "confirm") {
@@ -221,10 +242,14 @@ export function IpodVoteClient() {
       if (prev.kind === "result" || prev.kind === "already-voted") return { kind: "list", dayIdx: prev.dayIdx, cursor: 0 };
       return prev;
     });
-  }, [screen, router, locale]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [showLyrics, screen, router, locale]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const goPrev = useCallback(() => {
     setScreen((prev) => {
+      if (prev.kind === "sing-along") {
+        const len = singAlongDays.length;
+        return { kind: "sing-along", dayIdx: (prev.dayIdx - 1 + len) % len };
+      }
       if (prev.kind === "now-playing") {
         const len = chorusDays[prev.dayIdx]?.songs.length ?? 1;
         const nextIdx = (prev.songIdx - 1 + len) % len;
@@ -236,6 +261,10 @@ export function IpodVoteClient() {
 
   const goNext = useCallback(() => {
     setScreen((prev) => {
+      if (prev.kind === "sing-along") {
+        const len = singAlongDays.length;
+        return { kind: "sing-along", dayIdx: (prev.dayIdx + 1) % len };
+      }
       if (prev.kind === "now-playing") {
         const len = chorusDays[prev.dayIdx]?.songs.length ?? 1;
         const nextIdx = (prev.songIdx + 1) % len;
@@ -289,14 +318,17 @@ export function IpodVoteClient() {
     if (dist < outerR * 0.25) { goSelect(); return; }
 
     const angle = (Math.atan2(dy, dx) * 180) / Math.PI;
-    // top=MENU, right=next/down, bottom=play, left=prev/up
+    // top=MENU, right=next/down, bottom=play(now-playing)/lyrics(sing-along), left=prev/up
     if (angle >= -135 && angle < -45) goMenu();
     else if (angle >= -45 && angle < 45) {
-      if (screen.kind === "now-playing") goNext(); else goDown();
+      if (screen.kind === "now-playing" || screen.kind === "sing-along") goNext(); else goDown();
     }
-    else if (angle >= 45 && angle < 135) togglePlay();
+    else if (angle >= 45 && angle < 135) {
+      if (screen.kind === "sing-along") setShowLyrics((v) => !v);
+      else togglePlay();
+    }
     else {
-      if (screen.kind === "now-playing") goPrev(); else goUp();
+      if (screen.kind === "now-playing" || screen.kind === "sing-along") goPrev(); else goUp();
     }
   }
 
@@ -344,11 +376,11 @@ export function IpodVoteClient() {
     const STEP = 18;
     while (drag.accum >= STEP) {
       drag.accum -= STEP;
-      if (screen.kind === "now-playing") goNext(); else goDown();
+      if (screen.kind === "now-playing" || screen.kind === "sing-along") goNext(); else goDown();
     }
     while (drag.accum <= -STEP) {
       drag.accum += STEP;
-      if (screen.kind === "now-playing") goPrev(); else goUp();
+      if (screen.kind === "now-playing" || screen.kind === "sing-along") goPrev(); else goUp();
     }
   }
 
@@ -365,8 +397,8 @@ export function IpodVoteClient() {
     function onKey(e: KeyboardEvent) {
       if (e.key === "ArrowUp")    { e.preventDefault(); goUp(); }
       if (e.key === "ArrowDown")  { e.preventDefault(); goDown(); }
-      if (e.key === "ArrowLeft")  { e.preventDefault(); if (screen.kind === "now-playing") goPrev(); }
-      if (e.key === "ArrowRight") { e.preventDefault(); if (screen.kind === "now-playing") goNext(); }
+      if (e.key === "ArrowLeft")  { e.preventDefault(); if (screen.kind === "now-playing" || screen.kind === "sing-along") goPrev(); }
+      if (e.key === "ArrowRight") { e.preventDefault(); if (screen.kind === "now-playing" || screen.kind === "sing-along") goNext(); }
       if (e.key === "Enter" || e.key === " ") { e.preventDefault(); goSelect(); }
       if (e.key === "Escape" || e.key === "Backspace") { e.preventDefault(); goMenu(); }
     }
@@ -415,6 +447,14 @@ export function IpodVoteClient() {
         <span className={s.wheelRight}>►►|</span>
         <span className={s.wheelBottom}>►II</span>
       </div>
+
+      {showLyrics && screen.kind === "sing-along" && (
+        <LyricsPopup
+          day={singAlongDays[screen.dayIdx]}
+          locale={locale}
+          onClose={() => setShowLyrics(false)}
+        />
+      )}
     </div>
   );
 }
@@ -497,29 +537,34 @@ function ScreenContent({
       <>
         <TitleBar title="EXhOrizon [dot]" clock={clock} />
         <ul className={s.list}>
-          {chorusDays.map((d, i) => (
+          {singAlongDays.map((d, i) => (
             <li key={d.day} className={`${s.listItem} ${i === screen.cursor ? s.listItemActive : ""}`}
-              onClick={() => setScreen({ kind: "list", dayIdx: i, cursor: 0 })}>
-              <span className={s.listLabel}>{d.day === 1 ? tc("chorusVote.day1Label") : tc("chorusVote.day2Label")}</span>
-              <span className={s.listDate}>{d.date}</span>
+              onClick={() => setScreen({ kind: "sing-along", dayIdx: i })}>
+              <span className={s.listLabel}>{d.title}</span>
+              <span className={s.listDate}>{`Day${d.day}`}</span>
               <span className={s.listArrow}>›</span>
             </li>
           ))}
           <li
-            className={`${s.listItem} ${screen.cursor === chorusDays.length ? s.listItemActive : ""}`}
+            className={`${s.listItem} ${screen.cursor === singAlongDays.length ? s.listItemActive : ""}`}
             onClick={onSetlistSelect}
           >
             <span className={s.listLabel}>EXO PLANET #6 - EXhOrizon</span>
             <span className={s.listDate} />
             <span className={s.listArrow}>›</span>
           </li>
-          {Array.from({ length: Math.max(0, 6 - (chorusDays.length + 1)) }).map((_, i) => (
+          {Array.from({ length: Math.max(0, 6 - (singAlongDays.length + 1)) }).map((_, i) => (
             <li key={`empty-${i}`} className={s.listItem} style={{ pointerEvents: "none" }} />
           ))}
         </ul>
-        <VoteInfoBar />
       </>
     );
+  }
+
+  if (screen.kind === "sing-along") {
+    const day = singAlongDays[screen.dayIdx];
+    if (!day) return null;
+    return <SingAlongScreen day={day} />;
   }
 
   if (screen.kind === "list") {
@@ -652,6 +697,77 @@ function ScreenContent({
   }
 
   return null;
+}
+
+// ── 떼창 영상 재생 화면 (풀스크린 YouTube) ────────────────
+function SingAlongScreen({ day }: { day: SingAlongDay }) {
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  useYouTubePlayer({ containerRef, videoId: day.youtubeId, controls: true });
+  return (
+    <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", background: "#000" }}>
+      <div ref={containerRef} style={{ width: "100%", height: "100%", display: "block" }} />
+    </div>
+  );
+}
+
+// ── 가사지 팝업 (응원법과 동일한 디자인, 현재 페이지 로케일에 맞는 가사지 1장만) ──
+function LyricsPopup({
+  day,
+  locale,
+  onClose,
+}: {
+  day: SingAlongDay;
+  locale: string;
+  onClose: () => void;
+}) {
+  const lang = (LYRICS_LANG_CODES as readonly string[]).includes(locale) ? locale : "ko";
+
+  // 페이지 콘텐츠 wrapper가 자체 stacking context(position:relative + z-index)를
+  // 만들고 있어서, 그 안에서는 z-index를 아무리 높여도 헤더/하단 네비 위로 못 올라감
+  // → document.body로 포털해서 루트 stacking context에서 직접 비교되게 함
+  if (typeof document === "undefined") return null;
+
+  return createPortal(
+    <div className={s.lyricsOverlay} onClick={onClose}>
+      <div
+        className={cheerStyles.viewer}
+        style={{ maxWidth: 420, height: "88svh", display: "flex", flexDirection: "column" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className={cheerStyles.window} style={{ height: "100%", minHeight: 0 }}>
+          <div className={cheerStyles.titleBar}>
+            <span className={cheerStyles.titleIcon} aria-hidden>♥</span>
+            <span className={cheerStyles.titleText}>{day.title} 가사지</span>
+            <div className={cheerStyles.winBtns}>
+              <span className={cheerStyles.winBtn} aria-hidden>─</span>
+              <span className={cheerStyles.winBtn} aria-hidden>□</span>
+              <button
+                type="button"
+                className={`${cheerStyles.winBtn} ${cheerStyles.winBtnClose}`}
+                onClick={onClose}
+                aria-label="닫기"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+          <div
+            className={`${cheerStyles.canvas} ${s.lyricsCanvasScroll}`}
+            style={{ flex: "1 1 0%", minHeight: 0, overflowY: "auto", WebkitOverflowScrolling: "touch" }}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={`${LYRICS_DIR}/${encodeURIComponent(`${day.songId}_${lang}`)}.png`}
+              alt={`${day.title} 가사지`}
+              className={cheerStyles.guideImg}
+              style={{ display: "block", width: "100%", height: "auto" }}
+            />
+          </div>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
 }
 
 function TitleBar({ title, clock }: { title: string; clock: string }) {
