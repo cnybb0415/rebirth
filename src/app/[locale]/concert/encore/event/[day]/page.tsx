@@ -30,7 +30,7 @@ export default async function EventGuidePage({
     <>
       {/* concert 레이아웃의 어두운 배경을 흰색으로 덮음 */}
       <div className="fixed inset-0 bg-background" aria-hidden />
-      <main className="relative mx-auto w-full max-w-5xl px-3 py-8 sm:px-6 sm:py-10">
+      <main className="relative mx-auto w-full max-w-xl px-3 py-8 sm:px-6 sm:py-10">
         <div className="mb-5 text-center">
           <p className="text-xs font-semibold uppercase tracking-widest text-foreground/40">Event Guide</p>
           <h1 className="mt-1 text-2xl font-bold tracking-tight text-foreground">DAY {dayNum}</h1>
@@ -40,8 +40,8 @@ export default async function EventGuidePage({
           <img
             src={`${GUIDE_DIR}/${encodeURIComponent(file)}`}
             alt={`EXO PLANET #6 DAY ${dayNum} 이벤트 안내 (中文 / 日本語)`}
-            width={1600}
-            height={900}
+            width={1080}
+            height={1920}
             className="block h-auto w-full"
           />
         </div>
