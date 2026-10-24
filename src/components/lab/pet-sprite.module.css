@@ -1,0 +1,23 @@
+/* 스프라이트 시트(8칸 × 9줄, 한 칸 96×104)의 한 줄을 컷 단위로 재생 */
+.sprite {
+  --s: 1;
+  display: block;
+  flex-shrink: 0;
+  width: calc(96px * var(--s));
+  height: calc(104px * var(--s));
+  background-repeat: no-repeat;
+  background-size: calc(768px * var(--s)) calc(936px * var(--s));
+  background-position: 0 calc(var(--row) * -104px * var(--s));
+  animation: play calc(var(--frames) * var(--ms) * 1ms) steps(var(--frames)) infinite;
+  image-rendering: auto;
+}
+
+@keyframes play {
+  to {
+    background-position-x: calc(var(--frames) * -96px * var(--s));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sprite { animation: none; }
+}

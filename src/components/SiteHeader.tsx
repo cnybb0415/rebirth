@@ -153,6 +153,9 @@ export function SiteHeader() {
                 <Link href="/kwangya119" className="rounded-lg px-2 py-2 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
                   {t("kwangya119")}
                 </Link>
+                <Link href="/lab" className="rounded-lg px-2 py-2 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
+                  {t("lab")}
+                </Link>
                 <div>
                   <button
                     type="button"
