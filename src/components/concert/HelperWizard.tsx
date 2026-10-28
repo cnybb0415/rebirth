@@ -210,7 +210,7 @@ export function HelperWizard() {
               <p className={s.text}>
                 헬퍼 신청이 접수되었어요.
                 <br />
-                확인 후 입력하신 연락처로 연락드릴게요 ♥
+                확인 후 입력하신 메일로 연락드릴게요 ♥
               </p>
             </div>
           ) : (
