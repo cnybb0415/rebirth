@@ -152,7 +152,10 @@ export function createDiaryCurl(opts: DiaryCurlOptions): DiaryCurl | null {
   const radius = opts.radius ?? 0.085;
   const tilt = opts.tilt ?? 0.55;
 
-  const gl = canvas.getContext("webgl", { premultipliedAlpha: false, antialias: true });
+  // WebGL2면 2의 거듭제곱이 아닌 크기(2048x3072 등)도 밉맵을 만들 수 있어서 축소해 그릴 때 글씨가 덜 뭉개짐
+  const ctxOpts = { premultipliedAlpha: false, antialias: true };
+  const gl2 = canvas.getContext("webgl2", ctxOpts) as WebGL2RenderingContext | null;
+  const gl: WebGLRenderingContext | WebGL2RenderingContext | null = gl2 ?? (canvas.getContext("webgl", ctxOpts) as WebGLRenderingContext | null);
   if (!gl) return null;
 
   const onContextLost = (e: Event) => {
@@ -244,7 +247,12 @@ export function createDiaryCurl(opts: DiaryCurlOptions): DiaryCurl | null {
         const tx = gl.createTexture();
         gl.bindTexture(gl.TEXTURE_2D, tx);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
-        gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        if (gl2) {
+          gl.generateMipmap(gl.TEXTURE_2D);
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+        } else {
+          gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+        }
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
@@ -259,7 +267,8 @@ export function createDiaryCurl(opts: DiaryCurlOptions): DiaryCurl | null {
   };
 
   const resize = () => {
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    // 폰은 화면 밀도가 2.6~3배라 3배까지 그대로 그려야 선명함 (2배로 제한하면 브라우저가 늘려서 흐려짐)
+    const dpr = Math.min(window.devicePixelRatio || 1, 3);
     const w = Math.round(canvas.clientWidth * dpr);
     const h = Math.round(canvas.clientHeight * dpr);
     if (w && h && (canvas.width !== w || canvas.height !== h)) {
