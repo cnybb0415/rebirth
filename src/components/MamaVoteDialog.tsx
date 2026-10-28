@@ -148,7 +148,7 @@ export function MamaVoteDialog({
 
   return (
     <div
-      className="fixed inset-0 flex items-end justify-center bg-black/65 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:items-center sm:p-4"
+      className="fixed inset-0 flex items-center justify-center bg-black/65 p-3 backdrop-blur-sm sm:p-4"
       style={{ zIndex }}
       onClick={onClose}
     >
