@@ -23,7 +23,7 @@ export const HELPER_ROLES: HelperRole[] = [
     label: "카드섹션 배치 도우미",
     guideImage: "/images/concert/encore/helper/placement.webp",
     needsSeat: false,
-    summary: { headcount: "회차당 25명", condition: "티켓 소지 여부 상관없이 누구나", meet: "오전 7시 전후" },
+    summary: { headcount: "회차당 25명", condition: "티켓 소지 여부 상관없이 누구나", meet: "오전 7시 20분" },
   },
   {
     id: "lightstick",
