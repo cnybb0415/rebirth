@@ -94,12 +94,12 @@ export function HomeStreamingCard({ links }: { links: ReadonlyArray<OneClickStre
                   <button
                     type="button"
                     onClick={() => openHref(g.parts[0].href)}
-                    className="flex h-14 w-full items-center gap-3 rounded-2xl bg-white/[0.08] px-3.5 text-left transition hover:bg-white/[0.14] active:scale-[0.98]"
+                    className="flex min-h-14 w-full items-center gap-2.5 rounded-2xl bg-white/[0.08] px-3 py-2 text-left transition hover:bg-white/[0.14] active:scale-[0.98]"
                   >
                     <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white">
                       <MusicServiceIcon service={g.service as never} label={g.name} size={20} className="h-5 w-5" />
                     </span>
-                    <span className="min-w-0 flex-1 truncate text-sm font-semibold">{g.name}</span>
+                    <span className="min-w-0 flex-1 break-keep text-sm font-semibold leading-tight">{g.name}</span>
                     <PlayIcon />
                   </button>
                 ) : (
