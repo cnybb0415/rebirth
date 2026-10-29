@@ -178,9 +178,10 @@ export default async function Home({
             {latestTweet ? (
               <article className="mt-3">
                 <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed">
-                  {latestTweet.previewUrl
-                    ? latestTweet.text.replaceAll(latestTweet.previewUrl, "").replace(/\s*https:\/\/t\.co\/\S+\s*$/u, "").trim()
-                    : latestTweet.text}
+                  {(latestTweet.previewUrl ? latestTweet.text.replaceAll(latestTweet.previewUrl, "") : latestTweet.text)
+                    .replace(/\s*https:\/\/t\.co\/\S+\s*$/u, "")
+                    .replace(/\n{2,}/g, "\n")
+                    .trim()}
                 </p>
                 {latestTweet.mediaUrl || latestTweet.previewImageUrl ? (
                   <a

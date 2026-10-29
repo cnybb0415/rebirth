@@ -279,14 +279,16 @@ export async function ChartSummaryGrid({
                       </span>
                     )}
                   </p>
-                  <p
-                    className={cn(
-                      "mt-1 text-[11px] sm:text-xs font-semibold tabular-nums",
-                      change.className
-                    )}
-                  >
-                    {change.label}
-                  </p>
+                  {typeof item?.rank === "number" ? (
+                    <p
+                      className={cn(
+                        "mt-1 text-[11px] sm:text-xs font-semibold tabular-nums",
+                        change.className
+                      )}
+                    >
+                      {change.label}
+                    </p>
+                  ) : null}
                 </div>
               </div>
             </div>

@@ -33,14 +33,18 @@ function groupLinks(links: ReadonlyArray<OneClickStreamingLink>, platform: Platf
   for (const link of links) {
     const isWave = link.label.includes("뮤직웨이브");
     const key = isWave ? `${link.id}-wave` : link.id;
-    const name = isWave ? "멜론 뮤직웨이브" : SERVICE_NAME[link.id] ?? link.label;
+    const name = isWave ? "뮤직웨이브" : SERVICE_NAME[link.id] ?? link.label;
     if (!map.has(key)) map.set(key, { key, service: link.id, name, parts: [] });
     const href = pickHref(link, platform);
     if (!href) continue; // 이 기기에서 안 열리는 링크(iOS 전용 등)는 숨김
     const num = link.label.match(/(\d+)\s*$/)?.[1];
     map.get(key)!.parts.push({ key: link.label, short: num ?? link.label, label: link.label, href });
   }
-  return [...map.values()].filter((g) => g.parts.length > 0);
+  // 번호 버튼이 있는 서비스(한 줄 전체)는 앞뒤로, 버튼 하나짜리는 가운데 두 칸씩 모아 빈칸이 덜 생기게
+  const groups = [...map.values()].filter((g) => g.parts.length > 0);
+  const wide = groups.filter((g) => g.parts.length > 2);
+  const narrow = groups.filter((g) => g.parts.length <= 2);
+  return [...wide.slice(0, 1), ...narrow, ...wide.slice(1)];
 }
 
 export function HomeStreamingCard({ links }: { links: ReadonlyArray<OneClickStreamingLink> }) {
