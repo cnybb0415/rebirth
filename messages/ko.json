@@ -41,7 +41,17 @@
     "copyright": "Copyright ⓒ EXO RE:BIRTH All rights reserved.",
     "prevImage": "이전 이미지",
     "nextImage": "다음 이미지",
-    "viewImage": "이미지 {n} 보기"
+    "viewImage": "이미지 {n} 보기",
+    "streamingMobileOnly": "원클릭 스트리밍은 휴대폰에서 열려요. 휴대폰으로 접속해 주세요.",
+    "shortcuts": "바로가기",
+    "descKwangya": "허위 정보·악성 게시물 신고",
+    "descRadio": "지금 신청 가능한 라디오 확인",
+    "descSmsVote": "음악방송 생방송 문자 투표",
+    "descGuide": "스트리밍·다운로드·투표 방법",
+    "descVote": "진행 중인 투표 전체 보기",
+    "officialLinks": "EXO 공식 채널",
+    "mvTitle": "뮤직비디오",
+    "kwangyaSite": "광야119 신고 사이트"
   },
   "quickview": {
     "thisWeekSchedule": "이번 주 스케줄",

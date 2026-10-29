@@ -82,19 +82,29 @@ function isChartsData(value: unknown): value is ChartsData {
 }
 
 export async function getChartsData(): Promise<ChartsData> {
+  // 외부 JSON 으로 덮어쓰는 경우에만 HTTP 로 가져옴
   const overrideUrl = process.env.CHARTS_JSON_URL;
-  const url = overrideUrl ? toAbsoluteUrl(overrideUrl) : toAbsoluteUrl("/api/charts");
-
-  try {
-    const revalidate = secondsUntilNextKstTopOfHourPlusOneMin(new Date());
-    const response = await fetch(url, { next: { revalidate } });
-    if (!response.ok) return localCharts as ChartsData;
-
-    const json = (await response.json()) as unknown;
-    if (!isChartsData(json)) return localCharts as ChartsData;
-
-    return json;
-  } catch {
-    return localCharts as ChartsData;
+  if (overrideUrl) {
+    try {
+      const revalidate = secondsUntilNextKstTopOfHourPlusOneMin(new Date());
+      const response = await fetch(toAbsoluteUrl(overrideUrl), { next: { revalidate } });
+      if (response.ok) {
+        const json = (await response.json()) as unknown;
+        if (isChartsData(json)) return json;
+      }
+    } catch {
+      // 아래 실시간 로직으로 넘어감
+    }
   }
+
+  // 자기 사이트 /api/charts 를 다시 HTTP 로 부르면 빌드·재생성 때 실패해서
+  // charts.json(2026.01.15 임시 데이터)으로 떨어지던 문제가 있었음 → 같은 로직을 직접 호출
+  try {
+    const { getLiveChartsData } = await import("@/lib/chartsLive");
+    const live = await getLiveChartsData();
+    if (isChartsData(live)) return live;
+  } catch {
+    // ignore
+  }
+  return localCharts as ChartsData;
 }

@@ -41,7 +41,17 @@
     "copyright": "Copyright ⓒ EXO RE:BIRTH All rights reserved.",
     "prevImage": "上一张图片",
     "nextImage": "下一张图片",
-    "viewImage": "查看图片 {n}"
+    "viewImage": "查看图片 {n}",
+    "streamingMobileOnly": "一键流媒体需在手机上打开，请用手机访问。",
+    "shortcuts": "快捷入口",
+    "descKwangya": "举报虚假信息与恶意帖子",
+    "descRadio": "查看现在可申请的广播",
+    "descSmsVote": "音乐节目直播短信投票",
+    "descGuide": "流媒体·下载·投票方法",
+    "descVote": "查看所有进行中的投票",
+    "officialLinks": "EXO 官方频道",
+    "mvTitle": "音乐视频",
+    "kwangyaSite": "KWANGYA 119 举报网站"
   },
   "quickview": {
     "thisWeekSchedule": "本周日程",

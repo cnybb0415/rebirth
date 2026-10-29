@@ -74,6 +74,16 @@ async function resolveFinalUrl(url: string): Promise<string> {
   }
 }
 
+// X API 본문은 &amp; &lt; &gt; 처럼 HTML 엔티티로 와서 화면에 그대로 보였음
+function decodeEntities(text: string): string {
+  return text
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&");
+}
+
 function extractFirstUrl(text: string): string | undefined {
   const match = text.match(/https?:\/\/\S+/i);
   if (!match) return undefined;
@@ -228,7 +238,7 @@ export async function getLatestTweet(): Promise<LatestTweet | null> {
 
   return {
     id: tweet.id,
-    text: tweet.text,
+    text: decodeEntities(tweet.text),
     createdAt: tweet.created_at,
     mediaUrl,
     previewImageUrl,

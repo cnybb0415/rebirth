@@ -12,9 +12,9 @@ export type OneClickStreamingLink = {
   webHref?: string;
 };
 
-type Platform = "ios" | "android" | "other";
+export type Platform = "ios" | "android" | "other";
 
-function detectPlatform(): Platform {
+export function detectPlatform(): Platform {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const navAny = navigator as any;
 
@@ -31,7 +31,7 @@ function detectPlatform(): Platform {
   return "other";
 }
 
-function pickHref(link: OneClickStreamingLink, platform: Platform): string {
+export function pickHref(link: OneClickStreamingLink, platform: Platform): string {
   const ios = (link.iosHref ?? "").trim();
   const android = (link.androidHref ?? "").trim();
   const web = (link.webHref ?? "").trim();
@@ -43,7 +43,7 @@ function pickHref(link: OneClickStreamingLink, platform: Platform): string {
   return web;
 }
 
-function openHref(href: string): void {
+export function openHref(href: string): void {
   if (!href) return;
 
   // For universal links / http(s), open a new tab.

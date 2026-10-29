@@ -74,7 +74,7 @@ async function fetchYouTubeStats(signal?: AbortSignal): Promise<YouTubeStats> {
 export function YouTubeStatsCards({
   variant = "cards",
 }: {
-  variant?: "cards" | "inline";
+  variant?: "cards" | "inline" | "full";
 }) {
   const tc = useTranslations("common");
   const locale = useLocale();
@@ -96,6 +96,27 @@ export function YouTubeStatsCards({
 
   const ready = state.status === "ready";
   const errored = state.status === "error";
+
+  // 홈: 줄여 쓰지 않은 실제 숫자 그대로
+  if (variant === "full") {
+    const full = (n: number) => n.toLocaleString(locale === "ko" ? "ko-KR" : locale);
+    return (
+      <dl className="grid grid-cols-2 divide-x divide-foreground/[0.08]">
+        <div className="px-1">
+          <dt className="text-xs font-medium text-foreground/50">{tc("viewCount")}</dt>
+          <dd className="mt-1 text-[22px] font-extrabold leading-none tabular-nums sm:text-2xl">
+            {ready ? full(state.data.viewCount) : errored ? tc("loadFail") : <Skeleton className="h-6 w-32" />}
+          </dd>
+        </div>
+        <div className="pl-4">
+          <dt className="text-xs font-medium text-foreground/50">{tc("likes")}</dt>
+          <dd className="mt-1 text-[22px] font-extrabold leading-none tabular-nums sm:text-2xl">
+            {ready ? full(state.data.likeCount) : errored ? tc("loadFail") : <Skeleton className="h-6 w-20" />}
+          </dd>
+        </div>
+      </dl>
+    );
+  }
 
   if (variant === "inline") {
     return (

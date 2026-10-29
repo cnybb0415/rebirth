@@ -120,9 +120,11 @@ html,
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: "NanumBarunGothic", var(--font-sans), ui-sans-serif, system-ui,
-    -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
-    "Segoe UI Emoji";
+  /* var(--font-sans)는 @theme inline 이라 실제 CSS 변수로 안 만들어짐 → 줄 전체가 무시돼 Times 로 떨어졌었음.
+     정의된 --font-geist-sans 를 직접 씀 */
+  font-family: "Pretendard Variable", Pretendard, var(--font-geist-sans, ui-sans-serif), -apple-system,
+    BlinkMacSystemFont, system-ui, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", Roboto,
+    "Apple Color Emoji", "Segoe UI Emoji", sans-serif;
 }
 
 html[data-scroll-locked="true"] body {
@@ -137,12 +139,10 @@ html[data-scroll-locked="true"] nav[aria-label="하단 메뉴"] {
   pointer-events: none;
 }
 
-/* Nanum Barun Gothic family names are split by weight in the provided CSS */
 h1,
 h2,
 h3,
 strong,
 b {
-  font-family: "NanumBarunGothicBold", "NanumBarunGothic", var(--font-sans),
-    ui-sans-serif, system-ui;
+  font-family: inherit;
 }

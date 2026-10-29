@@ -41,7 +41,17 @@
     "copyright": "Copyright ⓒ EXO RE:BIRTH All rights reserved.",
     "prevImage": "前の画像",
     "nextImage": "次の画像",
-    "viewImage": "画像{n}を見る"
+    "viewImage": "画像{n}を見る",
+    "streamingMobileOnly": "ワンクリック配信はスマートフォンで開きます。スマートフォンからアクセスしてください。",
+    "shortcuts": "ショートカット",
+    "descKwangya": "虚偽情報・悪質な投稿の通報",
+    "descRadio": "今申請できるラジオを確認",
+    "descSmsVote": "音楽番組の生放送SMS投票",
+    "descGuide": "ストリーミング・ダウンロード・投票の方法",
+    "descVote": "進行中の投票をすべて見る",
+    "officialLinks": "EXO公式チャンネル",
+    "mvTitle": "ミュージックビデオ",
+    "kwangyaSite": "KWANGYA 119 通報サイト"
   },
   "quickview": {
     "thisWeekSchedule": "今週のスケジュール",

@@ -54,8 +54,8 @@ const CARDS: CardDef[] = [
     id: "flo_realtime",
     provider: "flo",
     providerLabel: "플로",
-    typeLabel: "실시간",
-    matchLabels: ["플로", "플로 실시간"],
+    typeLabel: "24시간",
+    matchLabels: ["플로", "플로 24시간", "플로 실시간"],
   },
   {
     id: "vibe_domestic",
@@ -101,7 +101,8 @@ function findItem(items: ChartItem[], matchLabels: string[]): ChartItem | undefi
 function getRankText(item?: ChartItem, rankSuffix?: string): { primary: string; suffix?: string } {
   if (typeof item?.rank === "number") return { primary: String(item.rank), suffix: rankSuffix };
   if (typeof item?.status === "string" && item.status.trim().length > 0) {
-    return { primary: item.status.trim() };
+    // "차트 미진입" → 카드가 좁아서 "미진입"만
+    return { primary: item.status.trim().replace(/^차트\s*/, "") };
   }
   return { primary: "-" };
 }
@@ -168,7 +169,7 @@ function renderTypeLabel(typeLabel: string) {
 
 function ProviderIcon({ provider, label }: { provider: ProviderKey; label: string }) {
   return (
-    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-sm border border-foreground/10 sm:h-8 sm:w-8">
+    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white">
       <MusicServiceIcon service={provider} label={label} size={16} className="h-[16px] w-[16px] sm:h-[18px] sm:w-[18px]" />
     </span>
   );
@@ -218,7 +219,7 @@ export async function ChartSummaryGrid({
     <div>
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h2 className="text-lg font-semibold">
+          <h2 className="text-[17px] font-bold">
             <span className="font-bold">{safeTitle}</span>{t("chartOf")}
           </h2>
           <div className="mt-1 flex items-center gap-2 text-xs text-neutral-400">
@@ -229,14 +230,14 @@ export async function ChartSummaryGrid({
         {moreHref ? (
           <Link
             href={moreHref}
-            className="text-xs font-medium text-foreground/50 hover:text-foreground whitespace-nowrap pt-1"
+            className="-mr-1 flex min-h-11 items-center whitespace-nowrap px-1 text-[13px] font-medium text-foreground/50 hover:text-foreground"
           >
             {t("moreCharts")}
           </Link>
         ) : null}
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-1.5 sm:gap-4">
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         {CARDS.map((card) => {
           const item = findItem(charts.items, card.matchLabels);
           const rankSuffix = t("rankSuffix");
@@ -247,41 +248,40 @@ export async function ChartSummaryGrid({
             <div
               key={card.id}
               className={cn(
-                "rounded-xl border border-foreground/10 bg-white px-2.5 py-2.5 shadow-sm sm:rounded-2xl sm:px-5 sm:py-4",
-                "transition-colors hover:border-sky-300"
+                "rounded-2xl bg-neutral-50 px-3 py-3 sm:px-4 sm:py-3.5"
               )}
             >
               <div className="flex items-center justify-between gap-2 sm:gap-4">
                 <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
                   <ProviderIcon provider={card.provider} label={card.providerLabel} />
                   <div className="min-w-0">
-                    <p className="text-[11px] sm:text-sm font-bold leading-tight break-keep">
+                    <p className="text-[13px] sm:text-sm font-bold leading-tight break-keep">
                       {card.providerLabel}
                     </p>
-                    <p className="mt-0.5 sm:mt-1 text-[9.5px] sm:text-xs text-neutral-500 leading-tight break-keep">
+                    <p className="mt-0.5 text-[11px] sm:text-xs text-neutral-500 leading-tight break-keep">
                       {renderTypeLabel(card.typeLabel)}
                     </p>
                   </div>
                 </div>
 
                 <div className="text-right">
-                  <p className="text-[12px] sm:text-xl font-extrabold tabular-nums leading-none">
+                  <p className="text-lg sm:text-xl font-extrabold tabular-nums leading-none">
                     {rankText.suffix ? (
                       <span className="inline-flex items-baseline gap-0.5">
                         <span>{rankText.primary}</span>
-                        <span className="text-[8px] sm:text-sm font-bold">
+                        <span className="text-[11px] sm:text-sm font-bold">
                           {rankText.suffix}
                         </span>
                       </span>
                     ) : (
-                      <span className="text-[8px] sm:text-sm font-semibold text-neutral-500 whitespace-nowrap">
+                      <span className="text-xs sm:text-sm font-semibold text-neutral-400 whitespace-nowrap">
                         {rankText.primary}
                       </span>
                     )}
                   </p>
                   <p
                     className={cn(
-                      "mt-0.5 sm:mt-1 text-[9.5px] sm:text-xs font-semibold tabular-nums",
+                      "mt-1 text-[11px] sm:text-xs font-semibold tabular-nums",
                       change.className
                     )}
                   >
