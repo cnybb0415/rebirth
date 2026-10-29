@@ -90,9 +90,9 @@ function HowTo({ images, maxH }: { images: string[]; maxH: string }) {
             <img
               key={src}
               src={src}
-              alt={`HOW TO VOTE ${i + 2}`}
+              alt={`MAMA 2026 2차 투표 방법 ${i + 1}`}
               draggable={false}
-              className={`aspect-[3/4] w-full shrink-0 snap-center snap-always object-contain ${maxH}`}
+              className={`aspect-[4/5] w-full shrink-0 snap-center snap-always object-contain ${maxH}`}
             />
           ))}
         </div>
@@ -179,7 +179,7 @@ export function MamaVoteDialog({
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={MAMA_VOTE.mainImage}
-                  alt="2026 MAMA HOW TO VOTE: 팬스 초이스 남자, 올해의 팬스 초이스 with VISA 모두 EXO 선택"
+                  alt="MAMA 2026 팬스 초이스 2차 투표 안내: Mnet Plus 앱 투표 90% (팬스 초이스 남자 · 올해의 팬스 초이스 with VISA 모두 EXO) + X 해시태그 투표 10% #2026MAMAVOTE #EXO, 10.28 18:00 ~ 11.08 23:59 (KST)"
                   className={`block aspect-square w-full object-cover ${imageMaxH}`}
                 />
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-[#0a0c18] to-transparent" />

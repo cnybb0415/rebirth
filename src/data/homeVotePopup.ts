@@ -18,12 +18,12 @@ export const MAMA_VOTE = {
   endsAt: "2026-11-08T23:59:59+09:00",
 
   // 팝업 맨 위에 보이는 메인 이미지
-  mainImage: "/images/home/popup/mama_main.webp",
+  mainImage: "/images/home/popup/mama_r2_main.webp",
   // "투표 방법 자세히 보기"에서 넘겨 보는 이미지
   howToImages: [
-    "/images/home/popup/mama_howto2.webp",
-    "/images/home/popup/mama_howto3.webp",
-    "/images/home/popup/mama_howto4.webp",
+    "/images/home/popup/mama_r2_howto1.webp",
+    "/images/home/popup/mama_r2_howto2.webp",
+    "/images/home/popup/mama_r2_howto3.webp",
   ],
 };
 

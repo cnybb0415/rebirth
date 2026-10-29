@@ -104,6 +104,7 @@ export const voteGuides: VoteGuide[] = [
     id: "award",
     label: "시상식",
     assets: [
+      { type: "image", src: "/images/guides/vote/공통/시상식/MAMA_2026.webp", alt: "2026 MAMA 팬스 초이스 2차 투표 가이드 (Mnet Plus 앱 투표 · X 해시태그 투표)" },
       { type: "image", src: "/images/guides/vote/공통/시상식/JMA_2026.jpg", alt: "JMA 2026 시상식 투표 가이드" },
       { type: "image", src: "/images/guides/vote/공통/시상식/ASEA_2026.png", alt: "ASEA 2026 시상식 투표 가이드" },
     ],
