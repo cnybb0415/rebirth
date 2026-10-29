@@ -92,7 +92,7 @@ function HowTo({ images, maxH }: { images: string[]; maxH: string }) {
               src={src}
               alt={`HOW TO VOTE ${i + 2}`}
               draggable={false}
-              className={`aspect-[3/4] w-full shrink-0 snap-center snap-always object-contain ${maxH}`}
+              className={`aspect-[4/5] w-full shrink-0 snap-center snap-always object-contain ${maxH}`}
             />
           ))}
         </div>
