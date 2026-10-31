@@ -220,7 +220,7 @@ export default async function Home({
 
       <footer className="overflow-hidden bg-[#1c1916] text-[#faf6ef]">
         <div className="mx-auto w-full max-w-6xl px-5 pt-12 sm:px-6">
-          <img src="/images/logo_width.webp" alt="EXO RE:BIRTH 로고" className="h-auto w-44 object-contain invert" />
+          <img src="/images/logo_width.webp" alt="EXO RE:BIRTH 로고" className="h-auto w-44 object-contain invert mix-blend-screen" />
 
           <div className="mt-10 grid gap-10 sm:grid-cols-2">
             <div>
