@@ -52,7 +52,7 @@
     "officialLinks": "EXO 공식 채널",
     "mvTitle": "뮤직비디오",
     "kwangyaSite": "광야119 신고 사이트",
-    "streamingPhoneOnly": "휴대폰에서 재생"
+    "streamingPhoneHint": "일부 서비스는 휴대폰에서만 열려서 여기선 안 보여요."
   },
   "quickview": {
     "thisWeekSchedule": "이번 주 스케줄",

@@ -40,23 +40,23 @@ export function HomeQuickLinks({ smsTo, smsBody }: { smsTo?: string; smsBody?: s
   ];
 
   const rowClass =
-    "group flex min-h-[64px] w-full items-center gap-4 border-t border-[#221e1a]/10 py-3.5 text-left lg:min-h-[148px] lg:flex-col lg:items-start lg:justify-between lg:gap-6 lg:rounded-[20px] lg:border lg:border-[#221e1a]/10 lg:p-4";
+    "group flex min-h-[64px] w-full items-center gap-4 border-t border-[#f0f0f1] py-3 first:border-t-0 text-left lg:min-h-[128px] lg:flex-col lg:items-start lg:justify-between lg:gap-4 lg:rounded-xl lg:border lg:border-[#e4e4e7] lg:p-4";
 
   return (
     <section aria-labelledby="home-shortcuts-title" className={HOME_CARD}>
-      <SectionHead id="home-shortcuts-title" no="04" label={t("shortcuts")} title="Quick" em="links" />
-      <ul className="mt-5 lg:grid lg:grid-cols-5 lg:gap-3">
+      <SectionHead id="home-shortcuts-title" label={t("shortcuts")} />
+      <ul className="mt-1 lg:grid lg:grid-cols-5 lg:gap-2">
         {items.map((it) => {
           const inner = (
             <>
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#efe8dc] text-[#221e1a] transition group-hover:bg-[#221e1a] group-hover:text-[#faf6ef]">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f4f4f5] text-[#18181b]">
                 {it.icon}
               </span>
               <span className="min-w-0 flex-1 lg:flex-none">
-                <span className="block text-[15px] font-semibold leading-tight text-[#221e1a]">{it.title}</span>
-                <span className="mt-1 block text-xs leading-snug text-[#6e655b]">{it.desc}</span>
+                <span className="block text-[15px] font-semibold leading-tight text-[#18181b]">{it.title}</span>
+                <span className="mt-1 block text-xs leading-snug text-[#71717a]">{it.desc}</span>
               </span>
-              <span aria-hidden className="shrink-0 text-lg text-[#221e1a]/35 transition group-hover:translate-x-0.5 lg:hidden">
+              <span aria-hidden className="shrink-0 text-lg text-[#18181b]/35 transition group-hover:translate-x-0.5 lg:hidden">
                 →
               </span>
             </>

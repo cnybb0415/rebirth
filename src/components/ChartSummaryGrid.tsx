@@ -219,18 +219,16 @@ export async function ChartSummaryGrid({
   return (
     <div>
       <SectionHead
-        no="05"
         label={`${safeTitle}${t("chartOf")}`}
-        title={safeTitle + ","}
         em="live"
-        right={moreHref ? <Link href={moreHref} className={PILL}>{t("moreCharts").replace(/\s*→\s*$/, "")} ↗</Link> : null}
+        right={moreHref ? <Link href={moreHref} className={PILL}>{t("moreCharts").replace(/\s*→\s*$/, "")} ›</Link> : null}
       />
-      <p className="mt-3 flex items-center gap-1.5 text-xs tabular-nums text-[#6e655b]">
+      <p className="flex items-center gap-1.5 text-xs tabular-nums text-[#71717a]">
         <ClockIcon />
         {updated} KST
       </p>
 
-      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
         {CARDS.map((card) => {
           const item = findItem(charts.items, card.matchLabels);
           const rankSuffix = t("rankSuffix");
@@ -241,7 +239,7 @@ export async function ChartSummaryGrid({
             <div
               key={card.id}
               className={cn(
-                "rounded-[20px] bg-[#efe8dc] px-3.5 py-3.5 sm:px-4 sm:py-4"
+                "rounded-xl bg-[#f4f4f5] px-3 py-3 sm:px-4 sm:py-3.5"
               )}
             >
               <div className="flex items-center justify-between gap-2 sm:gap-4">
@@ -258,7 +256,7 @@ export async function ChartSummaryGrid({
                 </div>
 
                 <div className="text-right">
-                  <p className="font-display text-[30px] sm:text-[34px] tabular-nums leading-none text-[#221e1a]">
+                  <p className="text-[20px] sm:text-[22px] font-bold tabular-nums leading-none text-[#18181b]">
                     {rankText.suffix ? (
                       <span className="inline-flex items-baseline gap-0.5">
                         <span>{rankText.primary}</span>
@@ -267,7 +265,7 @@ export async function ChartSummaryGrid({
                         </span>
                       </span>
                     ) : (
-                      <span className="font-body text-xs sm:text-[13px] font-semibold text-[#6e655b] whitespace-nowrap">
+                      <span className="font-body text-xs sm:text-[13px] font-semibold text-[#71717a] whitespace-nowrap">
                         {rankText.primary}
                       </span>
                     )}

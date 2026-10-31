@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { siteConfig } from "@/config/site";
 
 const HERO_IMAGES = [
   "/images/home/1.%EB%8B%A8%EC%B2%B4.png",
@@ -109,7 +108,7 @@ export function HomeHero() {
         }
       >
         <div className="px-3 pt-3 sm:px-5 sm:pt-5">
-        <div className="group relative w-full overflow-hidden rounded-[24px] sm:rounded-[32px]">
+        <div className="group relative w-full overflow-hidden rounded-2xl">
           <div
             className="flex w-full transition-transform duration-700 ease-out"
             style={{ transform: `translateX(-${index * 100}%)` }}
@@ -154,30 +153,6 @@ export function HomeHero() {
             ))}
           </div>
 
-          {/* 에디토리얼 오버레이: 세로 그리드선 + 문구 (사진 위, 클릭은 통과) */}
-          <div aria-hidden className="pointer-events-none absolute inset-0 grid grid-cols-4">
-            <span className="border-r border-white/15" />
-            <span className="border-r border-white/15" />
-            <span className="border-r border-white/15" />
-            <span />
-          </div>
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/55 to-transparent" />
-          <div className="pointer-events-none absolute inset-0 flex flex-col justify-between p-4 text-white sm:p-8">
-            <div className="flex items-start justify-between gap-4">
-              <p className="font-display text-[22px] italic leading-none sm:text-[32px]">Re:Birth.</p>
-              <p className="max-w-[9rem] text-right text-[10px] font-medium uppercase leading-snug tracking-[0.14em] text-white/80 sm:max-w-none sm:text-[11px]">
-                EXO supporting fanbase
-              </p>
-            </div>
-            <div className="flex items-end justify-between gap-4 pb-5 sm:pb-6">
-              <div>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/80 sm:text-[11px]">
-                  {siteConfig.artistName} — Now streaming
-                </p>
-                <p className="font-display mt-1 text-[56px] leading-[0.85] sm:text-[112px]">{siteConfig.trackTitle}</p>
-              </div>
-            </div>
-          </div>
         </div>
         </div>
       </div>

@@ -52,7 +52,7 @@
     "officialLinks": "EXO公式チャンネル",
     "mvTitle": "ミュージックビデオ",
     "kwangyaSite": "KWANGYA 119 通報サイト",
-    "streamingPhoneOnly": "スマホで再生"
+    "streamingPhoneHint": "一部のサービスはスマホでのみ開くため、ここには表示されません。"
   },
   "quickview": {
     "thisWeekSchedule": "今週のスケジュール",

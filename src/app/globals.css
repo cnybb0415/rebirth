@@ -147,11 +147,6 @@ b {
   font-family: inherit;
 }
 
-/* 메인 화면 세리프 제목 (src/lib/fonts.ts 의 --font-display) */
-.font-display {
-  font-family: var(--font-display), "Times New Roman", serif;
-  font-weight: 400;
-}
 .font-body {
   font-family: "Pretendard Variable", Pretendard, system-ui, sans-serif;
 }

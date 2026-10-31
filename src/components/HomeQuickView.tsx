@@ -120,20 +120,20 @@ const fetchRawVotes = unstable_cache(
 function ScheduleItemRow({ item }: { item: ScheduleItem }) {
   const [, mm, dd] = item.date.split("-");
   return (
-    <li className="flex items-center gap-4 border-t border-[#221e1a]/10 py-4">
+    <li className="flex items-center gap-4 border-t border-[#18181b]/10 py-3.5">
       <div className="w-12 shrink-0 leading-none">
-        <div className="text-[11px] font-semibold text-[#6e655b]">{Number(mm)}월</div>
-        <div className="font-display mt-1 text-[40px] leading-[0.85] tabular-nums text-[#221e1a]">{dd}</div>
+        <div className="text-[11px] font-semibold text-[#71717a]">{Number(mm)}월</div>
+        <div className="mt-1 text-[22px] font-bold leading-none tabular-nums text-[#18181b]">{dd}</div>
       </div>
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5 text-xs text-[#6e655b]">
+        <div className="flex items-center gap-1.5 text-xs text-[#71717a]">
           <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold leading-none ${CATEGORY_COLORS[item.category] ?? "bg-neutral-100 text-neutral-500"}`}>
             {item.category}
           </span>
           {item.time && <span className="tabular-nums">{item.time}</span>}
           {item.city && <span className="truncate">· {item.city}</span>}
         </div>
-        <p className="mt-1.5 line-clamp-2 text-[15px] font-semibold leading-snug text-[#221e1a]">{item.title}</p>
+        <p className="mt-1.5 line-clamp-2 text-[15px] font-semibold leading-snug text-[#18181b]">{item.title}</p>
       </div>
     </li>
   );
@@ -179,23 +179,20 @@ export async function HomeQuickView() {
       {/* 스케줄 */}
       <section className={HOME_CARD}>
         <SectionHead
-          no="02"
           label={scheduleLabel}
-          title="Up"
-          em="next"
-          right={<Link href="/schedule" className={PILL}>{more} ↗</Link>}
+          right={<Link href="/schedule" className={PILL}>{more} ›</Link>}
         />
         {scheduleItems.length === 0 ? (
-          <p className="mt-5 border-t border-[#221e1a]/10 pt-4 text-sm text-[#6e655b]">{t("noSchedule")}</p>
+          <p className="mt-2 border-t border-[#18181b]/10 pt-4 text-sm text-[#71717a]">{t("noSchedule")}</p>
         ) : (
-          <ul className="mt-5">
+          <ul className="mt-2">
             {scheduleItems.slice(0, 3).map((item) => (
               <ScheduleItemRow key={item.id} item={item} />
             ))}
           </ul>
         )}
         {thisWeek.length > 3 && (
-          <Link href="/schedule" className="mt-1 flex min-h-11 items-center justify-center rounded-full border border-[#221e1a]/10 text-[13px] font-semibold text-[#6e655b] hover:text-[#221e1a]">
+          <Link href="/schedule" className="mt-1 flex min-h-11 items-center justify-center rounded-full border border-[#18181b]/10 text-[13px] font-semibold text-[#71717a] hover:text-[#18181b]">
             +{thisWeek.length - 3}
           </Link>
         )}
@@ -204,33 +201,30 @@ export async function HomeQuickView() {
       {/* 진행 중인 투표 */}
       <section className={HOME_CARD}>
         <SectionHead
-          no="03"
           label={t("activeVotes")}
-          title="Cast a"
-          em="vote"
-          right={<Link href="/vote" className={PILL}>{more} ↗</Link>}
+          right={<Link href="/vote" className={PILL}>{more} ›</Link>}
         />
         {voteItems.length === 0 ? (
-          <p className="mt-5 border-t border-[#221e1a]/10 pt-4 text-sm text-[#6e655b]">{t("noVotes")}</p>
+          <p className="mt-2 border-t border-[#18181b]/10 pt-4 text-sm text-[#71717a]">{t("noVotes")}</p>
         ) : (
-          <ul className="mt-5">
+          <ul className="mt-2">
             {voteItems.slice(0, 4).map((item, i) => (
-              <li key={i} className="flex items-center gap-3.5 border-t border-[#221e1a]/10 py-4">
-                <span className="font-display w-14 shrink-0 text-[26px] leading-none tabular-nums text-[#221e1a]">
+              <li key={i} className="flex items-center gap-3.5 border-t border-[#18181b]/10 py-3.5">
+                <span className="w-14 shrink-0 rounded-full bg-[#f4f4f5] py-1 text-center text-[12px] font-bold tabular-nums text-[#18181b]">
                   {dDay(item.deadlineDate, now)}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-[#221e1a]">{item.name}</p>
-                  {item.organizer && <p className="mt-0.5 truncate text-xs text-[#6e655b]">{item.organizer}</p>}
+                  <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-[#18181b]">{item.name}</p>
+                  {item.organizer && <p className="mt-0.5 truncate text-xs text-[#71717a]">{item.organizer}</p>}
                 </div>
                 {item.link && (
                   <a
                     href={item.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex h-11 shrink-0 items-center gap-1 rounded-full bg-[#221e1a] px-4 text-[13px] font-bold text-[#faf6ef] transition hover:bg-black"
+                    className="flex h-10 shrink-0 items-center rounded-full bg-[#18181b] px-4 text-[13px] font-semibold text-white transition hover:bg-black"
                   >
-                    {t("voteBtn").replace(/↗/g, "").trim()} ↗
+                    {t("voteBtn").replace(/↗/g, "").trim()}
                   </a>
                 )}
               </li>
@@ -238,7 +232,7 @@ export async function HomeQuickView() {
           </ul>
         )}
         {voteItems.length > 4 && (
-          <Link href="/vote" className="mt-1 flex min-h-11 items-center justify-center rounded-full border border-[#221e1a]/10 text-[13px] font-semibold text-[#6e655b] hover:text-[#221e1a]">
+          <Link href="/vote" className="mt-1 flex min-h-11 items-center justify-center rounded-full border border-[#18181b]/10 text-[13px] font-semibold text-[#71717a] hover:text-[#18181b]">
             +{voteItems.length - 4}
           </Link>
         )}

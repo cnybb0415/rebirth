@@ -52,7 +52,7 @@
     "officialLinks": "EXO 官方频道",
     "mvTitle": "音乐视频",
     "kwangyaSite": "KWANGYA 119 举报网站",
-    "streamingPhoneOnly": "在手机上播放"
+    "streamingPhoneHint": "部分服务仅能在手机上打开，因此此处不显示。"
   },
   "quickview": {
     "thisWeekSchedule": "本周日程",
