@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useTranslations } from "next-intl";
 import { MusicServiceIcon } from "@/components/MusicServiceIcon";
+import { HOME_CARD, SectionHead } from "@/components/home/SectionHead";
 import {
   detectPlatform,
   openHref,
@@ -11,21 +12,33 @@ import {
   type Platform,
 } from "@/components/OneClickStreamingGrid";
 
-// 홈 원클릭 스트리밍 카드
-// - 서비스별 타일. 이 기기에서 열리는 링크가 1개면 타일을 누르면 바로 재생
-// - 멜론·바이브처럼 여러 개로 나뉜 경우 타일 아래 번호 버튼(1·2·3·4)으로 나눠 누름
-// - 링크는 src/config/site.ts 의 oneClickStreamingLinks 그대로 사용
+// 홈 원클릭 스트리밍 — 서비스마다 아치형 카드
+// - 이 기기에서 열리는 링크가 1개면 카드 전체가 재생 버튼
+// - 멜론·바이브처럼 나뉜 경우 카드 아래 1·2·3·4 버튼
+// - 이 기기에서 못 여는 서비스는 흐리게 + "휴대폰에서 재생"
+// 링크는 src/config/site.ts 의 oneClickStreamingLinks 그대로
 
 type Part = { key: string; short: string; label: string; href: string };
 type Group = { key: string; service: string; name: string; parts: Part[] };
 
 const SERVICE_NAME: Record<string, string> = {
-  melon: "멜론",
-  genie: "지니",
-  bugs: "벅스",
-  flo: "플로",
-  vibe: "바이브",
-  youtube: "유튜브",
+  melon: "Melon",
+  genie: "Genie",
+  bugs: "Bugs",
+  flo: "FLO",
+  vibe: "VIBE",
+  youtube: "YouTube",
+};
+
+// 아치 배경 (서비스 색을 옅게)
+const TINT: Record<string, string> = {
+  melon: "#cfe3c4",
+  "melon-wave": "#e3e8bf",
+  genie: "#c9dbef",
+  bugs: "#f3cfc0",
+  flo: "#d3d1f2",
+  vibe: "#e2cdef",
+  youtube: "#f1c9c3",
 };
 
 function groupLinks(links: ReadonlyArray<OneClickStreamingLink>, platform: Platform): Group[] {
@@ -33,18 +46,14 @@ function groupLinks(links: ReadonlyArray<OneClickStreamingLink>, platform: Platf
   for (const link of links) {
     const isWave = link.label.includes("뮤직웨이브");
     const key = isWave ? `${link.id}-wave` : link.id;
-    const name = isWave ? "뮤직웨이브" : SERVICE_NAME[link.id] ?? link.label;
+    const name = isWave ? "Musicwave" : SERVICE_NAME[link.id] ?? link.label;
     if (!map.has(key)) map.set(key, { key, service: link.id, name, parts: [] });
     const href = pickHref(link, platform);
-    if (!href) continue; // 이 기기에서 안 열리는 링크(iOS 전용 등)는 숨김
+    if (!href) continue;
     const num = link.label.match(/(\d+)\s*$/)?.[1];
     map.get(key)!.parts.push({ key: link.label, short: num ?? link.label, label: link.label, href });
   }
-  // 번호 버튼이 있는 서비스(한 줄 전체)는 앞뒤로, 버튼 하나짜리는 가운데 두 칸씩 모아 빈칸이 덜 생기게
-  const groups = [...map.values()].filter((g) => g.parts.length > 0);
-  const wide = groups.filter((g) => g.parts.length > 2);
-  const narrow = groups.filter((g) => g.parts.length <= 2);
-  return [...wide.slice(0, 1), ...narrow, ...wide.slice(1)];
+  return [...map.values()];
 }
 
 export function HomeStreamingCard({ links }: { links: ReadonlyArray<OneClickStreamingLink> }) {
@@ -55,86 +64,100 @@ export function HomeStreamingCard({ links }: { links: ReadonlyArray<OneClickStre
     setPlatform(detectPlatform());
   }, []);
 
-  const groups = platform ? groupLinks(links, platform) : [];
+  const groups = groupLinks(links, platform ?? "other");
 
   return (
-    <section
-      aria-labelledby="home-streaming-title"
-      className="overflow-hidden rounded-3xl bg-[#111114] p-5 text-white shadow-sm sm:p-6"
-    >
-      <div className="flex items-end justify-between gap-3">
-        <div>
-          <p className="text-xs font-medium tracking-wide text-white/55">ONE-CLICK STREAMING</p>
-          <h2 id="home-streaming-title" className="mt-1 text-lg font-bold sm:text-xl">
-            {t("actionStreaming")}
-          </h2>
-        </div>
-        <span className="rounded-full bg-white/10 px-2.5 py-1 text-[11px] text-white/70">
-          {platform === "ios" ? "iPhone" : platform === "android" ? "Android" : "PC"}
-        </span>
-      </div>
+    <section aria-labelledby="home-streaming-title" className={HOME_CARD}>
+      <SectionHead
+        id="home-streaming-title"
+        no="01"
+        label={t("actionStreaming")}
+        title="One-click"
+        em="stream"
+        right={
+          platform ? (
+            <span className="rounded-full bg-[#221e1a] px-3 py-1.5 text-[11px] font-semibold text-[#faf6ef]">
+              {platform === "ios" ? "iPhone" : platform === "android" ? "Android" : "PC"}
+            </span>
+          ) : null
+        }
+      />
 
-      {platform === null ? (
-        <div className="mt-4 grid grid-cols-2 gap-2" aria-hidden>
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-14 animate-pulse rounded-2xl bg-white/[0.07]" />
-          ))}
-        </div>
-      ) : groups.length === 0 ? (
-        <p className="mt-4 rounded-2xl bg-white/[0.07] px-4 py-5 text-center text-sm text-white/70">
-          {t("streamingMobileOnly")}
-        </p>
-      ) : (
-        <ul className="mt-4 grid grid-cols-2 gap-2">
-          {groups.map((g) => {
-            const single = g.parts.length === 1;
-            return (
-              <li key={g.key} className={g.parts.length > 2 ? "col-span-2" : undefined}>
-                {single ? (
-                  <button
-                    type="button"
-                    onClick={() => openHref(g.parts[0].href)}
-                    className="flex min-h-14 w-full items-center gap-2.5 rounded-2xl bg-white/[0.08] px-3 py-2 text-left transition hover:bg-white/[0.14] active:scale-[0.98]"
-                  >
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white">
-                      <MusicServiceIcon service={g.service as never} label={g.name} size={20} className="h-5 w-5" />
-                    </span>
-                    <span className="min-w-0 flex-1 break-keep text-sm font-semibold leading-tight">{g.name}</span>
-                    <PlayIcon />
-                  </button>
-                ) : (
-                  <div className="flex min-h-14 w-full items-center gap-3 rounded-2xl bg-white/[0.08] px-3.5 py-2.5">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-white">
-                      <MusicServiceIcon service={g.service as never} label={g.name} size={20} className="h-5 w-5" />
-                    </span>
-                    <span className="min-w-0 shrink-0 text-sm font-semibold">{g.name}</span>
-                    <span className="ml-auto flex flex-wrap justify-end gap-1.5">
+      <ul className="mt-6 grid grid-cols-2 gap-x-3 gap-y-5 sm:grid-cols-3 lg:grid-cols-6">
+        {groups.map((g, i) => {
+          const available = platform !== null && g.parts.length > 0;
+          const single = available && g.parts.length === 1;
+          const no = String(i + 1).padStart(2, "0");
+
+          const arch = (
+            <span
+              className="relative flex aspect-[4/5] w-full items-center justify-center overflow-hidden rounded-t-[999px] rounded-b-[18px] transition duration-300 group-hover:brightness-[1.03]"
+              style={{ background: TINT[g.key] ?? "#e8e0d2" }}
+            >
+              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white shadow-[0_8px_24px_rgba(34,30,26,0.12)] transition duration-300 group-hover:-translate-y-1">
+                <MusicServiceIcon service={g.service as never} label={g.name} size={30} className="h-[30px] w-[30px]" />
+              </span>
+              {single ? (
+                <span className="absolute bottom-3 right-3 flex h-8 w-8 items-center justify-center rounded-full bg-[#221e1a] text-[#faf6ef]">
+                  <PlayIcon />
+                </span>
+              ) : null}
+            </span>
+          );
+
+          const caption = (
+            <span className="mt-2.5 flex items-baseline gap-2">
+              <span className="text-[10px] font-semibold tabular-nums text-[#6e655b]">{no}</span>
+              <span className="font-display text-[26px] leading-none text-[#221e1a]">{g.name}</span>
+            </span>
+          );
+
+          return (
+            <li key={g.key} className={available ? undefined : "opacity-45"}>
+              {single ? (
+                <button
+                  type="button"
+                  onClick={() => openHref(g.parts[0].href)}
+                  aria-label={`${g.parts[0].label} 재생`}
+                  className="group block w-full text-left"
+                >
+                  {arch}
+                  {caption}
+                </button>
+              ) : (
+                <div className="group">
+                  {arch}
+                  {caption}
+                  {available ? (
+                    <div className="mt-2 flex gap-1.5">
                       {g.parts.map((p) => (
                         <button
                           key={p.key}
                           type="button"
                           onClick={() => openHref(p.href)}
-                          aria-label={p.label}
-                          className="h-9 min-w-9 rounded-xl bg-white/[0.12] px-2.5 text-sm font-bold tabular-nums transition hover:bg-[#ffd84a] hover:text-[#111114] active:scale-95"
+                          aria-label={`${p.label} 재생`}
+                          className="h-10 min-w-0 flex-1 rounded-full border border-[#221e1a]/15 text-[13px] font-bold tabular-nums text-[#221e1a] transition hover:bg-[#221e1a] hover:text-[#faf6ef] active:scale-95"
                         >
                           {p.short}
                         </button>
                       ))}
-                    </span>
-                  </div>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      )}
+                    </div>
+                  ) : platform !== null ? (
+                    <p className="mt-1 text-[11px] text-[#6e655b]">{t("streamingPhoneOnly")}</p>
+                  ) : null}
+                </div>
+              )}
+            </li>
+          );
+        })}
+      </ul>
     </section>
   );
 }
 
 function PlayIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="#ffd84a" aria-hidden className="shrink-0">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden>
       <path d="M7 4.5v15l12.5-7.5z" />
     </svg>
   );

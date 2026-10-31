@@ -2,9 +2,10 @@
 
 import * as React from "react";
 import { useTranslations } from "next-intl";
-import { Radio, MessageSquare, Vote, BookOpen, ChevronRight } from "lucide-react";
+import { Radio, MessageSquare, Vote, BookOpen } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { buildSmsHref, detectSmsPlatform } from "@/lib/sms";
+import { HOME_CARD, SectionHead } from "@/components/home/SectionHead";
 
 // 홈 바로가기 목록 (KWANGYA 119 · 라디오 · 문자투표 · 가이드 · 투표)
 // 아이콘 + 제목 + 한 줄 설명. 문자투표는 누르면 문자 앱이 열림
@@ -39,40 +40,41 @@ export function HomeQuickLinks({ smsTo, smsBody }: { smsTo?: string; smsBody?: s
   ];
 
   const rowClass =
-    "flex min-h-[60px] w-full items-center gap-3.5 px-4 py-3 text-left transition hover:bg-neutral-50 active:bg-neutral-100";
-
-  const inner = (it: (typeof items)[number]) => (
-    <>
-      <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-neutral-100 text-foreground/80">
-        {it.icon}
-      </span>
-      <span className="min-w-0 flex-1">
-        <span className="block text-[15px] font-semibold leading-tight">{it.title}</span>
-        <span className="mt-0.5 block truncate text-xs text-foreground/50">{it.desc}</span>
-      </span>
-      <ChevronRight size={18} className="shrink-0 text-foreground/30" aria-hidden />
-    </>
-  );
+    "group flex min-h-[64px] w-full items-center gap-4 border-t border-[#221e1a]/10 py-3.5 text-left lg:min-h-[148px] lg:flex-col lg:items-start lg:justify-between lg:gap-6 lg:rounded-[20px] lg:border lg:border-[#221e1a]/10 lg:p-4";
 
   return (
-    <section aria-labelledby="home-shortcuts-title">
-      <h2 id="home-shortcuts-title" className="sr-only">
-        {t("shortcuts")}
-      </h2>
-      <ul className="divide-y divide-foreground/[0.06] overflow-hidden rounded-3xl border border-foreground/[0.08] bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)]">
-        {items.map((it) => (
-          <li key={it.key}>
-            {it.href ? (
-              <Link href={it.href} className={rowClass}>
-                {inner(it)}
-              </Link>
-            ) : (
-              <button type="button" onClick={it.onClick} className={rowClass}>
-                {inner(it)}
-              </button>
-            )}
-          </li>
-        ))}
+    <section aria-labelledby="home-shortcuts-title" className={HOME_CARD}>
+      <SectionHead id="home-shortcuts-title" no="04" label={t("shortcuts")} title="Quick" em="links" />
+      <ul className="mt-5 lg:grid lg:grid-cols-5 lg:gap-3">
+        {items.map((it) => {
+          const inner = (
+            <>
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#efe8dc] text-[#221e1a] transition group-hover:bg-[#221e1a] group-hover:text-[#faf6ef]">
+                {it.icon}
+              </span>
+              <span className="min-w-0 flex-1 lg:flex-none">
+                <span className="block text-[15px] font-semibold leading-tight text-[#221e1a]">{it.title}</span>
+                <span className="mt-1 block text-xs leading-snug text-[#6e655b]">{it.desc}</span>
+              </span>
+              <span aria-hidden className="shrink-0 text-lg text-[#221e1a]/35 transition group-hover:translate-x-0.5 lg:hidden">
+                →
+              </span>
+            </>
+          );
+          return (
+            <li key={it.key}>
+              {it.href ? (
+                <Link href={it.href} className={rowClass}>
+                  {inner}
+                </Link>
+              ) : (
+                <button type="button" onClick={it.onClick} className={rowClass}>
+                  {inner}
+                </button>
+              )}
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

@@ -3,6 +3,7 @@ import type { ChartItem, ChartsData } from "@/lib/charts";
 import { cn } from "@/lib/utils";
 import { MusicServiceIcon } from "@/components/MusicServiceIcon";
 import { getTranslations } from "next-intl/server";
+import { PILL, SectionHead } from "@/components/home/SectionHead";
 
 type ProviderKey = "melon" | "genie" | "bugs" | "flo" | "vibe";
 
@@ -217,27 +218,19 @@ export async function ChartSummaryGrid({
 
   return (
     <div>
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="text-[17px] font-bold">
-            <span className="font-bold">{safeTitle}</span>{t("chartOf")}
-          </h2>
-          <div className="mt-1 flex items-center gap-2 text-xs text-neutral-400">
-            <ClockIcon />
-            <span className="tabular-nums">{updated}</span>
-          </div>
-        </div>
-        {moreHref ? (
-          <Link
-            href={moreHref}
-            className="-mr-1 flex min-h-11 items-center whitespace-nowrap px-1 text-[13px] font-medium text-foreground/50 hover:text-foreground"
-          >
-            {t("moreCharts")}
-          </Link>
-        ) : null}
-      </div>
+      <SectionHead
+        no="05"
+        label={`${safeTitle}${t("chartOf")}`}
+        title={safeTitle + ","}
+        em="live"
+        right={moreHref ? <Link href={moreHref} className={PILL}>{t("moreCharts").replace(/\s*→\s*$/, "")} ↗</Link> : null}
+      />
+      <p className="mt-3 flex items-center gap-1.5 text-xs tabular-nums text-[#6e655b]">
+        <ClockIcon />
+        {updated} KST
+      </p>
 
-      <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
+      <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-3">
         {CARDS.map((card) => {
           const item = findItem(charts.items, card.matchLabels);
           const rankSuffix = t("rankSuffix");
@@ -248,7 +241,7 @@ export async function ChartSummaryGrid({
             <div
               key={card.id}
               className={cn(
-                "rounded-2xl bg-neutral-50 px-3 py-3 sm:px-4 sm:py-3.5"
+                "rounded-[20px] bg-[#efe8dc] px-3.5 py-3.5 sm:px-4 sm:py-4"
               )}
             >
               <div className="flex items-center justify-between gap-2 sm:gap-4">
@@ -265,16 +258,16 @@ export async function ChartSummaryGrid({
                 </div>
 
                 <div className="text-right">
-                  <p className="text-lg sm:text-xl font-extrabold tabular-nums leading-none">
+                  <p className="font-display text-[30px] sm:text-[34px] tabular-nums leading-none text-[#221e1a]">
                     {rankText.suffix ? (
                       <span className="inline-flex items-baseline gap-0.5">
                         <span>{rankText.primary}</span>
-                        <span className="text-[11px] sm:text-sm font-bold">
+                        <span className="font-body text-[11px] sm:text-xs font-semibold">
                           {rankText.suffix}
                         </span>
                       </span>
                     ) : (
-                      <span className="text-xs sm:text-sm font-semibold text-neutral-400 whitespace-nowrap">
+                      <span className="font-body text-xs sm:text-[13px] font-semibold text-[#6e655b] whitespace-nowrap">
                         {rankText.primary}
                       </span>
                     )}

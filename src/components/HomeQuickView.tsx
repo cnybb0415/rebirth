@@ -1,6 +1,7 @@
 import { unstable_cache } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { HOME_CARD, PILL, SectionHead } from "@/components/home/SectionHead";
 
 type ScheduleItem = {
   id: string;
@@ -119,20 +120,20 @@ const fetchRawVotes = unstable_cache(
 function ScheduleItemRow({ item }: { item: ScheduleItem }) {
   const [, mm, dd] = item.date.split("-");
   return (
-    <li className="flex items-center gap-3.5 border-t border-foreground/[0.06] py-3 first:border-t-0 first:pt-1">
-      <div className="w-11 shrink-0 text-center leading-none">
-        <div className="text-[11px] font-medium text-foreground/45">{Number(mm)}월</div>
-        <div className="mt-1 text-xl font-extrabold tabular-nums">{dd}</div>
+    <li className="flex items-center gap-4 border-t border-[#221e1a]/10 py-4">
+      <div className="w-12 shrink-0 leading-none">
+        <div className="text-[11px] font-semibold text-[#6e655b]">{Number(mm)}월</div>
+        <div className="font-display mt-1 text-[40px] leading-[0.85] tabular-nums text-[#221e1a]">{dd}</div>
       </div>
       <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-1.5 text-xs text-[#6e655b]">
           <span className={`rounded-full px-2 py-0.5 text-[11px] font-bold leading-none ${CATEGORY_COLORS[item.category] ?? "bg-neutral-100 text-neutral-500"}`}>
             {item.category}
           </span>
-          {item.time && <span className="text-xs tabular-nums text-foreground/45">{item.time}</span>}
-          {item.city && <span className="truncate text-xs text-foreground/45">· {item.city}</span>}
+          {item.time && <span className="tabular-nums">{item.time}</span>}
+          {item.city && <span className="truncate">· {item.city}</span>}
         </div>
-        <p className="mt-1 line-clamp-2 text-[15px] font-semibold leading-snug">{item.title}</p>
+        <p className="mt-1.5 line-clamp-2 text-[15px] font-semibold leading-snug text-[#221e1a]">{item.title}</p>
       </div>
     </li>
   );
@@ -142,17 +143,6 @@ function dDay(deadline: Date, now: Date): string {
   const kst = (d: Date) => new Date(d.getTime() + 9 * 3600_000).toISOString().slice(0, 10);
   const days = Math.round((Date.parse(kst(deadline)) - Date.parse(kst(now))) / 86_400_000);
   return days <= 0 ? "D-DAY" : `D-${days}`;
-}
-
-function SectionHead({ title, href, more }: { title: string; href: string; more: string }) {
-  return (
-    <div className="flex items-center justify-between">
-      <h2 className="text-[17px] font-bold">{title}</h2>
-      <Link href={href} className="-mr-1 flex min-h-11 items-center px-1 text-[13px] font-medium text-foreground/50 hover:text-foreground">
-        {more} ›
-      </Link>
-    </div>
-  );
 }
 
 export async function HomeQuickView() {
@@ -182,53 +172,65 @@ export async function HomeQuickView() {
   const scheduleItems = thisWeek.length > 0 ? thisWeek : nextUpcoming;
   const scheduleLabel = thisWeek.length > 0 ? t("thisWeekSchedule") : t("nextSchedule");
 
-  const card = "rounded-3xl border border-foreground/[0.08] bg-white p-5 shadow-[0_1px_2px_rgba(0,0,0,0.04)]";
+  const more = t("viewAll").replace(/\s*→\s*$/, "");
 
   return (
-    <div className="grid gap-3">
+    <div className="grid gap-3 sm:gap-4 lg:grid-cols-2">
       {/* 스케줄 */}
-      <section className={card}>
-        <SectionHead title={scheduleLabel} href="/schedule" more={t("viewAll").replace(/\s*→\s*$/, "")} />
+      <section className={HOME_CARD}>
+        <SectionHead
+          no="02"
+          label={scheduleLabel}
+          title="Up"
+          em="next"
+          right={<Link href="/schedule" className={PILL}>{more} ↗</Link>}
+        />
         {scheduleItems.length === 0 ? (
-          <p className="mt-1 text-sm text-foreground/45">{t("noSchedule")}</p>
+          <p className="mt-5 border-t border-[#221e1a]/10 pt-4 text-sm text-[#6e655b]">{t("noSchedule")}</p>
         ) : (
-          <ul className="mt-1">
+          <ul className="mt-5">
             {scheduleItems.slice(0, 3).map((item) => (
               <ScheduleItemRow key={item.id} item={item} />
             ))}
           </ul>
         )}
         {thisWeek.length > 3 && (
-          <Link href="/schedule" className="mt-1 flex min-h-11 items-center justify-center rounded-2xl bg-neutral-50 text-[13px] font-medium text-foreground/55 hover:text-foreground">
+          <Link href="/schedule" className="mt-1 flex min-h-11 items-center justify-center rounded-full border border-[#221e1a]/10 text-[13px] font-semibold text-[#6e655b] hover:text-[#221e1a]">
             +{thisWeek.length - 3}
           </Link>
         )}
       </section>
 
       {/* 진행 중인 투표 */}
-      <section className={card}>
-        <SectionHead title={t("activeVotes")} href="/vote" more={t("viewAll").replace(/\s*→\s*$/, "")} />
+      <section className={HOME_CARD}>
+        <SectionHead
+          no="03"
+          label={t("activeVotes")}
+          title="Cast a"
+          em="vote"
+          right={<Link href="/vote" className={PILL}>{more} ↗</Link>}
+        />
         {voteItems.length === 0 ? (
-          <p className="mt-1 text-sm text-foreground/45">{t("noVotes")}</p>
+          <p className="mt-5 border-t border-[#221e1a]/10 pt-4 text-sm text-[#6e655b]">{t("noVotes")}</p>
         ) : (
-          <ul className="mt-1">
+          <ul className="mt-5">
             {voteItems.slice(0, 4).map((item, i) => (
-              <li key={i} className="flex items-center gap-3 border-t border-foreground/[0.06] py-3 first:border-t-0 first:pt-1">
-                <span className="w-12 shrink-0 rounded-full bg-[#ffd84a]/30 py-1 text-center text-[11px] font-extrabold tabular-nums text-[#7a5d00]">
+              <li key={i} className="flex items-center gap-3.5 border-t border-[#221e1a]/10 py-4">
+                <span className="font-display w-14 shrink-0 text-[26px] leading-none tabular-nums text-[#221e1a]">
                   {dDay(item.deadlineDate, now)}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="line-clamp-2 text-[15px] font-semibold leading-snug">{item.name}</p>
-                  {item.organizer && <p className="mt-0.5 truncate text-xs text-foreground/45">{item.organizer}</p>}
+                  <p className="line-clamp-2 text-[15px] font-semibold leading-snug text-[#221e1a]">{item.name}</p>
+                  {item.organizer && <p className="mt-0.5 truncate text-xs text-[#6e655b]">{item.organizer}</p>}
                 </div>
                 {item.link && (
                   <a
                     href={item.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex h-10 shrink-0 items-center rounded-xl bg-[#111114] px-3.5 text-[13px] font-bold text-white transition hover:bg-black"
+                    className="flex h-11 shrink-0 items-center gap-1 rounded-full bg-[#221e1a] px-4 text-[13px] font-bold text-[#faf6ef] transition hover:bg-black"
                   >
-                    {t("voteBtn").replace(/↗/g, "").trim()}
+                    {t("voteBtn").replace(/↗/g, "").trim()} ↗
                   </a>
                 )}
               </li>
@@ -236,7 +238,7 @@ export async function HomeQuickView() {
           </ul>
         )}
         {voteItems.length > 4 && (
-          <Link href="/vote" className="mt-1 flex min-h-11 items-center justify-center rounded-2xl bg-neutral-50 text-[13px] font-medium text-foreground/55 hover:text-foreground">
+          <Link href="/vote" className="mt-1 flex min-h-11 items-center justify-center rounded-full border border-[#221e1a]/10 text-[13px] font-semibold text-[#6e655b] hover:text-[#221e1a]">
             +{voteItems.length - 4}
           </Link>
         )}

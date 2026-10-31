@@ -101,16 +101,16 @@ export function YouTubeStatsCards({
   if (variant === "full") {
     const full = (n: number) => n.toLocaleString(locale === "ko" ? "ko-KR" : locale);
     return (
-      <dl className="grid grid-cols-2 divide-x divide-foreground/[0.08]">
+      <dl className="grid grid-cols-2 divide-x divide-[#221e1a]/10 border-t border-[#221e1a]/10 pt-4">
         <div className="px-1">
-          <dt className="text-xs font-medium text-foreground/50">{tc("viewCount")}</dt>
-          <dd className="mt-1 text-[22px] font-extrabold leading-none tabular-nums sm:text-2xl">
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6e655b]">{tc("viewCount")}</dt>
+          <dd className="font-display mt-2 text-[30px] leading-none tabular-nums text-[#221e1a] sm:text-[40px]">
             {ready ? full(state.data.viewCount) : errored ? tc("loadFail") : <Skeleton className="h-6 w-32" />}
           </dd>
         </div>
         <div className="pl-4">
-          <dt className="text-xs font-medium text-foreground/50">{tc("likes")}</dt>
-          <dd className="mt-1 text-[22px] font-extrabold leading-none tabular-nums sm:text-2xl">
+          <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#6e655b]">{tc("likes")}</dt>
+          <dd className="font-display mt-2 text-[30px] leading-none tabular-nums text-[#221e1a] sm:text-[40px]">
             {ready ? full(state.data.likeCount) : errored ? tc("loadFail") : <Skeleton className="h-6 w-20" />}
           </dd>
         </div>
