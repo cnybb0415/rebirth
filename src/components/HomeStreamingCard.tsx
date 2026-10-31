@@ -87,10 +87,10 @@ export function HomeStreamingCard({ links }: { links: ReadonlyArray<OneClickStre
                   type="button"
                   onClick={() => openHref(g.parts[0].href)}
                   aria-label={`${g.parts[0].label} 재생`}
-                  className="flex h-14 w-full items-center gap-3 rounded-xl border border-[#e4e4e7] px-3 text-left transition hover:bg-[#fafafa] active:scale-[0.99]"
+                  className="flex h-14 w-full items-center gap-2.5 rounded-xl border border-[#e4e4e7] px-3 text-left transition hover:bg-[#fafafa] active:scale-[0.99]"
                 >
                   {icon}
-                  <span className="min-w-0 flex-1 truncate text-[15px] font-semibold text-[#18181b]">{g.name}</span>
+                  <span className="min-w-0 flex-1 break-keep text-[14px] font-semibold leading-tight text-[#18181b] sm:text-[15px]">{g.name}</span>
                   <PlayIcon />
                 </button>
               ) : (
