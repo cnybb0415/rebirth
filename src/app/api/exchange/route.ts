@@ -10,7 +10,7 @@ import {
   type HaveRow,
   type WantRow,
 } from "@/data/ticketExchange";
-import { countRecentByIp, createExchange, hashIp, hashPassword, listExchanges } from "@/lib/exchangeDb";
+import { countRecentByIp, createExchange, hashIp, hashPassword, listExchanges, purgeExpiredExchanges } from "@/lib/exchangeDb";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -53,6 +53,7 @@ export async function GET(req: NextRequest) {
   const kind = req.nextUrl.searchParams.get("kind");
   if (kind !== "date" && kind !== "seat") return NextResponse.json({ error: "invalid_kind" }, { status: 400 });
   try {
+    await purgeExpiredExchanges().catch(() => {}); // 정리 실패해도 목록은 보여 줌
     const open = EXCHANGE_DATES.filter((d) => isDateOpen(d)).map((d) => d.id);
     const items = await listExchanges(kind, open);
     return NextResponse.json({ items }, { headers: { "cache-control": "no-store" } });

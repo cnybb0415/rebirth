@@ -1,6 +1,6 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from "crypto";
-import type { ContactType, ExchangeKind, HaveRow, WantRow } from "@/data/ticketExchange";
+import { EXCHANGE_DATES, isDatePurgeable, type ContactType, type ExchangeKind, type HaveRow, type WantRow } from "@/data/ticketExchange";
 
 // 콘서트 티켓 교환 게시판 (Supabase ticket_exchanges, supabase/migrations 참고)
 // 비밀번호·IP 는 해시로만 저장, 목록 응답에는 절대 포함하지 않음
@@ -126,4 +126,20 @@ export async function deleteExchange(id: string, pw: string) {
   const { error } = await getDb().from("ticket_exchanges").delete().eq("id", id);
   if (error) throw new Error(error.message);
   return "ok" as const;
+}
+
+// 글에 적힌 모든 공연(가진·원하는)이 끝나고 7일이 지난 글은 지움
+// 게시판을 여는 요청 때 서버 인스턴스마다 최대 10분에 한 번 실행
+let lastPurge = 0;
+export async function purgeExpiredExchanges(): Promise<void> {
+  if (Date.now() - lastPurge < 10 * 60_000) return;
+  lastPurge = Date.now();
+  const expired = EXCHANGE_DATES.filter((d) => isDatePurgeable(d)).map((d) => d.id);
+  if (expired.length === 0) return;
+  const { error } = await getDb()
+    .from("ticket_exchanges")
+    .delete()
+    .containedBy("have_dates", expired)
+    .containedBy("want_dates", expired);
+  if (error) throw new Error(error.message);
 }

@@ -26,6 +26,7 @@ export const EXCHANGE_NOTICE = [
   "티켓은 공연 당일 현장에서 서로 직접 확인한 뒤 교환하시기 바랍니다. 선입금이나 티켓 선발송을 요구하면 거래하지 말아 주세요.",
   "교환 글만 올려 주시기 바랍니다. 판매·양도·웃돈 거래 글은 삭제됩니다.",
   "글을 쓸 때 정한 비밀번호로 '교환 완료' 표시와 삭제를 할 수 있습니다.",
+  "콘서트 종료 후 모든 정보는 삭제됩니다.",
 ];
 
 export const EXCHANGE_LIMITS = { seat: 40, memo: 200, contact: 120, qtyMax: 4, rows: 6 };
@@ -35,6 +36,11 @@ export type HaveRow = { date: string; seat: string; qty: number };
 export type WantRow = { date: string; seat: string };
 
 export const isDateOpen = (d: ExchangeDate, now = Date.now()) => now <= Date.parse(d.endsAt);
+
+// 혹시 모를 상황에 대비해 공연일로부터 7일은 DB에 보관한 뒤 삭제
+export const EXCHANGE_KEEP_DAYS = 7;
+export const isDatePurgeable = (d: ExchangeDate, now = Date.now()) =>
+  now > Date.parse(d.endsAt) + EXCHANGE_KEEP_DAYS * 86_400_000;
 export const findDate = (id: string) => EXCHANGE_DATES.find((d) => d.id === id);
 
 // 연락처: X(트위터) 아이디 또는 카카오톡 오픈채팅 링크만
