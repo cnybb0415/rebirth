@@ -24,7 +24,8 @@
     "supportRecruit": "팀원 모집",
     "openMenu": "메뉴 열기",
     "closeMenu": "메뉴 닫기",
-    "close": "닫기"
+    "close": "닫기",
+    "exchange": "티켓 교환"
   },
   "home": {
     "actionKwangya": "KWANGYA 119 신고하기",
@@ -161,7 +162,8 @@
       "helper": "헬퍼모집",
       "funding": "모금",
       "notice": "공지",
-      "vote": "아바타스타"
+      "vote": "아바타스타",
+      "exchange": "티켓교환"
     },
     "voteAllTab": "전체",
     "voteTopHint": "▸ 멤버별 1위 후보",

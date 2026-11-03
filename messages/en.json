@@ -24,7 +24,8 @@
     "supportRecruit": "Join the Team",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
-    "close": "Close"
+    "close": "Close",
+    "exchange": "Ticket Swap"
   },
   "home": {
     "actionKwangya": "Report KWANGYA 119",
@@ -161,7 +162,8 @@
       "helper": "Helper",
       "funding": "Funding",
       "notice": "Notice",
-      "vote": "Fan Vote"
+      "vote": "Fan Vote",
+      "exchange": "Ticket Swap"
     },
     "voteAllTab": "All",
     "voteTopHint": "▸ Top pick per member",

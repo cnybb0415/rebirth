@@ -24,7 +24,8 @@
     "supportRecruit": "加入团队",
     "openMenu": "打开菜单",
     "closeMenu": "关闭菜单",
-    "close": "关闭"
+    "close": "关闭",
+    "exchange": "换票"
   },
   "home": {
     "actionKwangya": "KWANGYA 119举报",
@@ -161,7 +162,8 @@
       "helper": "志愿者",
       "funding": "众筹",
       "notice": "公告",
-      "vote": "粉丝投票"
+      "vote": "粉丝投票",
+      "exchange": "换票"
     },
     "voteAllTab": "全部",
     "voteTopHint": "▸ 每位成员第一名",
