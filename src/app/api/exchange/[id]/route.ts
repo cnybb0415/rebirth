@@ -23,10 +23,12 @@ function forbiddenOrigin(req: NextRequest) {
   }
 }
 
-const result = (r: "ok" | "forbidden" | "not_found") =>
-  r === "ok"
-    ? NextResponse.json({ ok: true })
-    : NextResponse.json({ error: r === "forbidden" ? "wrong_password" : "not_found" }, { status: r === "forbidden" ? 403 : 404 });
+const result = (r: "ok" | "forbidden" | "not_found" | "locked") => {
+  if (r === "ok") return NextResponse.json({ ok: true });
+  if (r === "locked") return NextResponse.json({ error: "locked" }, { status: 429 });
+  if (r === "forbidden") return NextResponse.json({ error: "wrong_password" }, { status: 403 });
+  return NextResponse.json({ error: "not_found" }, { status: 404 });
+};
 
 // 교환 완료 / 다시 모집중
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {

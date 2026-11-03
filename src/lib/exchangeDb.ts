@@ -76,12 +76,40 @@ export async function createExchange(row: Omit<ExchangePost, "id" | "status" | "
   return data as ExchangePost;
 }
 
-// 비밀번호가 맞을 때만 상태 변경/삭제. 틀리면 "forbidden", 없으면 "not_found"
-async function authorize(id: string, pw: string): Promise<"ok" | "forbidden" | "not_found"> {
-  const { data, error } = await getDb().from("ticket_exchanges").select("pw_hash").eq("id", id).maybeSingle();
+// 비밀번호가 맞을 때만 상태 변경/삭제
+// 숫자 6자리라 경우의 수가 100만 개뿐 → 한 글에 5번 틀리면 30분 잠금 (하루 최대 240번 시도, 전부 맞히려면 약 11년)
+const PW_MAX_FAILS = 5;
+const PW_LOCK_MS = 30 * 60_000;
+
+type AuthResult = "ok" | "forbidden" | "not_found" | "locked";
+
+async function authorize(id: string, pw: string): Promise<AuthResult> {
+  const db = getDb();
+  const { data, error } = await db
+    .from("ticket_exchanges")
+    .select("pw_hash,pw_fail_count,pw_locked_until")
+    .eq("id", id)
+    .maybeSingle();
   if (error) throw new Error(error.message);
   if (!data) return "not_found";
-  return checkPassword(pw, data.pw_hash as string) ? "ok" : "forbidden";
+
+  const lockedUntil = data.pw_locked_until ? Date.parse(data.pw_locked_until as string) : 0;
+  if (lockedUntil > Date.now()) return "locked"; // 잠긴 동안은 맞는 비밀번호도 확인하지 않음
+
+  if (checkPassword(pw, data.pw_hash as string)) {
+    if ((data.pw_fail_count as number) > 0 || lockedUntil) {
+      await db.from("ticket_exchanges").update({ pw_fail_count: 0, pw_locked_until: null }).eq("id", id);
+    }
+    return "ok";
+  }
+
+  const fails = ((data.pw_fail_count as number) ?? 0) + 1;
+  const lock = fails >= PW_MAX_FAILS;
+  await db
+    .from("ticket_exchanges")
+    .update(lock ? { pw_fail_count: 0, pw_locked_until: new Date(Date.now() + PW_LOCK_MS).toISOString() } : { pw_fail_count: fails })
+    .eq("id", id);
+  return lock ? "locked" : "forbidden";
 }
 
 export async function setExchangeStatus(id: string, pw: string, status: "open" | "done") {

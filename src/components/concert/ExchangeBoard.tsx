@@ -53,7 +53,8 @@ const SERVER_ERR: Record<string, string> = {
   contact: "연락처 형식을 확인해 주십시오. X 아이디 또는 open.kakao.com 오픈채팅 링크만 가능합니다.",
   phone: "전화번호는 공개 게시판에 올릴 수 없습니다. X 아이디나 오픈채팅을 이용해 주십시오.",
   too_many: "짧은 시간에 글을 너무 많이 올렸습니다. 잠시 후 다시 시도해 주십시오.",
-  wrong_password: "비밀번호가 맞지 않습니다.",
+  wrong_password: "비밀번호가 맞지 않습니다. 5번 틀리면 30분 동안 잠깁니다.",
+  locked: "비밀번호를 여러 번 틀려 30분 동안 잠겼습니다. 잠시 후 다시 시도해 주십시오.",
   not_found: "이미 삭제된 글입니다.",
 };
 
