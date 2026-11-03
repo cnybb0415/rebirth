@@ -104,7 +104,9 @@ export const voteGuides: VoteGuide[] = [
     id: "award",
     label: "시상식",
     assets: [
-      { type: "image", src: "/images/guides/vote/공통/시상식/MAMA_2026.webp", alt: "2026 MAMA 팬스 초이스 2차 투표 가이드 (Mnet Plus 앱 투표 · X 해시태그 투표)" },
+      { type: "image", src: "/images/guides/vote/공통/시상식/MAMA_2026_r2.webp", alt: "2026 MAMA 팬스 초이스 2차 투표 가이드: 2026.10.28 18:00 ~ 11.08 23:59 (KST), 엠넷플러스 투표 90% + X 해시태그 투표 10%. 엠넷플러스 앱 홈 상단 '투표' > FAN'S CHOICE 배너 선택 후 팬스초이스 남자 부문과 올해의 팬스초이스 with VISA 부문에서 'EXO' 선택 후 제출(1일 1기기 1계정 1표). X에 #2026MAMAVOTE #EXO 해시태그로 게시, 1RT = 1VOTE(1일 1계정 1표, 공개 계정만 인정)" },
+      { type: "image", src: "/images/guides/vote/공통/시상식/MMA_2026_melon.webp", alt: "2026 MMA 부문별 투표 가이드 (멜론, 국내): 2026.10.30 ~ 11.13 23:59 (KST), 글로벌 TOP10 'EXO'. 멜론 앱 상단 'MMA 2026' 클릭 > '투표하기' > 부문별 투표 '글로벌 TOP10' 선택 > 'EXO' 선택 후 투표하기 (유료 회원 매일 3표 / 무료 회원 매일 1표, 추가 투표권은 모든 부문별 투표 후 사용 가능)" },
+      { type: "image", src: "/images/guides/vote/공통/시상식/MMA_2026_berriz.webp", alt: "2026 MMA Voting Guide (Berriz, Global): 2026.10.30 ~ 11.13 23:59 (KST), GLOBAL TOP10 'EXO'. Tap the Berriz GLOBAL TOP 10 banner > Join the 'GLOBAL TOP 10 Community' > enter a community nickname > select 'EXO' and tap Vote" },
       { type: "image", src: "/images/guides/vote/공통/시상식/JMA_2026.jpg", alt: "JMA 2026 시상식 투표 가이드" },
       { type: "image", src: "/images/guides/vote/공통/시상식/ASEA_2026.png", alt: "ASEA 2026 시상식 투표 가이드" },
     ],
