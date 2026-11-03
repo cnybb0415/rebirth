@@ -21,6 +21,9 @@ import {
 } from "@/data/ticketExchange";
 import type { ExchangePost } from "@/lib/exchangeDb";
 
+// 공지(src/data/announcements.ts)에 있는 앙콘 좌석배치도
+const SEAT_MAP = { src: "/images/concert/notice/encore/01-1 좌배도.jpg", alt: "EXO PLANET #6 - EXhOrizon [dot] 좌석배치도" };
+
 // 콘서트 티켓 교환 게시판 — 날짜 교환 / 좌석 교환
 // 글은 Supabase(ticket_exchanges)에 저장. 완료 표시·삭제는 글 비밀번호로
 
@@ -100,6 +103,7 @@ export function ExchangeBoard() {
   const [manage, setManage] = useState<{ id: string; action: "done" | "open" | "delete" } | null>(null);
   const [managePw, setManagePw] = useState("");
   const [manageErr, setManageErr] = useState("");
+  const [mapOpen, setMapOpen] = useState(false);
   const windowRef = useRef<HTMLDivElement>(null);
 
   const load = useCallback(async (k: ExchangeKind) => {
@@ -119,6 +123,13 @@ export function ExchangeBoard() {
   useEffect(() => {
     void load(kind);
   }, [kind, load]);
+
+  useEffect(() => {
+    if (!mapOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMapOpen(false);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mapOpen]);
 
   const scrollTop = () => windowRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
   const set = <K extends keyof Form>(key: K, value: Form[K]) => setForm((p) => ({ ...p, [key]: value }));
@@ -246,7 +257,12 @@ export function ExchangeBoard() {
               </button>
             ))}
           </div>
-          <p className={w.text}>{kindInfo.desc}</p>
+          <div className={s.descRow}>
+            <p className={w.text}>{kindInfo.desc}</p>
+            <button type="button" className={s.mapBtn} onClick={() => setMapOpen(true)}>
+              좌석배치도
+            </button>
+          </div>
 
           {view === "list" ? (
             <>
@@ -515,6 +531,28 @@ export function ExchangeBoard() {
           {view === "list" ? `${kindInfo.label} · ${items ? shown.length : 0}건` : `${kindInfo.label} 글쓰기`}
         </div>
       </div>
+
+      {mapOpen ? (
+        <div className={w.overlay} onClick={() => setMapOpen(false)}>
+          <div className={f.dialog} style={{ maxWidth: 560 }} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="좌석배치도">
+            <div className={f.titleBar}>
+              <span className={f.titleIcon} aria-hidden>🗺️</span>
+              <span className={f.titleText}>좌석배치도.jpg</span>
+              <div className={f.winBtns}>
+                <span className={f.winBtn} aria-hidden>─</span>
+                <span className={f.winBtn} aria-hidden>□</span>
+                <button type="button" className={`${f.winBtnClose} ${w.closeBtn}`} onClick={() => setMapOpen(false)} aria-label="닫기" autoFocus>✕</button>
+              </div>
+            </div>
+            <div className={f.imageBody}>
+              <div className={f.imageCanvas}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={SEAT_MAP.src} alt={SEAT_MAP.alt} className={f.noticeImg} />
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

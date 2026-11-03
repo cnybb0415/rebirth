@@ -228,3 +228,20 @@
 .qty { color: rgba(80, 10, 45, 0.55); font-size: 11px; }
 
 .memoWarn { display: block; margin-top: 6px; font-size: 11px; color: #a01030; }
+
+.descRow { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.descRow p { margin: 0; }
+.mapBtn {
+  flex: none;
+  font-family: inherit;
+  -webkit-font-smoothing: none;
+  font-size: 11px;
+  color: #7a1a50;
+  background: #fff;
+  border: 2px solid;
+  border-color: #ffccee #7a1a50 #7a1a50 #ffccee;
+  min-height: 36px;
+  padding: 0 10px;
+  cursor: pointer;
+}
+.mapBtn:active { border-color: #7a1a50 #ffccee #ffccee #7a1a50; }
