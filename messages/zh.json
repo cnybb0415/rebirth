@@ -388,6 +388,10 @@
     "sNotFound": "该帖子已被删除。",
     "sPostFail": "发布失败，请检查填写内容后重试。",
     "sPostNet": "发布失败，请稍后再试。",
-    "sManageFail": "处理失败。"
+    "sManageFail": "处理失败。",
+    "searchBtn": "搜索",
+    "searchPlaceholder": "搜索座位（例如：6、12区、站席）",
+    "noResult": "没有搜索结果。",
+    "loadMore": "查看更多（{n}）"
   }
 }

@@ -388,6 +388,10 @@
     "sNotFound": "이미 삭제된 글입니다.",
     "sPostFail": "글을 올리지 못했습니다. 입력한 내용을 확인한 뒤 다시 시도해 주십시오.",
     "sPostNet": "글을 올리지 못했습니다. 잠시 후 다시 시도해 주십시오.",
-    "sManageFail": "처리하지 못했습니다."
+    "sManageFail": "처리하지 못했습니다.",
+    "searchBtn": "검색",
+    "searchPlaceholder": "좌석 검색 (예: 6, 12구역, 스탠딩)",
+    "noResult": "검색 결과가 없습니다.",
+    "loadMore": "더 보기 ({n})"
   }
 }
