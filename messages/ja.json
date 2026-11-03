@@ -24,7 +24,8 @@
     "supportRecruit": "チームに参加",
     "openMenu": "メニューを開く",
     "closeMenu": "メニューを閉じる",
-    "close": "閉じる"
+    "close": "閉じる",
+    "exchange": "チケット交換"
   },
   "home": {
     "actionKwangya": "KWANGYA 119通報",
@@ -161,7 +162,8 @@
       "helper": "ヘルパー",
       "funding": "募金",
       "notice": "お知らせ",
-      "vote": "投票"
+      "vote": "投票",
+      "exchange": "チケット交換"
     },
     "voteAllTab": "全て",
     "voteTopHint": "▸ メンバー別1位",

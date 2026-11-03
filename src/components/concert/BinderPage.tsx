@@ -46,6 +46,14 @@ export const BINDER_CATEGORIES = [
     textColor: "#0d0020",
   },
   {
+    id: "exchange",
+    title: "티켓교환",
+    emoji: "🎟️",
+    href: "/concert/exchange",
+    tabColor: "#7dd3fc",
+    textColor: "#001a29",
+  },
+  {
     id: "vote",
     title: "아바타스타",
     emoji: "🗳️",
@@ -100,6 +108,7 @@ export async function BinderPage({ children, activeTab, pixelFontFamily, locale 
     funding: t("tab.funding"),
     notice: t("tab.notice"),
     vote: t("tab.vote"),
+    exchange: t("tab.exchange"),
   };
   return (
     /* 바깥 여백 — 모바일에서 사방 숨쉬기 */
