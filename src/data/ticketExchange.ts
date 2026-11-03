@@ -28,7 +28,11 @@ export const EXCHANGE_NOTICE = [
   "글을 쓸 때 정한 비밀번호로 '교환 완료' 표시와 삭제를 할 수 있습니다.",
 ];
 
-export const EXCHANGE_LIMITS = { seat: 40, memo: 200, contact: 120, qtyMax: 4 };
+export const EXCHANGE_LIMITS = { seat: 40, memo: 200, contact: 120, qtyMax: 4, rows: 6 };
+
+// 가진 티켓 한 줄 / 원하는 회차·좌석 한 줄 (+ 버튼으로 여러 줄)
+export type HaveRow = { date: string; seat: string; qty: number };
+export type WantRow = { date: string; seat: string };
 
 export const isDateOpen = (d: ExchangeDate, now = Date.now()) => now <= Date.parse(d.endsAt);
 export const findDate = (id: string) => EXCHANGE_DATES.find((d) => d.id === id);

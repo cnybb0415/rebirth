@@ -1,6 +1,6 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 import { createHash, randomBytes, scryptSync, timingSafeEqual } from "crypto";
-import type { ContactType, ExchangeKind } from "@/data/ticketExchange";
+import type { ContactType, ExchangeKind, HaveRow, WantRow } from "@/data/ticketExchange";
 
 // 콘서트 티켓 교환 게시판 (Supabase ticket_exchanges, supabase/migrations 참고)
 // 비밀번호·IP 는 해시로만 저장, 목록 응답에는 절대 포함하지 않음
@@ -17,11 +17,10 @@ function getDb(): SupabaseClient {
 export type ExchangePost = {
   id: string;
   kind: ExchangeKind;
-  have_date: string;
+  haves: HaveRow[];
+  wants: WantRow[];
+  have_dates: string[];
   want_dates: string[];
-  have_seat: string | null;
-  want_seat: string | null;
-  qty: number;
   contact_type: ContactType;
   contact: string;
   memo: string | null;
@@ -29,7 +28,7 @@ export type ExchangePost = {
   created_at: string;
 };
 
-const PUBLIC_COLS = "id,kind,have_date,want_dates,have_seat,want_seat,qty,contact_type,contact,memo,status,created_at";
+const PUBLIC_COLS = "id,kind,haves,wants,have_dates,want_dates,contact_type,contact,memo,status,created_at";
 
 export function hashIp(ip: string): string {
   return createHash("sha256").update(ip + (process.env.VOTE_IP_SALT ?? "exchange-salt")).digest("hex");
@@ -54,7 +53,7 @@ export async function listExchanges(kind: ExchangeKind, openDates: string[]): Pr
     .from("ticket_exchanges")
     .select(PUBLIC_COLS)
     .eq("kind", kind)
-    .in("have_date", openDates)
+    .overlaps("have_dates", openDates) // 가진 티켓 중 아직 안 지난 공연이 하나라도 있는 글만
     .order("created_at", { ascending: false })
     .limit(300);
   if (error) throw new Error(error.message);

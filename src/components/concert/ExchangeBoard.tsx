@@ -16,6 +16,8 @@ import {
   normalizeContact,
   type ContactType,
   type ExchangeKind,
+  type HaveRow,
+  type WantRow,
 } from "@/data/ticketExchange";
 import type { ExchangePost } from "@/lib/exchangeDb";
 
@@ -23,11 +25,9 @@ import type { ExchangePost } from "@/lib/exchangeDb";
 // 글은 Supabase(ticket_exchanges)에 저장. 완료 표시·삭제는 글 비밀번호로
 
 type Form = {
-  haveDate: string;
-  wantDates: string[];
-  haveSeat: string;
-  wantSeat: string;
-  qty: number;
+  seatDate: string; // 좌석 교환: 한 날짜
+  haves: HaveRow[]; // 가진 티켓 (+ 로 추가)
+  wants: WantRow[]; // 원하는 회차·좌석 (+ 로 추가)
   contactType: ContactType;
   contact: string;
   memo: string;
@@ -35,12 +35,13 @@ type Form = {
   agreed: boolean;
 };
 
+const NEW_HAVE: HaveRow = { date: "", seat: "", qty: 1 };
+const NEW_WANT: WantRow = { date: "", seat: "" };
+
 const EMPTY: Form = {
-  haveDate: "",
-  wantDates: [],
-  haveSeat: "",
-  wantSeat: "",
-  qty: 1,
+  seatDate: "",
+  haves: [NEW_HAVE],
+  wants: [NEW_WANT],
   contactType: "x",
   contact: "",
   memo: "",
@@ -67,7 +68,7 @@ function timeAgo(iso: string): string {
   return `${Math.round(h / 24)}일 전`;
 }
 
-const toggle = <T,>(list: T[], v: T) => (list.includes(v) ? list.filter((x) => x !== v) : [...list, v]);
+const seatText = (seat: string) => seat.trim() || "구역 무관";
 
 function TitleBar({ title }: { title: string }) {
   return (
@@ -123,7 +124,7 @@ export function ExchangeBoard() {
 
   const shown = (items ?? []).filter(
     (it) =>
-      (dateFilter === "all" || it.have_date === dateFilter || (kind === "date" && it.want_dates.includes(dateFilter))) &&
+      (dateFilter === "all" || it.have_dates.includes(dateFilter) || it.want_dates.includes(dateFilter)) &&
       (!openOnly || it.status === "open"),
   );
 
@@ -131,11 +132,15 @@ export function ExchangeBoard() {
 
   const validate = (): string[] => {
     const e: string[] = [];
-    if (!form.haveDate) e.push(kind === "date" ? "가지고 있는 날짜를 선택해 주십시오." : "날짜를 선택해 주십시오.");
-    if (kind === "date" && form.wantDates.length === 0) e.push("교환하고 싶은 날짜를 하나 이상 선택해 주십시오.");
     if (kind === "seat") {
-      if (!form.haveSeat.trim()) e.push("지금 가진 좌석(구역)을 입력해 주십시오.");
-      if (!form.wantSeat.trim()) e.push("원하는 구역을 입력해 주십시오.");
+      if (!form.seatDate) e.push("날짜를 선택해 주십시오.");
+      if (form.haves.some((h) => !h.seat.trim())) e.push("가진 좌석(구역)을 모두 입력해 주십시오.");
+      if (form.wants.some((x) => !x.seat.trim())) e.push("원하는 구역을 모두 입력해 주십시오.");
+    } else {
+      if (form.haves.some((h) => !h.date)) e.push("가진 티켓의 날짜를 모두 선택해 주십시오.");
+      if (form.wants.some((x) => !x.date)) e.push("원하는 회차를 모두 선택해 주십시오.");
+      const haveDates = form.haves.map((h) => h.date);
+      if (form.wants.some((x) => x.date && haveDates.includes(x.date))) e.push("원하는 회차는 가진 티켓과 다른 날짜여야 합니다.");
     }
     if (!normalizeContact(form.contactType, form.contact))
       e.push(form.contactType === "x" ? "X 아이디를 확인해 주십시오. (예: @exol_1234)" : "오픈채팅 링크를 확인해 주십시오. (https://open.kakao.com/o/…)");
@@ -145,7 +150,8 @@ export function ExchangeBoard() {
   };
 
   const startWrite = () => {
-    setForm({ ...EMPTY, haveDate: dateFilter !== "all" ? dateFilter : "" });
+    const pre = dateFilter !== "all" ? dateFilter : "";
+    setForm({ ...EMPTY, seatDate: pre, haves: [{ ...NEW_HAVE, date: kind === "date" ? pre : "" }] });
     setErrors([]);
     setView("write");
     scrollTop();
@@ -162,11 +168,9 @@ export function ExchangeBoard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           kind,
-          haveDate: form.haveDate,
-          wantDates: kind === "date" ? form.wantDates : [],
-          haveSeat: form.haveSeat,
-          wantSeat: kind === "seat" ? form.wantSeat : "",
-          qty: form.qty,
+          seatDate: kind === "seat" ? form.seatDate : undefined,
+          haves: form.haves,
+          wants: form.wants,
           contactType: form.contactType,
           contact: form.contact,
           memo: form.memo,
@@ -288,26 +292,33 @@ export function ExchangeBoard() {
                       <li key={it.id} className={`${s.card} ${done ? s.cardDone : ""}`}>
                         <div className={s.cardTop}>
                           <span className={`${s.badge} ${done ? s.badgeDone : ""}`}>{done ? "교환완료" : "모집중"}</span>
-                          <span className={s.meta}>{it.qty}매 · {timeAgo(it.created_at)}</span>
+                          <span className={s.meta}>{timeAgo(it.created_at)}</span>
                         </div>
+                        {it.kind === "seat" ? <p className={s.cardDate}>{dateLabel(it.have_dates[0])}</p> : null}
 
-                        {it.kind === "date" ? (
-                          <div className={s.swap}>
-                            <span className={s.have}>{dateLabel(it.have_date)}</span>
-                            <span className={s.arrow} aria-label="에서">→</span>
-                            <span className={s.want}>{it.want_dates.map(dateLabel).join(" · ")}</span>
-                          </div>
-                        ) : (
-                          <>
-                            <p className={s.meta}>{dateLabel(it.have_date)}</p>
-                            <div className={s.swap}>
-                              <span className={s.have}>{it.have_seat}</span>
-                              <span className={s.arrow} aria-label="에서">→</span>
-                              <span className={s.want}>{it.want_seat}</span>
-                            </div>
-                          </>
-                        )}
-                        {it.kind === "date" && it.have_seat ? <p className={s.meta}>좌석 {it.have_seat}</p> : null}
+                        <div className={s.swapBlock}>
+                          <span className={s.swapLabel}>보유</span>
+                          <ul className={s.swapList}>
+                            {it.haves.map((h, i) => (
+                              <li key={i} className={s.have}>
+                                {it.kind === "date" ? <b>{dateLabel(h.date)}</b> : null}
+                                {it.kind === "date" ? (h.seat.trim() ? ` ${h.seat}` : "") : seatText(h.seat)}
+                                <span className={s.qty}> · {h.qty}매</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                        <div className={s.swapBlock}>
+                          <span className={`${s.swapLabel} ${s.swapLabelWant}`}>희망</span>
+                          <ul className={s.swapList}>
+                            {it.wants.map((x, i) => (
+                              <li key={i} className={s.want}>
+                                {it.kind === "date" ? <b>{dateLabel(x.date)}</b> : null}
+                                {it.kind === "date" ? ` ${seatText(x.seat)}` : seatText(x.seat)}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
                         {it.memo ? <p className={s.memo}>{it.memo}</p> : null}
 
                         <div className={s.cardActions}>
@@ -360,54 +371,88 @@ export function ExchangeBoard() {
           ) : (
             <>
               <div className={w.fields}>
-                <fieldset className={w.group}>
-                  <legend className={w.legend}>{kind === "date" ? "가지고 있는 날짜" : "날짜"}<span className={w.req}>*</span></legend>
-                  {openDates.map((d) => (
-                    <label key={d.id} className={w.check}>
-                      <input
-                        type="radio" name="haveDate" className={s.radio} checked={form.haveDate === d.id}
-                        onChange={() => setForm((p) => ({ ...p, haveDate: d.id, wantDates: p.wantDates.filter((x) => x !== d.id) }))}
-                      />
-                      {d.label}
-                    </label>
-                  ))}
-                </fieldset>
-
-                {kind === "date" ? (
+                {kind === "seat" ? (
                   <fieldset className={w.group}>
-                    <legend className={w.legend}>교환하고 싶은 날짜 (여러 개 가능)<span className={w.req}>*</span></legend>
-                    {openDates.filter((d) => d.id !== form.haveDate).map((d) => (
+                    <legend className={w.legend}>날짜<span className={w.req}>*</span></legend>
+                    {openDates.map((d) => (
                       <label key={d.id} className={w.check}>
-                        <input type="checkbox" checked={form.wantDates.includes(d.id)} onChange={() => set("wantDates", toggle(form.wantDates, d.id))} />
+                        <input type="radio" name="seatDate" className={s.radio} checked={form.seatDate === d.id} onChange={() => set("seatDate", d.id)} />
                         {d.label}
                       </label>
                     ))}
                   </fieldset>
                 ) : null}
 
-                <label>
-                  <span className={w.label}>
-                    {kind === "date" ? "가진 좌석 (선택)" : "지금 가진 좌석"}
-                    {kind === "seat" ? <span className={w.req}>*</span> : null}
-                  </span>
-                  <input className={w.input} maxLength={EXCHANGE_LIMITS.seat} placeholder="예: 2층 B구역 10열" value={form.haveSeat} onChange={(e) => set("haveSeat", e.target.value)} />
-                </label>
-
-                {kind === "seat" ? (
-                  <label>
-                    <span className={w.label}>가고 싶은 구역<span className={w.req}>*</span></span>
-                    <input className={w.input} maxLength={EXCHANGE_LIMITS.seat} placeholder="예: 1층 플로어, A·B구역" value={form.wantSeat} onChange={(e) => set("wantSeat", e.target.value)} />
-                  </label>
-                ) : null}
-
-                <label>
-                  <span className={w.label}>매수<span className={w.req}>*</span></span>
-                  <select className={w.input} value={form.qty} onChange={(e) => set("qty", Number(e.target.value))}>
-                    {Array.from({ length: EXCHANGE_LIMITS.qtyMax }, (_, i) => i + 1).map((n) => (
-                      <option key={n} value={n}>{n}매</option>
+                {/* 가진 티켓 — 여러 장이면 + 로 추가 */}
+                <fieldset className={w.group}>
+                  <legend className={w.legend}>가진 티켓<span className={w.req}>*</span></legend>
+                  <div className={s.rows}>
+                    {form.haves.map((h, i) => (
+                      <div key={i} className={s.rowBox}>
+                        <div className={s.rowHead}>
+                          <span className={s.rowNo}>티켓 {i + 1}</span>
+                          {form.haves.length > 1 ? (
+                            <button type="button" className={s.linkBtn} onClick={() => set("haves", form.haves.filter((_, j) => j !== i))} aria-label={`티켓 ${i + 1} 빼기`}>
+                              빼기
+                            </button>
+                          ) : null}
+                        </div>
+                        {kind === "date" ? (
+                          <select className={w.input} aria-label={`티켓 ${i + 1} 날짜`} value={h.date} onChange={(e) => set("haves", form.haves.map((r, j) => (j === i ? { ...r, date: e.target.value } : r)))}>
+                            <option value="">날짜 선택</option>
+                            {openDates.map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}
+                          </select>
+                        ) : null}
+                        <div className={s.rowLine}>
+                          <input
+                            className={w.input} aria-label={`티켓 ${i + 1} 좌석`} maxLength={EXCHANGE_LIMITS.seat}
+                            placeholder={kind === "date" ? "좌석 (선택) 예: 2층 B구역" : "좌석 예: 3층 C구역 4열"}
+                            value={h.seat} onChange={(e) => set("haves", form.haves.map((r, j) => (j === i ? { ...r, seat: e.target.value } : r)))}
+                          />
+                          <select className={`${w.input} ${s.qtySelect}`} aria-label={`티켓 ${i + 1} 매수`} value={h.qty} onChange={(e) => set("haves", form.haves.map((r, j) => (j === i ? { ...r, qty: Number(e.target.value) } : r)))}>
+                            {Array.from({ length: EXCHANGE_LIMITS.qtyMax }, (_, n) => n + 1).map((n) => <option key={n} value={n}>{n}매</option>)}
+                          </select>
+                        </div>
+                      </div>
                     ))}
-                  </select>
-                </label>
+                    {form.haves.length < EXCHANGE_LIMITS.rows ? (
+                      <button type="button" className={s.addBtn} onClick={() => set("haves", [...form.haves, { ...NEW_HAVE }])}>+ 티켓 추가</button>
+                    ) : null}
+                  </div>
+                </fieldset>
+
+                {/* 원하는 회차·좌석 — 여러 개면 + 로 추가 */}
+                <fieldset className={w.group}>
+                  <legend className={w.legend}>{kind === "date" ? "원하는 회차·좌석" : "원하는 구역"}<span className={w.req}>*</span></legend>
+                  <div className={s.rows}>
+                    {form.wants.map((x, i) => (
+                      <div key={i} className={s.rowBox}>
+                        <div className={s.rowHead}>
+                          <span className={s.rowNo}>희망 {i + 1}</span>
+                          {form.wants.length > 1 ? (
+                            <button type="button" className={s.linkBtn} onClick={() => set("wants", form.wants.filter((_, j) => j !== i))} aria-label={`희망 ${i + 1} 빼기`}>
+                              빼기
+                            </button>
+                          ) : null}
+                        </div>
+                        {kind === "date" ? (
+                          <select className={w.input} aria-label={`희망 ${i + 1} 회차`} value={x.date} onChange={(e) => set("wants", form.wants.map((r, j) => (j === i ? { ...r, date: e.target.value } : r)))}>
+                            <option value="">회차 선택</option>
+                            {openDates.filter((d) => !form.haves.some((h) => h.date === d.id)).map((d) => <option key={d.id} value={d.id}>{d.label}</option>)}
+                          </select>
+                        ) : null}
+                        <input
+                          className={w.input} aria-label={`희망 ${i + 1} 좌석`} maxLength={EXCHANGE_LIMITS.seat}
+                          placeholder={kind === "date" ? "원하는 좌석 (선택) 예: 1층, 플로어" : "원하는 구역 예: 1층 플로어"}
+                          value={x.seat} onChange={(e) => set("wants", form.wants.map((r, j) => (j === i ? { ...r, seat: e.target.value } : r)))}
+                        />
+                      </div>
+                    ))}
+                    {form.wants.length < EXCHANGE_LIMITS.rows ? (
+                      <button type="button" className={s.addBtn} onClick={() => set("wants", [...form.wants, { ...NEW_WANT }])}>+ 희망 추가</button>
+                    ) : null}
+                  </div>
+                </fieldset>
 
                 <fieldset className={w.group}>
                   <legend className={w.legend}>연락 방법<span className={w.req}>*</span></legend>

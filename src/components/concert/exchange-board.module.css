@@ -183,3 +183,46 @@
 .contactTypes { display: flex; flex-wrap: wrap; gap: 0 14px; }
 .radio { border-radius: 50%; }
 .textarea { resize: vertical; min-height: 72px; line-height: 1.5; }
+
+/* 여러 줄 입력 (가진 티켓 / 원하는 회차) */
+.rows { display: flex; flex-direction: column; gap: 8px; padding-top: 4px; }
+.rowBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: #fff7fb;
+  border: 1px dashed rgba(122, 26, 80, 0.35);
+  padding: 8px;
+}
+.rowHead { display: flex; align-items: center; justify-content: space-between; min-height: 24px; }
+.rowNo { font-size: 10px; color: rgba(80, 10, 45, 0.6); letter-spacing: 0.08em; }
+.rowLine { display: flex; gap: 6px; }
+.rowLine input { flex: 1; min-width: 0; }
+.qtySelect { width: 76px !important; flex: none; }
+.addBtn {
+  font-family: inherit;
+  -webkit-font-smoothing: none;
+  font-size: 12px;
+  color: #901858;
+  background: #fff;
+  border: 2px dashed rgba(122, 26, 80, 0.45);
+  min-height: 44px;
+  cursor: pointer;
+}
+.addBtn:hover { background: #ffe6f3; }
+
+/* 카드: 보유 / 희망 */
+.cardDate { margin: 0; font-size: 13px; color: #2a0018; }
+.swapBlock { display: flex; gap: 8px; align-items: flex-start; }
+.swapLabel {
+  flex: none;
+  font-size: 10px;
+  color: #fff;
+  background: #7a1a50;
+  padding: 3px 6px 2px;
+  margin-top: 2px;
+}
+.swapLabelWant { background: #c83880; }
+.swapList { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 3px; font-size: 13px; line-height: 1.5; }
+.swapList b { font-weight: normal; color: inherit; }
+.qty { color: rgba(80, 10, 45, 0.55); font-size: 11px; }

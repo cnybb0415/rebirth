@@ -7,6 +7,8 @@ import {
   normalizeContact,
   type ContactType,
   type ExchangeKind,
+  type HaveRow,
+  type WantRow,
 } from "@/data/ticketExchange";
 import { countRecentByIp, createExchange, hashIp, hashPassword, listExchanges } from "@/lib/exchangeDb";
 
@@ -65,30 +67,44 @@ export async function POST(req: NextRequest) {
   let row: Parameters<typeof createExchange>[0];
   try {
     const raw = await req.text();
-    if (raw.length > 4_000) throw new BadRequest();
+    if (raw.length > 8_000) throw new BadRequest();
     const d = JSON.parse(raw) as Record<string, unknown>;
     if (d.website) return NextResponse.json({ ok: true }); // 봇용 숨김 칸
 
     const kind = d.kind as ExchangeKind;
     if (kind !== "date" && kind !== "seat") throw new BadRequest();
 
-    const have = typeof d.haveDate === "string" ? findDate(d.haveDate) : undefined;
-    if (!have || !isDateOpen(have)) throw new BadRequest();
+    const rows = (v: unknown) => {
+      if (!Array.isArray(v) || v.length < 1 || v.length > EXCHANGE_LIMITS.rows) throw new BadRequest();
+      return v.map((r) => (r && typeof r === "object" ? (r as Record<string, unknown>) : ({} as Record<string, unknown>)));
+    };
+    const openDate = (id: unknown) => {
+      const dt = typeof id === "string" ? findDate(id) : undefined;
+      if (!dt || !isDateOpen(dt)) throw new BadRequest();
+      return dt.id;
+    };
 
-    let wantDates: string[] = [];
-    if (kind === "date") {
-      if (!Array.isArray(d.wantDates)) throw new BadRequest();
-      wantDates = [...new Set(d.wantDates.map(String))];
-      const ok = wantDates.length > 0 && wantDates.every((id) => id !== have.id && !!findDate(id) && isDateOpen(findDate(id)!));
-      if (!ok) throw new BadRequest();
-    }
+    // 좌석 교환은 한 날짜 안에서만
+    const seatDate = kind === "seat" ? openDate(d.seatDate) : null;
 
-    const haveSeat = text(d.haveSeat, EXCHANGE_LIMITS.seat, kind === "seat");
-    const wantSeat = text(d.wantSeat, EXCHANGE_LIMITS.seat, kind === "seat");
+    const haves: HaveRow[] = rows(d.haves).map((r) => {
+      const qty = Number(r.qty);
+      if (!Number.isInteger(qty) || qty < 1 || qty > EXCHANGE_LIMITS.qtyMax) throw new BadRequest();
+      return {
+        date: seatDate ?? openDate(r.date),
+        seat: text(r.seat, EXCHANGE_LIMITS.seat, kind === "seat") ?? "",
+        qty,
+      };
+    });
+    const haveDates = [...new Set(haves.map((h) => h.date))];
+
+    const wants: WantRow[] = rows(d.wants).map((r) => {
+      const date = seatDate ?? openDate(r.date);
+      if (kind === "date" && haveDates.includes(date)) throw new BadRequest(); // 가진 날짜와 같은 날짜는 날짜 교환이 아님
+      return { date, seat: text(r.seat, EXCHANGE_LIMITS.seat, kind === "seat") ?? "" };
+    });
+
     const memo = text(d.memo, EXCHANGE_LIMITS.memo);
-
-    const qty = Number(d.qty);
-    if (!Number.isInteger(qty) || qty < 1 || qty > EXCHANGE_LIMITS.qtyMax) throw new BadRequest();
 
     const contactType = d.contactType as ContactType;
     if (contactType !== "x" && contactType !== "openchat") throw new BadRequest();
@@ -100,11 +116,10 @@ export async function POST(req: NextRequest) {
 
     row = {
       kind,
-      have_date: have.id,
-      want_dates: wantDates,
-      have_seat: haveSeat,
-      want_seat: kind === "seat" ? wantSeat : null,
-      qty,
+      haves,
+      wants,
+      have_dates: haveDates,
+      want_dates: [...new Set(wants.map((x) => x.date))],
       contact_type: contactType,
       contact,
       memo,
