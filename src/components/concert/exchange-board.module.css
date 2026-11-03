@@ -254,3 +254,7 @@
   cursor: pointer;
 }
 .mapBtn:active { border-color: #7a1a50 #ffccee #ffccee #7a1a50; }
+
+/* 글 비밀번호: 로그인 비밀번호가 아니라서 type="password" 대신 글자만 가림
+   (브라우저가 저장·유출 경고를 띄우지 않게) */
+.pin { -webkit-text-security: disc; letter-spacing: 0.2em; }

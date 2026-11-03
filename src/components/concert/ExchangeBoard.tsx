@@ -367,7 +367,7 @@ export function ExchangeBoard() {
                             </label>
                             <div className={s.manageRow}>
                               <input
-                                id={`pw-${it.id}`} className={w.input} type="password" inputMode="numeric" pattern="[0-9]*" maxLength={6} autoComplete="off"
+                                id={`pw-${it.id}`} className={`${w.input} ${s.pin}`} type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} autoComplete="off" name={`exchange-pin-${it.id}`} data-1p-ignore data-lpignore="true"
                                 placeholder={t("pwShort")} value={managePw} onChange={(e) => setManagePw(e.target.value.replace(/\D/g, "").slice(0, 6))}
                                 onKeyDown={(e) => e.key === "Enter" && void runManage()}
                               />
@@ -503,7 +503,7 @@ export function ExchangeBoard() {
 
                 <label>
                   <span className={w.label}>{t("fPw")}<span className={w.req}>*</span></span>
-                  <input className={w.input} type="password" inputMode="numeric" pattern="[0-9]*" autoComplete="new-password" maxLength={6} placeholder="••••••" value={form.password} onChange={(e) => set("password", e.target.value.replace(/\D/g, "").slice(0, 6))} />
+                  <input className={`${w.input} ${s.pin}`} type="text" inputMode="numeric" pattern="[0-9]*" autoComplete="off" name="exchange-pin" data-1p-ignore data-lpignore="true" maxLength={6} placeholder="••••••" value={form.password} onChange={(e) => set("password", e.target.value.replace(/\D/g, "").slice(0, 6))} />
                   <span className={w.subLabel} style={{ display: "block", marginTop: 6 }}>{t("fPwHint")}</span>
                 </label>
 
