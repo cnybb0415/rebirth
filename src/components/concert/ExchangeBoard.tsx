@@ -9,6 +9,7 @@ import {
   EXCHANGE_KINDS,
   EXCHANGE_LIMITS,
   EXCHANGE_NOTICE,
+  EXCHANGE_NOTICE_TITLE,
   contactHref,
   findDate,
   isDateOpen,
@@ -139,7 +140,7 @@ export function ExchangeBoard() {
     if (!normalizeContact(form.contactType, form.contact))
       e.push(form.contactType === "x" ? "X 아이디를 확인해 주십시오. (예: @exol_1234)" : "오픈채팅 링크를 확인해 주십시오. (https://open.kakao.com/o/…)");
     if (form.password.length < 4 || form.password.length > 20) e.push("비밀번호는 4~20자로 정해 주십시오.");
-    if (!form.agreed) e.push("판매·양도가 아닌 교환 글인지 확인해 주십시오.");
+    if (!form.agreed) e.push("안내 확인과 교환 글 여부에 동의해 주십시오.");
     return e;
   };
 
@@ -244,10 +245,13 @@ export function ExchangeBoard() {
 
           {view === "list" ? (
             <>
-              <div className={s.notice}>
-                {EXCHANGE_NOTICE.map((line) => (
-                  <p key={line}>· {line}</p>
-                ))}
+              <div className={s.notice} role="note" aria-label={EXCHANGE_NOTICE_TITLE}>
+                <p className={s.noticeTitle}>⚠ {EXCHANGE_NOTICE_TITLE}</p>
+                <ul className={s.noticeList}>
+                  {EXCHANGE_NOTICE.map((line) => (
+                    <li key={line}>{line}</li>
+                  ))}
+                </ul>
               </div>
 
               <div className={s.toolbar}>
@@ -438,7 +442,7 @@ export function ExchangeBoard() {
 
                 <label className={w.check}>
                   <input type="checkbox" checked={form.agreed} onChange={() => set("agreed", !form.agreed)} />
-                  판매·양도가 아닌 교환 글입니다
+                  안내를 확인했으며, 판매·양도가 아닌 교환 글입니다
                 </label>
               </div>
 
