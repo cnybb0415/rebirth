@@ -1,11 +1,20 @@
 /* exchange-board.module.css — 티켓교환.exe (funding-page 핑크 Win 창 + helper-wizard 폼 위에 얹음) */
 
-/* 한글은 단어 단위로 줄바꿈, 마지막 줄에 한 단어만 남지 않게 */
+/* 마지막 줄에 한 단어만 남지 않게 */
 .board,
 .board * {
-  word-break: keep-all;
   overflow-wrap: anywhere;
   text-wrap: pretty;
+}
+/* 한글만 단어 단위 줄바꿈 (일본어·중국어는 글자 단위가 자연스러움) */
+.board:lang(ko),
+.board:lang(ko) * {
+  word-break: keep-all;
+}
+.board:lang(ja) *,
+.board:lang(zh) * {
+  word-break: normal;
+  line-break: strict;
 }
 .board .memo { overflow-wrap: anywhere; }
 
