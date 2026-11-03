@@ -18,12 +18,12 @@ export const EXCHANGE_KINDS: { id: ExchangeKind; label: string; desc: string }[]
   { id: "seat", label: "좌석 교환", desc: "같은 날짜 안에서 다른 구역 티켓으로 교환합니다" },
 ];
 
-export const EXCHANGE_NOTICE_TITLE = "거래 전 꼭 읽어 주십시오";
+export const EXCHANGE_NOTICE_TITLE = "거래 전 꼭 읽어주세요";
 
 export const EXCHANGE_NOTICE = [
   "이 게시판은 교환 글을 모아 보여 주는 공간입니다. 게시판을 통해 이루어지는 개인 간 거래에서 발생하는 문제에 대해 EXO RE:BIRTH는 책임지지 않습니다.",
   "예매 내역 등으로 본인 확인이 된 사람과만 거래를 진행하시기 바랍니다.",
-  "티켓은 공연 당일 현장에서 서로 직접 확인한 뒤 교환하시기 바랍니다. 선입금이나 티켓 선발송을 요구하면 거래하지 마십시오.",
+  "티켓은 공연 당일 현장에서 서로 직접 확인한 뒤 교환하시기 바랍니다. 선입금이나 티켓 선발송을 요구하면 거래하지 말아 주세요.",
   "교환 글만 올려 주시기 바랍니다. 판매·양도·웃돈 거래 글은 삭제됩니다.",
   "글을 쓸 때 정한 비밀번호로 '교환 완료' 표시와 삭제를 할 수 있습니다.",
 ];

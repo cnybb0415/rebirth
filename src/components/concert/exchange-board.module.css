@@ -1,5 +1,14 @@
 /* exchange-board.module.css — 티켓교환.exe (funding-page 핑크 Win 창 + helper-wizard 폼 위에 얹음) */
 
+/* 한글은 단어 단위로 줄바꿈, 마지막 줄에 한 단어만 남지 않게 */
+.board,
+.board * {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+.board .memo { overflow-wrap: anywhere; }
+
 .tabs {
   display: flex;
   gap: 4px;

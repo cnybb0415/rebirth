@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
     if (!contact) throw new BadRequest("contact");
 
     const pw = typeof d.password === "string" ? d.password : "";
-    if (pw.length < 4 || pw.length > 20) throw new BadRequest();
+    if (!/^\d{6}$/.test(pw)) throw new BadRequest(); // 숫자 6자리
 
     row = {
       kind,

@@ -139,7 +139,7 @@ export function ExchangeBoard() {
     }
     if (!normalizeContact(form.contactType, form.contact))
       e.push(form.contactType === "x" ? "X 아이디를 확인해 주십시오. (예: @exol_1234)" : "오픈채팅 링크를 확인해 주십시오. (https://open.kakao.com/o/…)");
-    if (form.password.length < 4 || form.password.length > 20) e.push("비밀번호는 4~20자로 정해 주십시오.");
+    if (!/^\d{6}$/.test(form.password)) e.push("비밀번호는 숫자 6자리로 정해 주십시오.");
     if (!form.agreed) e.push("안내 확인과 교환 글 여부에 동의해 주십시오.");
     return e;
   };
@@ -213,7 +213,7 @@ export function ExchangeBoard() {
   };
 
   return (
-    <div className={f.desktop}>
+    <div className={`${f.desktop} ${s.board}`}>
       <input
         type="text" name="website" tabIndex={-1} autoComplete="off" aria-hidden
         value={honeypot} onChange={(e) => setHoneypot(e.target.value)}
@@ -335,8 +335,8 @@ export function ExchangeBoard() {
                             </label>
                             <div className={s.manageRow}>
                               <input
-                                id={`pw-${it.id}`} className={w.input} type="password" autoComplete="off"
-                                value={managePw} onChange={(e) => setManagePw(e.target.value)}
+                                id={`pw-${it.id}`} className={w.input} type="password" inputMode="numeric" pattern="[0-9]*" maxLength={6} autoComplete="off"
+                                placeholder="숫자 6자리" value={managePw} onChange={(e) => setManagePw(e.target.value.replace(/\D/g, "").slice(0, 6))}
                                 onKeyDown={(e) => e.key === "Enter" && void runManage()}
                               />
                               <button type="button" className={f.btn} style={{ maxWidth: 80 }} onClick={() => void runManage()}>확인</button>
@@ -435,8 +435,8 @@ export function ExchangeBoard() {
                 </label>
 
                 <label>
-                  <span className={w.label}>글 비밀번호 (4~20자)<span className={w.req}>*</span></span>
-                  <input className={w.input} type="password" autoComplete="new-password" maxLength={20} value={form.password} onChange={(e) => set("password", e.target.value)} />
+                  <span className={w.label}>글 비밀번호 (숫자 6자리)<span className={w.req}>*</span></span>
+                  <input className={w.input} type="password" inputMode="numeric" pattern="[0-9]*" autoComplete="new-password" maxLength={6} placeholder="••••••" value={form.password} onChange={(e) => set("password", e.target.value.replace(/\D/g, "").slice(0, 6))} />
                   <span className={w.subLabel} style={{ display: "block", marginTop: 6 }}>교환 완료 표시와 삭제할 때 사용합니다.</span>
                 </label>
 

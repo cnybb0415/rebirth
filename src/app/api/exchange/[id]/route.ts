@@ -33,7 +33,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   if (forbiddenOrigin(req)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   const { id } = await params;
   const body = await readBody(req);
-  if (!UUID.test(id) || typeof body.password !== "string" || (body.status !== "open" && body.status !== "done")) {
+  if (!UUID.test(id) || typeof body.password !== "string" || !/^\d{6}$/.test(body.password) || (body.status !== "open" && body.status !== "done")) {
     return NextResponse.json({ error: "invalid" }, { status: 400 });
   }
   try {
@@ -47,7 +47,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   if (forbiddenOrigin(req)) return NextResponse.json({ error: "forbidden" }, { status: 403 });
   const { id } = await params;
   const body = await readBody(req);
-  if (!UUID.test(id) || typeof body.password !== "string") return NextResponse.json({ error: "invalid" }, { status: 400 });
+  if (!UUID.test(id) || typeof body.password !== "string" || !/^\d{6}$/.test(body.password)) return NextResponse.json({ error: "invalid" }, { status: 400 });
   try {
     return result(await deleteExchange(id, body.password));
   } catch {
