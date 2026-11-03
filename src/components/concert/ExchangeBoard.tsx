@@ -19,6 +19,7 @@ import {
 import type { ExchangePost } from "@/lib/exchangeDb";
 
 // 공지(src/data/announcements.ts)에 있는 앙콘 좌석배치도
+const PAGE_SIZE = 20;
 const SEAT_MAP_SRC = "/images/concert/notice/encore/01-1 좌배도.jpg";
 
 // 문구는 messages/*.json 의 "exchange"
@@ -97,6 +98,9 @@ export function ExchangeBoard() {
   const [kind, setKind] = useState<ExchangeKind>("date");
   const [dateFilter, setDateFilter] = useState<string>("all");
   const [openOnly, setOpenOnly] = useState(true);
+  const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [visible, setVisible] = useState(PAGE_SIZE);
   const [items, setItems] = useState<ExchangePost[] | null>(null);
   const [loadError, setLoadError] = useState(false);
   const [view, setView] = useState<"list" | "write">("list");
@@ -110,11 +114,11 @@ export function ExchangeBoard() {
   const [mapOpen, setMapOpen] = useState(false);
   const windowRef = useRef<HTMLDivElement>(null);
 
-  const load = useCallback(async (k: ExchangeKind) => {
+  const load = useCallback(async (k: ExchangeKind, date: string) => {
     setItems(null);
     setLoadError(false);
     try {
-      const res = await fetch(`/api/exchange?kind=${k}`, { cache: "no-store" });
+      const res = await fetch(`/api/exchange?kind=${k}${date !== "all" ? `&date=${date}` : ""}`, { cache: "no-store" });
       if (!res.ok) throw new Error();
       const json = (await res.json()) as { items: ExchangePost[] };
       setItems(json.items);
@@ -125,8 +129,12 @@ export function ExchangeBoard() {
   }, []);
 
   useEffect(() => {
-    void load(kind);
-  }, [kind, load]);
+    setVisible(PAGE_SIZE);
+  }, [kind, dateFilter, openOnly, query]);
+
+  useEffect(() => {
+    void load(kind, dateFilter);
+  }, [kind, dateFilter, load]);
 
   useEffect(() => {
     if (!mapOpen) return;
@@ -138,11 +146,14 @@ export function ExchangeBoard() {
   const scrollTop = () => windowRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
   const set = <K extends keyof Form>(key: K, value: Form[K]) => setForm((p) => ({ ...p, [key]: value }));
 
+  const q = query.trim().toLowerCase().replace(/\s/g, "");
   const shown = (items ?? []).filter(
     (it) =>
       (dateFilter === "all" || it.have_dates.includes(dateFilter) || it.want_dates.includes(dateFilter)) &&
-      (!openOnly || it.status === "open"),
+      (!openOnly || it.status === "open") &&
+      (!q || [...it.haves, ...it.wants].some((r) => (r.seat ?? "").toLowerCase().replace(/\s/g, "").includes(q))),
   );
+  const pageItems = shown.slice(0, visible);
 
   const kindInfo = kinds.find((k) => k.id === kind)!;
 
@@ -201,7 +212,7 @@ export function ExchangeBoard() {
       }
       setView("list");
       setDateFilter("all");
-      await load(kind);
+      await load(kind, dateFilter);
       scrollTop();
     } catch {
       setErrors([t("sPostNet")]);
@@ -226,7 +237,7 @@ export function ExchangeBoard() {
       }
       setManage(null);
       setManagePw("");
-      await load(kind);
+      await load(kind, dateFilter);
     } catch {
       setManageErr(t("sManageFail"));
     }
@@ -280,7 +291,7 @@ export function ExchangeBoard() {
               </div>
 
               <div className={s.toolbar}>
-                <div className={s.chips} role="group" aria-label={t("dateFilterAria")}>
+                <div className={s.chips} style={{ flexBasis: "100%" }} role="group" aria-label={t("dateFilterAria")}>
                   <button type="button" className={`${s.chip} ${dateFilter === "all" ? s.chipOn : ""}`} aria-pressed={dateFilter === "all"} onClick={() => setDateFilter("all")}>
                     {t("all")}
                   </button>
@@ -290,11 +301,26 @@ export function ExchangeBoard() {
                     </button>
                   ))}
                 </div>
+                <button type="button" className={s.chip} aria-expanded={searchOpen} onClick={() => { setSearchOpen((v) => !v); if (searchOpen) setQuery(""); }}>
+                  {t("searchBtn")}
+                </button>
                 <label className={w.check} style={{ padding: 0, fontSize: 11 }}>
                   <input type="checkbox" checked={openOnly} onChange={() => setOpenOnly((v) => !v)} />
                   {t("openOnly")}
                 </label>
               </div>
+              {searchOpen && (
+                <input
+                  className={w.input}
+                  type="search"
+                  autoFocus
+                  maxLength={20}
+                  placeholder={t("searchPlaceholder")}
+                  aria-label={t("searchBtn")}
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              )}
 
               {openDates.length === 0 ? (
                 <p className={s.empty}>{t("closed")}</p>
@@ -303,10 +329,11 @@ export function ExchangeBoard() {
               ) : loadError ? (
                 <p className={s.empty}>{t("loadError")}</p>
               ) : shown.length === 0 ? (
-                <p className={s.empty}>{t("empty")}</p>
+                <p className={s.empty}>{q ? t("noResult") : t("empty")}</p>
               ) : (
+                <>
                 <ul className={s.list}>
-                  {shown.map((it) => {
+                  {pageItems.map((it) => {
                     const done = it.status === "done";
                     const managing = manage?.id === it.id;
                     return (
@@ -381,6 +408,12 @@ export function ExchangeBoard() {
                     );
                   })}
                 </ul>
+                {shown.length > visible && (
+                  <button type="button" className={s.addBtn} onClick={() => setVisible((v) => v + PAGE_SIZE)}>
+                    {t("loadMore", { n: shown.length - visible })}
+                  </button>
+                )}
+                </>
               )}
 
               {openDates.length > 0 ? (

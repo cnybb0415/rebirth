@@ -55,7 +55,9 @@ export async function GET(req: NextRequest) {
   try {
     await purgeExpiredExchanges().catch(() => {}); // 정리 실패해도 목록은 보여 줌
     const open = EXCHANGE_DATES.filter((d) => isDateOpen(d)).map((d) => d.id);
-    const items = await listExchanges(kind, open);
+    const date = req.nextUrl.searchParams.get("date");
+    if (date && !open.includes(date)) return NextResponse.json({ items: [] }, { headers: { "cache-control": "no-store" } });
+    const items = await listExchanges(kind, open, date ?? undefined);
     return NextResponse.json({ items }, { headers: { "cache-control": "no-store" } });
   } catch {
     return NextResponse.json({ error: "server_error" }, { status: 500 });

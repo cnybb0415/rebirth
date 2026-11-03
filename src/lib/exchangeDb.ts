@@ -47,15 +47,15 @@ function checkPassword(pw: string, stored: string): boolean {
   return a.length === b.length && timingSafeEqual(a, b);
 }
 
-export async function listExchanges(kind: ExchangeKind, openDates: string[]): Promise<ExchangePost[]> {
+export async function listExchanges(kind: ExchangeKind, openDates: string[], date?: string): Promise<ExchangePost[]> {
   if (openDates.length === 0) return [];
-  const { data, error } = await getDb()
+  let q = getDb()
     .from("ticket_exchanges")
     .select(PUBLIC_COLS)
     .eq("kind", kind)
-    .overlaps("have_dates", openDates) // 가진 티켓 중 아직 안 지난 공연이 하나라도 있는 글만
-    .order("created_at", { ascending: false })
-    .limit(300);
+    .overlaps("have_dates", openDates); // 가진 티켓 중 아직 안 지난 공연이 하나라도 있는 글만
+  if (date) q = q.or(`have_dates.cs.{${date}},want_dates.cs.{${date}}`); // 날짜 칩: 서버에서 거름
+  const { data, error } = await q.order("created_at", { ascending: false }).limit(300);
   if (error) throw new Error(error.message);
   return (data ?? []) as ExchangePost[];
 }

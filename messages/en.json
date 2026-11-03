@@ -388,6 +388,10 @@
     "sNotFound": "This post has already been deleted.",
     "sPostFail": "Couldn't post. Please check what you entered and try again.",
     "sPostNet": "Couldn't post. Please try again later.",
-    "sManageFail": "Couldn't complete this."
+    "sManageFail": "Couldn't complete this.",
+    "searchBtn": "Search",
+    "searchPlaceholder": "Search seats (e.g. 6, Zone 12, Standing)",
+    "noResult": "No results found.",
+    "loadMore": "Show more ({n})"
   }
 }
