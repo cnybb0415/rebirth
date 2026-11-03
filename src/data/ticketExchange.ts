@@ -14,14 +14,14 @@ export const EXCHANGE_DATES: ExchangeDate[] = [
 ];
 
 export const EXCHANGE_KINDS: { id: ExchangeKind; label: string; desc: string }[] = [
-  { id: "date", label: "날짜 교환", desc: "가진 날짜 티켓을 다른 날짜 티켓으로 바꿔요" },
-  { id: "seat", label: "좌석 교환", desc: "같은 날짜 안에서 다른 구역 티켓으로 바꿔요" },
+  { id: "date", label: "날짜 교환", desc: "가진 날짜 티켓을 다른 날짜 티켓으로 교환합니다" },
+  { id: "seat", label: "좌석 교환", desc: "같은 날짜 안에서 다른 구역 티켓으로 교환합니다" },
 ];
 
 export const EXCHANGE_NOTICE = [
-  "교환만 올려 주세요. 판매·양도·웃돈 거래 글은 삭제돼요.",
-  "예매 내역은 직접 확인하고, 선입금이나 개인정보를 먼저 요구하면 거래하지 마세요.",
-  "글을 쓸 때 정한 비밀번호로 '교환 완료' 표시와 삭제를 할 수 있어요.",
+  "교환 글만 올려 주시기 바랍니다. 판매·양도·웃돈 거래 글은 삭제됩니다.",
+  "예매 내역은 직접 확인하시고, 선입금이나 개인정보를 먼저 요구하는 경우 거래하지 않기를 권장합니다.",
+  "글을 쓸 때 정한 비밀번호로 '교환 완료' 표시와 삭제를 할 수 있습니다.",
 ];
 
 export const EXCHANGE_LIMITS = { seat: 40, memo: 200, contact: 120, qtyMax: 4 };

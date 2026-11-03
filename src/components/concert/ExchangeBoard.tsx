@@ -48,11 +48,11 @@ const EMPTY: Form = {
 };
 
 const SERVER_ERR: Record<string, string> = {
-  contact: "연락처 형식을 확인해 주세요. X 아이디 또는 open.kakao.com 오픈채팅 링크만 돼요.",
-  phone: "전화번호는 공개 게시판에 올릴 수 없어요. X 아이디나 오픈채팅을 써 주세요.",
-  too_many: "글을 너무 많이 올렸어요. 잠시 후 다시 시도해 주세요.",
-  wrong_password: "비밀번호가 맞지 않아요.",
-  not_found: "이미 삭제된 글이에요.",
+  contact: "연락처 형식을 확인해 주십시오. X 아이디 또는 open.kakao.com 오픈채팅 링크만 가능합니다.",
+  phone: "전화번호는 공개 게시판에 올릴 수 없습니다. X 아이디나 오픈채팅을 이용해 주십시오.",
+  too_many: "짧은 시간에 글을 너무 많이 올렸습니다. 잠시 후 다시 시도해 주십시오.",
+  wrong_password: "비밀번호가 맞지 않습니다.",
+  not_found: "이미 삭제된 글입니다.",
 };
 
 const dateLabel = (id: string) => findDate(id)?.label ?? id;
@@ -130,16 +130,16 @@ export function ExchangeBoard() {
 
   const validate = (): string[] => {
     const e: string[] = [];
-    if (!form.haveDate) e.push(kind === "date" ? "가지고 있는 날짜를 골라 주세요." : "날짜를 골라 주세요.");
-    if (kind === "date" && form.wantDates.length === 0) e.push("바꾸고 싶은 날짜를 하나 이상 골라 주세요.");
+    if (!form.haveDate) e.push(kind === "date" ? "가지고 있는 날짜를 선택해 주십시오." : "날짜를 선택해 주십시오.");
+    if (kind === "date" && form.wantDates.length === 0) e.push("교환하고 싶은 날짜를 하나 이상 선택해 주십시오.");
     if (kind === "seat") {
-      if (!form.haveSeat.trim()) e.push("지금 가진 좌석(구역)을 적어 주세요.");
-      if (!form.wantSeat.trim()) e.push("가고 싶은 구역을 적어 주세요.");
+      if (!form.haveSeat.trim()) e.push("지금 가진 좌석(구역)을 입력해 주십시오.");
+      if (!form.wantSeat.trim()) e.push("원하는 구역을 입력해 주십시오.");
     }
     if (!normalizeContact(form.contactType, form.contact))
-      e.push(form.contactType === "x" ? "X 아이디를 확인해 주세요. (예: @exol_1234)" : "오픈채팅 링크를 확인해 주세요. (https://open.kakao.com/o/…)");
-    if (form.password.length < 4 || form.password.length > 20) e.push("비밀번호는 4~20자로 정해 주세요.");
-    if (!form.agreed) e.push("판매·양도가 아닌 교환 글인지 확인해 주세요.");
+      e.push(form.contactType === "x" ? "X 아이디를 확인해 주십시오. (예: @exol_1234)" : "오픈채팅 링크를 확인해 주십시오. (https://open.kakao.com/o/…)");
+    if (form.password.length < 4 || form.password.length > 20) e.push("비밀번호는 4~20자로 정해 주십시오.");
+    if (!form.agreed) e.push("판매·양도가 아닌 교환 글인지 확인해 주십시오.");
     return e;
   };
 
@@ -175,7 +175,7 @@ export function ExchangeBoard() {
       });
       if (!res.ok) {
         const j = (await res.json().catch(() => ({}))) as { error?: string };
-        setErrors([SERVER_ERR[j.error ?? ""] ?? "올리지 못했어요. 입력한 내용을 확인하고 다시 시도해 주세요."]);
+        setErrors([SERVER_ERR[j.error ?? ""] ?? "글을 올리지 못했습니다. 입력한 내용을 확인한 뒤 다시 시도해 주십시오."]);
         return;
       }
       setView("list");
@@ -183,7 +183,7 @@ export function ExchangeBoard() {
       await load(kind);
       scrollTop();
     } catch {
-      setErrors(["올리지 못했어요. 잠시 후 다시 시도해 주세요."]);
+      setErrors(["글을 올리지 못했습니다. 잠시 후 다시 시도해 주십시오."]);
     } finally {
       setSending(false);
     }
@@ -200,14 +200,14 @@ export function ExchangeBoard() {
       });
       if (!res.ok) {
         const j = (await res.json().catch(() => ({}))) as { error?: string };
-        setManageErr(SERVER_ERR[j.error ?? ""] ?? "처리하지 못했어요.");
+        setManageErr(SERVER_ERR[j.error ?? ""] ?? "처리하지 못했습니다.");
         return;
       }
       setManage(null);
       setManagePw("");
       await load(kind);
     } catch {
-      setManageErr("처리하지 못했어요.");
+      setManageErr("처리하지 못했습니다.");
     }
   };
 
@@ -268,13 +268,13 @@ export function ExchangeBoard() {
               </div>
 
               {openDates.length === 0 ? (
-                <p className={s.empty}>공연이 모두 끝나서 교환 게시판을 닫았어요.</p>
+                <p className={s.empty}>공연이 모두 끝나 교환 게시판을 닫았습니다.</p>
               ) : items === null ? (
                 <p className={s.empty}>불러오는 중…</p>
               ) : loadError ? (
-                <p className={s.empty}>목록을 불러오지 못했어요. 잠시 후 다시 열어 주세요.</p>
+                <p className={s.empty}>목록을 불러오지 못했습니다. 잠시 후 다시 열어 주십시오.</p>
               ) : shown.length === 0 ? (
-                <p className={s.empty}>아직 올라온 글이 없어요.</p>
+                <p className={s.empty}>아직 올라온 글이 없습니다.</p>
               ) : (
                 <ul className={s.list}>
                   {shown.map((it) => {
@@ -371,7 +371,7 @@ export function ExchangeBoard() {
 
                 {kind === "date" ? (
                   <fieldset className={w.group}>
-                    <legend className={w.legend}>바꾸고 싶은 날짜 (여러 개 가능)<span className={w.req}>*</span></legend>
+                    <legend className={w.legend}>교환하고 싶은 날짜 (여러 개 가능)<span className={w.req}>*</span></legend>
                     {openDates.filter((d) => d.id !== form.haveDate).map((d) => (
                       <label key={d.id} className={w.check}>
                         <input type="checkbox" checked={form.wantDates.includes(d.id)} onChange={() => set("wantDates", toggle(form.wantDates, d.id))} />
@@ -427,18 +427,18 @@ export function ExchangeBoard() {
 
                 <label>
                   <span className={w.label}>메모 (선택)</span>
-                  <textarea className={`${w.input} ${s.textarea}`} rows={3} maxLength={EXCHANGE_LIMITS.memo} placeholder="연석 교환 원해요, 시야 좋은 곳 우선 등" value={form.memo} onChange={(e) => set("memo", e.target.value)} />
+                  <textarea className={`${w.input} ${s.textarea}`} rows={3} maxLength={EXCHANGE_LIMITS.memo} placeholder="연석 교환 희망, 시야 좋은 구역 우선 등" value={form.memo} onChange={(e) => set("memo", e.target.value)} />
                 </label>
 
                 <label>
                   <span className={w.label}>글 비밀번호 (4~20자)<span className={w.req}>*</span></span>
                   <input className={w.input} type="password" autoComplete="new-password" maxLength={20} value={form.password} onChange={(e) => set("password", e.target.value)} />
-                  <span className={w.subLabel} style={{ display: "block", marginTop: 6 }}>교환 완료 표시와 삭제할 때 써요.</span>
+                  <span className={w.subLabel} style={{ display: "block", marginTop: 6 }}>교환 완료 표시와 삭제할 때 사용합니다.</span>
                 </label>
 
                 <label className={w.check}>
                   <input type="checkbox" checked={form.agreed} onChange={() => set("agreed", !form.agreed)} />
-                  판매·양도가 아닌 교환 글이에요
+                  판매·양도가 아닌 교환 글입니다
                 </label>
               </div>
 
