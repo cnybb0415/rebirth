@@ -476,7 +476,8 @@ export function ExchangeBoard() {
 
                 <label>
                   <span className={w.label}>메모 (선택)</span>
-                  <textarea className={`${w.input} ${s.textarea}`} rows={3} maxLength={EXCHANGE_LIMITS.memo} placeholder="연석 교환 희망, 시야 좋은 구역 우선 등" value={form.memo} onChange={(e) => set("memo", e.target.value)} />
+                  <textarea className={`${w.input} ${s.textarea}`} rows={3} maxLength={EXCHANGE_LIMITS.memo} placeholder="자유" value={form.memo} onChange={(e) => set("memo", e.target.value)} />
+                  <span className={s.memoWarn}>※ 금전 요구 금지</span>
                 </label>
 
                 <label>
