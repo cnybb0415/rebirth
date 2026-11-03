@@ -53,6 +53,7 @@ export async function listExchanges(kind: ExchangeKind, openDates: string[], dat
     .from("ticket_exchanges")
     .select(PUBLIC_COLS)
     .eq("kind", kind)
+    .is("deleted_at", null) // 작성자가 삭제한 글은 숨김
     .overlaps("have_dates", openDates); // 가진 티켓 중 아직 안 지난 공연이 하나라도 있는 글만
   if (date) q = q.or(`have_dates.cs.{${date}},want_dates.cs.{${date}}`); // 날짜 칩: 서버에서 거름
   const { data, error } = await q.order("created_at", { ascending: false }).limit(300);
@@ -89,6 +90,7 @@ async function authorize(id: string, pw: string): Promise<AuthResult> {
     .from("ticket_exchanges")
     .select("pw_hash,pw_fail_count,pw_locked_until")
     .eq("id", id)
+    .is("deleted_at", null) // 숨긴 글은 다시 관리할 수 없음
     .maybeSingle();
   if (error) throw new Error(error.message);
   if (!data) return "not_found";
@@ -115,7 +117,7 @@ async function authorize(id: string, pw: string): Promise<AuthResult> {
 export async function setExchangeStatus(id: string, pw: string, status: "open" | "done") {
   const auth = await authorize(id, pw);
   if (auth !== "ok") return auth;
-  const { error } = await getDb().from("ticket_exchanges").update({ status }).eq("id", id);
+  const { error } = await getDb().from("ticket_exchanges").update({ status }).eq("id", id).is("deleted_at", null);
   if (error) throw new Error(error.message);
   return "ok" as const;
 }
@@ -123,12 +125,13 @@ export async function setExchangeStatus(id: string, pw: string, status: "open" |
 export async function deleteExchange(id: string, pw: string) {
   const auth = await authorize(id, pw);
   if (auth !== "ok") return auth;
-  const { error } = await getDb().from("ticket_exchanges").delete().eq("id", id);
+  // 바로 지우지 않고 목록에서만 숨김 — 실제 삭제는 공연 종료 7일 뒤 정리 때 함께
+  const { error } = await getDb().from("ticket_exchanges").update({ deleted_at: new Date().toISOString() }).eq("id", id);
   if (error) throw new Error(error.message);
   return "ok" as const;
 }
 
-// 글에 적힌 모든 공연(가진·원하는)이 끝나고 7일이 지난 글은 지움
+// 글에 적힌 모든 공연(가진·원하는)이 끝나고 7일이 지난 글은 지움 (숨긴 글 포함)
 // 게시판을 여는 요청 때 서버 인스턴스마다 최대 10분에 한 번 실행
 let lastPurge = 0;
 export async function purgeExpiredExchanges(): Promise<void> {
