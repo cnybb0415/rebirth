@@ -3,6 +3,7 @@ import {
   EXCHANGE_DATES,
   EXCHANGE_LIMITS,
   findDate,
+  hasPremium,
   isDateOpen,
   normalizeContact,
   type ContactType,
@@ -32,6 +33,7 @@ function text(v: unknown, max: number, required = false): string | null {
   }
   if (s.length > max) throw new BadRequest();
   if (PHONE.test(s)) throw new BadRequest("phone"); // 전화번호는 공개 게시판에 못 올림
+  if (hasPremium(s)) throw new BadRequest("premium"); // 웃돈(추금) 거래 금지
   return s;
 }
 

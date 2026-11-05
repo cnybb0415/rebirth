@@ -9,6 +9,7 @@ import {
   EXCHANGE_DATES,
   EXCHANGE_LIMITS,
   contactHref,
+  hasPremium,
   isDateOpen,
   normalizeContact,
   type ContactType,
@@ -56,6 +57,7 @@ const EMPTY: Form = {
 const SERVER_ERR: Record<string, string> = {
   contact: "sContact",
   phone: "sPhone",
+  premium: "ePremium",
   too_many: "sTooMany",
   wrong_password: "sWrongPw",
   locked: "sLocked",
@@ -159,6 +161,8 @@ export function ExchangeBoard() {
 
   const validate = (): string[] => {
     const e: string[] = [];
+    // 웃돈(추금) 표현은 다른 오류보다 먼저 보이게
+    if ([form.memo, ...form.haves.map((h) => h.seat), ...form.wants.map((x) => x.seat)].some(hasPremium)) e.push(t("ePremium"));
     if (kind === "seat") {
       if (!form.seatDate) e.push(t("eSeatDate"));
       if (form.haves.some((h) => !h.seat.trim())) e.push(t("eHaveSeats"));

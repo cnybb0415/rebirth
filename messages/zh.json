@@ -392,6 +392,7 @@
     "searchBtn": "搜索",
     "searchPlaceholder": "搜索座位（例如：6、12区、站席）",
     "noResult": "没有搜索结果。",
-    "loadMore": "查看更多（{n}）"
+    "loadMore": "查看更多（{n}）",
+    "ePremium": "禁止加钱交易。请删除相关内容后重新提交。"
   }
 }
