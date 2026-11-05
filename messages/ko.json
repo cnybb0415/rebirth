@@ -392,6 +392,7 @@
     "searchBtn": "검색",
     "searchPlaceholder": "좌석 검색 (예: 6, 12구역, 스탠딩)",
     "noResult": "검색 결과가 없습니다.",
-    "loadMore": "더 보기 ({n})"
+    "loadMore": "더 보기 ({n})",
+    "ePremium": "추가금 거래는 금지합니다. 추금·추가금 등의 표현을 지우고 다시 등록해 주십시오."
   }
 }

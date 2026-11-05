@@ -392,6 +392,7 @@
     "searchBtn": "Search",
     "searchPlaceholder": "Search seats (e.g. 6, Zone 12, Standing)",
     "noResult": "No results found.",
-    "loadMore": "Show more ({n})"
+    "loadMore": "Show more ({n})",
+    "ePremium": "Trading with extra money (premiums) is prohibited. Please remove words like that and try again."
   }
 }

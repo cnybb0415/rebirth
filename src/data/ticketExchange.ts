@@ -46,3 +46,8 @@ export function normalizeContact(type: ContactType, raw: string): string | null 
 export function contactHref(type: ContactType, contact: string): string {
   return type === "x" ? `https://x.com/${contact}` : contact;
 }
+
+// 웃돈(추금·추가금 등) 거래 표현 — 메모·좌석 칸에 있으면 글 등록을 막음
+export const PREMIUM_PATTERN =
+  /추\s*금|추가\s*(금|비용|요금)|웃\s*돈|웃금|ㅊㄱ|프리미엄|차액|사례금|\+\s*\d+\s*(만|천|원|k)|\d+\s*(만\s*원|천\s*원)|premium|extra\s*(pay|money|cash)|追加料金|上乗せ|プレミア|加钱|加價|加价|补差价|補差價/i;
+export const hasPremium = (s: string | null | undefined) => !!s && PREMIUM_PATTERN.test(s);
