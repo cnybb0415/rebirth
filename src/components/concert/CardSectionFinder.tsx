@@ -6,15 +6,12 @@ import f from "./funding-page.module.css";
 import w from "./helper-wizard.module.css";
 import x from "./exchange-board.module.css";
 import s from "./card-section.module.css";
+import { FIRST_OPEN_AT, useCardClock } from "@/data/cardSection";
 
 // 좌석 한 칸: [열, 번호, 배치도 행, 배치도 칸, "앞뒤" 색 코드]
 type Seat = [number, number, number, number, string];
 type CardData = Record<string, Record<string, Seat[]>>;
 
-const DAYS = [
-  { id: "1107", short: "11.7", endsAt: "2026-11-07T23:59:59+09:00" },
-  // 막콘(1108)은 데이터 업데이트 후 추가
-] as const;
 
 // 종이 색 (G 초록 · R 빨강 · W 흰색 · K 검정 · P 분홍 · B 파랑)
 const PAPER: Record<string, string> = {
@@ -47,7 +44,14 @@ export function CardSectionFinder() {
   const [data, setData] = useState<CardData | null>(null);
   const [loadError, setLoadError] = useState(false);
   // 기본 날짜: 오늘이 지난 공연이면 다음 공연
-  const [day, setDay] = useState<string>(() => (DAYS.find((d) => Date.now() <= Date.parse(d.endsAt)) ?? DAYS[DAYS.length - 1]).id);
+  const clock = useCardClock();
+  const openDays = clock?.open ?? null;
+  const [picked, setPicked] = useState<string | null>(null);
+  // 고른 날짜가 없으면: 공개된 날짜 중 아직 안 끝난 첫 공연, 없으면 마지막 공연
+  const fallback = openDays?.length
+    ? (openDays.find((d) => clock!.now <= Date.parse(d.endsAt)) ?? openDays[openDays.length - 1]).id
+    : "";
+  const day = picked && openDays?.some((d) => d.id === picked) ? picked : fallback;
   const [zone, setZone] = useState("");
   const [row, setRow] = useState("");
   const [num, setNum] = useState("");
@@ -78,10 +82,11 @@ export function CardSectionFinder() {
     return { minR, rows: maxR - minR + 1, cols: maxC + 1 };
   }, [seats]);
 
-  const pickDay = (id: string) => {
-    setDay(id);
-    // 같은 좌석으로 다른 날짜도 바로 볼 수 있게 선택은 유지
-  };
+  // 같은 좌석으로 다른 날짜도 바로 볼 수 있게 구역·열·번호 선택은 유지
+  const pickDay = (id: string) => setPicked(id);
+  const openLabel = new Date(FIRST_OPEN_AT).toLocaleString(undefined, {
+    month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "Asia/Seoul",
+  });
 
   return (
     <div className={`${f.desktop} ${x.board}`}>
@@ -89,7 +94,7 @@ export function CardSectionFinder() {
         <TitleBar title={t("windowTitle")} />
         <div className={f.body}>
           <div className={x.tabs} role="tablist" aria-label={t("dayAria")}>
-            {DAYS.map((d) => (
+            {(openDays ?? []).map((d) => (
               <button
                 key={d.id}
                 type="button"
@@ -105,7 +110,11 @@ export function CardSectionFinder() {
 
           <p className={s.desc}>{t("desc")}</p>
 
-          {loadError ? (
+          {openDays === null ? (
+            <p className={x.empty}>{t("loading")}</p>
+          ) : openDays.length === 0 ? (
+            <p className={x.empty}>{t("notYet", { time: openLabel })}</p>
+          ) : loadError ? (
             <p className={x.empty}>{t("loadError")}</p>
           ) : !data ? (
             <p className={x.empty}>{t("loading")}</p>

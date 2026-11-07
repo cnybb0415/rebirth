@@ -431,6 +431,7 @@
       "K": "Black",
       "P": "Pink",
       "B": "Blue"
-    }
+    },
+    "notYet": "Card section lookup opens at {time} (KST)."
   }
 }

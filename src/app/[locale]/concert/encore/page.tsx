@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import s from "./encore.module.css";
+import { useOpenCardDays } from "@/data/cardSection";
 
 const MENU_ITEMS = [
   { id: "cheer",   navKey: "cheer",   en: "CHEER",   href: "/concert/cheer"   },
@@ -20,6 +21,8 @@ export default function EncorePage() {
   const router = useRouter();
   const locale = useLocale();
   const tnav = useTranslations("nav");
+  const cardOpen = !!useOpenCardDays()?.length;
+  const menu = MENU_ITEMS.filter((m) => m.id !== "cardsection" || cardOpen); // 카드섹션은 공개 시간부터 보임
 
   const navigate = (href: string) => router.push(`/${locale}${href}`);
 
@@ -61,7 +64,7 @@ export default function EncorePage() {
 
               {/* ── 메뉴 ── */}
               <ul className={s.menuList}>
-                {MENU_ITEMS.map((item, i) => {
+                {menu.map((item, i) => {
                   const isActive = i === activeIdx;
                   return (
                     <li
@@ -75,8 +78,8 @@ export default function EncorePage() {
                       onClick={() => navigate(item.href)}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); navigate(item.href); }
-                        if (e.key === "ArrowDown") { e.preventDefault(); setActiveIdx((i + 1) % MENU_ITEMS.length); }
-                        if (e.key === "ArrowUp") { e.preventDefault(); setActiveIdx((i - 1 + MENU_ITEMS.length) % MENU_ITEMS.length); }
+                        if (e.key === "ArrowDown") { e.preventDefault(); setActiveIdx((i + 1) % menu.length); }
+                        if (e.key === "ArrowUp") { e.preventDefault(); setActiveIdx((i - 1 + menu.length) % menu.length); }
                       }}
                     >
                       <span className={s.menuCursor} aria-hidden>►</span>
