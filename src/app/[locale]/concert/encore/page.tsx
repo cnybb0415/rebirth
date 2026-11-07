@@ -12,6 +12,7 @@ const MENU_ITEMS = [
   { id: "notice",  navKey: "notice",  en: "NOTICE",  href: "/concert/notice"  },
   { id: "helper",  navKey: "helper",  en: "HELPER",  href: "/concert/helper"  },
   { id: "exchange", navKey: "exchange", en: "TRADE", href: "/concert/exchange" },
+  { id: "cardsection", navKey: "cardSection", en: "CARD", href: "/concert/cardsection" },
 ] as const;
 
 export default function EncorePage() {

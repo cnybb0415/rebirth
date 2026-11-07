@@ -182,6 +182,9 @@ export function SiteHeader() {
                       <Link href="/concert/exchange" className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
                         {t("exchange")}
                       </Link>
+                      <Link href="/concert/cardsection" className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
+                        {t("cardSection")}
+                      </Link>
                       <Link href="/concert/funding" className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
                         {t("funding")}
                       </Link>

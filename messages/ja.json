@@ -25,7 +25,8 @@
     "openMenu": "メニューを開く",
     "closeMenu": "メニューを閉じる",
     "close": "閉じる",
-    "exchange": "チケット交換"
+    "exchange": "チケット交換",
+    "cardSection": "カードセクション"
   },
   "home": {
     "actionKwangya": "KWANGYA 119通報",
@@ -163,7 +164,8 @@
       "funding": "募金",
       "notice": "お知らせ",
       "vote": "投票",
-      "exchange": "チケット交換"
+      "exchange": "チケット交換",
+      "cardSection": "カードセクション"
     },
     "voteAllTab": "全て",
     "voteTopHint": "▸ メンバー別1位",
@@ -394,5 +396,41 @@
     "noResult": "検索結果がありません。",
     "loadMore": "もっと見る（{n}）",
     "ePremium": "追加料金を伴う取引は禁止です。該当する表現を削除して再度登録してください。"
+  },
+  "cardSection": {
+    "windowTitle": "カードセクション.exe - EXO PLANET #6",
+    "dayAria": "公演日",
+    "day": {
+      "1107": "11.7 2日目",
+      "1108": "11.8 最終日"
+    },
+    "desc": "ゾーン・列・番号を選ぶと、自分の席で掲げる紙の色が分かります。2階24〜43ゾーンのみ対象です。",
+    "loading": "読み込み中…",
+    "loadError": "座席情報を読み込めませんでした。しばらくしてから再度開いてください。",
+    "zone": "ゾーン",
+    "row": "列",
+    "num": "番号",
+    "choose": "選択",
+    "zoneN": "{n}ゾーン",
+    "rowN": "{n}列",
+    "numN": "{n}番",
+    "seatLine": "{zone}ゾーン {row}列 {num}番",
+    "front": "表",
+    "back": "裏",
+    "hint": "表と裏の色を事前にご確認ください。",
+    "pickZone": "まずゾーンを選んでください。",
+    "pickRest": "列と番号を選んでください。",
+    "mapTitle": "{zone}ゾーン配置図",
+    "mapSideAria": "配置図の面",
+    "stage": "▼ 1列",
+    "status": "カードセクション座席照会",
+    "color": {
+      "G": "緑",
+      "R": "赤",
+      "W": "白",
+      "K": "黒",
+      "P": "ピンク",
+      "B": "青"
+    }
   }
 }
