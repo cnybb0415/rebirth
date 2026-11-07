@@ -25,7 +25,8 @@
     "openMenu": "메뉴 열기",
     "closeMenu": "메뉴 닫기",
     "close": "닫기",
-    "exchange": "티켓 교환"
+    "exchange": "티켓 교환",
+    "cardSection": "카드섹션"
   },
   "home": {
     "actionKwangya": "KWANGYA 119 신고하기",
@@ -163,7 +164,8 @@
       "funding": "모금",
       "notice": "공지",
       "vote": "아바타스타",
-      "exchange": "티켓교환"
+      "exchange": "티켓교환",
+      "cardSection": "카드섹션"
     },
     "voteAllTab": "전체",
     "voteTopHint": "▸ 멤버별 1위 후보",
@@ -394,5 +396,42 @@
     "noResult": "검색 결과가 없습니다.",
     "loadMore": "더 보기 ({n})",
     "ePremium": "추가금 거래는 금지합니다. 추금·추가금 등의 표현을 지우고 다시 등록해 주십시오."
+  },
+  "cardSection": {
+    "windowTitle": "카드섹션.exe - EXO PLANET #6",
+    "dayAria": "공연 날짜",
+    "day": {
+      "1107": "11.7 중콘",
+      "1108": "11.8 막콘"
+    },
+    "desc": "구역·열·번호를 고르면 내 자리에서 들어야 할 종이 색을 알려 드립니다. 2층 24~43구역만 해당합니다.",
+    "loading": "불러오는 중…",
+    "loadError": "좌석 정보를 불러오지 못했습니다. 잠시 후 다시 열어 주십시오.",
+    "zone": "구역",
+    "row": "열",
+    "num": "번호",
+    "choose": "선택",
+    "zoneN": "{n}구역",
+    "rowN": "{n}열",
+    "numN": "{n}번",
+    "seatLine": "{zone}구역 {row}열 {num}번",
+    "front": "앞면",
+    "back": "뒷면",
+    "hint": "앞면과 뒷면 색을 미리 확인해 두시기 바랍니다.",
+    "pickZone": "구역을 먼저 선택해 주십시오.",
+    "pickRest": "열과 번호를 선택해 주십시오.",
+    "mapTitle": "{zone}구역 배치도",
+    "mapSideAria": "배치도 면 선택",
+    "stage": "▼ 무대",
+    "status": "카드섹션 좌석 조회",
+    "color": {
+      "G": "초록",
+      "R": "빨강",
+      "W": "흰색",
+      "K": "검정",
+      "P": "분홍",
+      "B": "파랑"
+    },
+    "notYet": "카드섹션 좌석 조회는 {time}에 공개됩니다."
   }
 }

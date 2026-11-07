@@ -25,7 +25,8 @@
     "openMenu": "打开菜单",
     "closeMenu": "关闭菜单",
     "close": "关闭",
-    "exchange": "换票"
+    "exchange": "换票",
+    "cardSection": "卡片应援"
   },
   "home": {
     "actionKwangya": "KWANGYA 119举报",
@@ -163,7 +164,8 @@
       "funding": "众筹",
       "notice": "公告",
       "vote": "粉丝投票",
-      "exchange": "换票"
+      "exchange": "换票",
+      "cardSection": "卡片应援"
     },
     "voteAllTab": "全部",
     "voteTopHint": "▸ 每位成员第一名",
@@ -394,5 +396,42 @@
     "noResult": "没有搜索结果。",
     "loadMore": "查看更多（{n}）",
     "ePremium": "禁止加钱交易。请删除相关内容后重新提交。"
+  },
+  "cardSection": {
+    "windowTitle": "卡片应援.exe - EXO PLANET #6",
+    "dayAria": "演出日期",
+    "day": {
+      "1107": "11.7 第二场",
+      "1108": "11.8 末场"
+    },
+    "desc": "选择区域、排和座位号，即可查看你需要举的卡纸颜色。仅限2层24~43区。",
+    "loading": "加载中…",
+    "loadError": "无法加载座位信息，请稍后再试。",
+    "zone": "区域",
+    "row": "排",
+    "num": "座位号",
+    "choose": "选择",
+    "zoneN": "{n}区",
+    "rowN": "{n}排",
+    "numN": "{n}号",
+    "seatLine": "{zone}区 {row}排 {num}号",
+    "front": "正面",
+    "back": "背面",
+    "hint": "请提前确认正面和背面的颜色。",
+    "pickZone": "请先选择区域。",
+    "pickRest": "请选择排和座位号。",
+    "mapTitle": "{zone}区座位图",
+    "mapSideAria": "座位图面",
+    "stage": "▼ 舞台",
+    "status": "卡片应援座位查询",
+    "color": {
+      "G": "绿色",
+      "R": "红色",
+      "W": "白色",
+      "K": "黑色",
+      "P": "粉色",
+      "B": "蓝色"
+    },
+    "notYet": "卡片应援座位查询将于{time}开放。"
   }
 }

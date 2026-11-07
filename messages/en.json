@@ -25,7 +25,8 @@
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "close": "Close",
-    "exchange": "Ticket Swap"
+    "exchange": "Ticket Swap",
+    "cardSection": "Card Section"
   },
   "home": {
     "actionKwangya": "Report KWANGYA 119",
@@ -163,7 +164,8 @@
       "funding": "Funding",
       "notice": "Notice",
       "vote": "Fan Vote",
-      "exchange": "Ticket Swap"
+      "exchange": "Ticket Swap",
+      "cardSection": "Card Section"
     },
     "voteAllTab": "All",
     "voteTopHint": "▸ Top pick per member",
@@ -394,5 +396,42 @@
     "noResult": "No results found.",
     "loadMore": "Show more ({n})",
     "ePremium": "Trading with extra money (premiums) is prohibited. Please remove words like that and try again."
+  },
+  "cardSection": {
+    "windowTitle": "CardSection.exe - EXO PLANET #6",
+    "dayAria": "Show date",
+    "day": {
+      "1107": "11.7 Day 2",
+      "1108": "11.8 Day 3"
+    },
+    "desc": "Choose your zone, row and seat number to see which paper colors you should hold. Floor 2 zones 24–43 only.",
+    "loading": "Loading…",
+    "loadError": "Couldn't load the seat data. Please try again shortly.",
+    "zone": "Zone",
+    "row": "Row",
+    "num": "Seat",
+    "choose": "Select",
+    "zoneN": "Zone {n}",
+    "rowN": "Row {n}",
+    "numN": "Seat {n}",
+    "seatLine": "Zone {zone} · Row {row} · Seat {num}",
+    "front": "Front",
+    "back": "Back",
+    "hint": "Please check your front and back colors in advance.",
+    "pickZone": "Please choose a zone first.",
+    "pickRest": "Please choose a row and seat number.",
+    "mapTitle": "Zone {zone} map",
+    "mapSideAria": "Map side",
+    "stage": "▼ STAGE",
+    "status": "Card section seat lookup",
+    "color": {
+      "G": "Green",
+      "R": "Red",
+      "W": "White",
+      "K": "Black",
+      "P": "Pink",
+      "B": "Blue"
+    },
+    "notYet": "Card section lookup opens at {time} (KST)."
   }
 }

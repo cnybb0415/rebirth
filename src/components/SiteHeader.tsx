@@ -10,9 +10,11 @@ import logoPng from "@/../public/images/exo_logo.png";
 import { guideCategories } from "@/lib/guideCategories";
 import { streamingCategories } from "@/lib/streamingCategories";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { useOpenCardDays } from "@/data/cardSection";
 
 export function SiteHeader() {
   const t = useTranslations("nav");
+  const cardOpen = !!useOpenCardDays()?.length;
   const tguide = useTranslations("guide");
   const tstreaming = useTranslations("streaming");
 
@@ -182,6 +184,11 @@ export function SiteHeader() {
                       <Link href="/concert/exchange" className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
                         {t("exchange")}
                       </Link>
+                      {cardOpen && (
+                        <Link href="/concert/cardsection" className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
+                          {t("cardSection")}
+                        </Link>
+                      )}
                       <Link href="/concert/funding" className="block rounded-lg px-2 py-1.5 hover:bg-foreground/5" onClick={() => setOpenMenu(false)}>
                         {t("funding")}
                       </Link>
