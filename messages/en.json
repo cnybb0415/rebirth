@@ -422,7 +422,7 @@
     "pickRest": "Please choose a row and seat number.",
     "mapTitle": "Zone {zone} map",
     "mapSideAria": "Map side",
-    "stage": "▼ Row 1",
+    "stage": "▼ STAGE",
     "status": "Card section seat lookup",
     "color": {
       "G": "Green",
