@@ -57,12 +57,19 @@ export function CardSectionFinder() {
   const [num, setNum] = useState("");
   const [side, setSide] = useState<0 | 1>(0); // 배치도 미리보기: 0 앞면 · 1 뒷면
 
+  // 공개된 날짜가 늘어나면(예: 막콘 공개 시각) 서버에서 다시 받아 옴
+  const openKey = (openDays ?? []).map((d) => d.id).join(",");
   useEffect(() => {
-    fetch("/data/card-section.json")
+    if (!openKey) return;
+    let alive = true;
+    fetch("/api/card-section", { cache: "no-store" })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((j: CardData) => setData(j))
-      .catch(() => setLoadError(true));
-  }, []);
+      .then((j: { data: CardData }) => alive && setData(j.data))
+      .catch(() => alive && setLoadError(true));
+    return () => {
+      alive = false;
+    };
+  }, [openKey]);
 
   const zones = useMemo(() => Object.keys(data?.[day] ?? {}).sort((a, b) => +a - +b), [data, day]);
   const seats = useMemo(() => (zone ? data?.[day]?.[zone] ?? [] : []), [data, day, zone]);

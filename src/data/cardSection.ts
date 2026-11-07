@@ -1,28 +1,41 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { CARD_DAYS } from "./cardSectionDays";
 
-// 카드섹션 공개 시간 (입장 전에 열림)
-export const CARD_DAYS = [
-  { id: "1107", openAt: "2026-11-07T16:10:00+09:00", endsAt: "2026-11-07T23:59:59+09:00" },
-  { id: "1108", openAt: "2026-11-08T15:10:00+09:00", endsAt: "2026-11-08T23:59:59+09:00" },
-] as const;
+export { CARD_DAYS, FIRST_OPEN_AT } from "./cardSectionDays";
 
-export const FIRST_OPEN_AT = CARD_DAYS[0].openAt;
+// 서버 시각과 이 기기 시계의 차이 — 폰 시계가 틀려도 서버(한국시간) 기준으로 열림
+let offsetPromise: Promise<number> | null = null;
+function serverOffset(): Promise<number> {
+  offsetPromise ??= fetch("/api/card-section?meta=1", { cache: "no-store" })
+    .then((r) => (r.ok ? r.json() : Promise.reject()))
+    .then((j: { now: number }) => j.now - Date.now())
+    .catch(() => {
+      offsetPromise = null; // 다음에 다시 시도
+      return 0;
+    });
+  return offsetPromise;
+}
 
 // 지금 공개된 날짜 목록 (30초마다 다시 확인 → 페이지를 열어 둔 채로 시간이 돼도 열림)
 export function useCardClock() {
   const [now, setNow] = useState<number | null>(null);
   useEffect(() => {
-    const tick = () => setNow(Date.now());
-    const first = setTimeout(tick, 0);
+    let offset = 0;
+    let alive = true;
+    const tick = () => alive && setNow(Date.now() + offset);
+    serverOffset().then((o) => {
+      offset = o;
+      tick();
+    });
     const id = setInterval(tick, 30_000);
     return () => {
-      clearTimeout(first);
+      alive = false;
       clearInterval(id);
     };
   }, []);
-  if (now === null) return null; // 서버 렌더·첫 화면에서는 아직 모름
+  if (now === null) return null; // 서버 시각을 받기 전
   return { now, open: CARD_DAYS.filter((d) => now >= Date.parse(d.openAt)) };
 }
 
