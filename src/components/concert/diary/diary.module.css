@@ -111,3 +111,82 @@
 @media (prefers-reduced-motion: reduce) {
   .page, .canvas { transition-duration: 1ms; }
 }
+
+/* ── 마지막 장 메모: "LAST PAGE" 써짐 → 메모가 날아감 → 밑의 메모에 "NEXT PAGE" 써짐 ──
+   끝은 또 다른 시작이라는 의미. 마지막 장에 머물 때마다 처음부터 재생 */
+.memo {
+  position: absolute;
+  left: calc(var(--cx) * 1%);
+  top: calc(var(--cy) * 1%);
+  width: calc(var(--w) * 1%);
+  height: calc(var(--h) * 1%);
+  transform: translate(-50%, -50%) rotate(calc(var(--rot) * 1deg));
+  pointer-events: none;
+}
+
+/* 날아가는 메모 (사진 속 메모를 오려낸 것 — 클립·테이프는 원래 자리에 남음) */
+.memoPaper {
+  position: absolute;
+  inset: 0;
+  background: url('/images/concert/encore/diary/memo_paper.webp') center / 100% 100% no-repeat;
+  transform-origin: 20% 90%;
+  animation: memoFly 1.7s cubic-bezier(0.45, 0, 0.7, 0.2) 3.4s forwards;
+  will-change: transform, opacity;
+}
+
+/* 밑에 깔린 메모지 (PC처럼 사진에 메모지가 없는 자리에서만) — 살짝 틀어져서 두 장이 겹친 느낌 */
+.memoBase {
+  position: absolute;
+  inset: 0;
+  background: url('/images/concert/encore/diary/memo_paper.webp') center / 100% 100% no-repeat;
+  transform: rotate(-4deg) translate(-2%, 1%);
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+}
+
+/* 손글씨 (Permanent Marker 폰트)
+   글자마다: 윤곽 획을 펜으로 긋고(hwStroke) → 잉크가 차오름(hwFill). 시작 시간은 글자별로 DiaryClient에서 지정 */
+.hw {
+  position: absolute;
+  left: 4%;
+  width: 92%;
+  top: 57%; /* 클립 아래로 */
+  height: auto;
+  transform: translateY(-50%) rotate(-7deg);
+  overflow: visible;
+}
+.hw text {
+  font-size: 66px;
+}
+.hwChar {
+  fill: rgba(28, 24, 20, 0);
+  stroke: #1c1814;
+  stroke-width: 1.6px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 700;
+  stroke-dashoffset: 700;
+  animation-name: hwStroke, hwFill;
+  animation-duration: 0.42s, 0.28s;
+  animation-timing-function: cubic-bezier(0.5, 0, 0.3, 1), ease-out;
+  animation-fill-mode: forwards, forwards;
+}
+@keyframes hwStroke {
+  to { stroke-dashoffset: 0; }
+}
+@keyframes hwFill {
+  to { fill: rgba(28, 24, 20, 0.94); }
+}
+
+/* 모서리가 살짝 들렸다가(바람) 흔들리며 위로 날아가 사라짐 */
+@keyframes memoFly {
+  0% { transform: none; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.2)); opacity: 1; }
+  14% { transform: translate(-1%, -4%) rotate(-5deg); filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.35)); }
+  30% { transform: translate(4%, -10%) rotate(6deg) scale(1.03); filter: drop-shadow(0 14px 16px rgba(0, 0, 0, 0.35)); }
+  70% { opacity: 1; }
+  100% { transform: translate(120%, -230%) rotate(78deg) scale(0.92); filter: drop-shadow(0 24px 24px rgba(0, 0, 0, 0.2)); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .memoPaper { display: none; }
+  .hwChar { animation: none; fill: rgba(28, 24, 20, 0.94); stroke: none; }
+}

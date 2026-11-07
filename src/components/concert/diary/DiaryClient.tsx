@@ -3,7 +3,11 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { diarySpreads, diaryPagesMobile, AUTO_FLIP_AFTER_MS, type DiaryPage } from "@/data/diary";
 import { createDiaryCurl, type DiaryCurl } from "./pageCurl";
+import { Permanent_Marker } from "next/font/google";
 import s from "./diary.module.css";
+
+// 다이어리 손글씨(대문자 마커 글씨)와 비슷한 손글씨체 — 마지막 장 메모에 씀
+const marker = Permanent_Marker({ weight: "400", subsets: ["latin"], display: "swap" });
 
 type Layout = {
   pages: DiaryPage[];
@@ -17,7 +21,12 @@ type Layout = {
   prevZone: number;
   /** 마우스를 올리면 모서리가 살짝 들리는 영역(이 x, y 이상) */
   peekZone: [number, number];
+  /** 마지막 장 메모 위치(책 영역 기준 %): 가운데 x·y, 너비·높이, 기울기(도) */
+  memo?: MemoSpot;
 };
+
+/** base: 사진에 메모지가 없는 자리라 밑에 깔릴 메모지도 같이 그림 */
+type MemoSpot = { cx: number; cy: number; w: number; h: number; rot: number; base?: boolean };
 
 const LAYOUTS = {
   // 가로: 펼침면 양쪽. 오른쪽 장이 가운데 책등을 넘어 왼쪽으로 넘어감
@@ -28,6 +37,8 @@ const LAYOUTS = {
     radius: 0.085,
     prevZone: 0.5,
     peekZone: [0.78, 0.68],
+    // 마지막 펼침면 오른쪽 장 아래 빈 종이 위에 메모지 2장을 겹쳐 붙임
+    memo: { cx: 85.94, cy: 80.08, w: 11.07, h: 19.24, rot: 6, base: true },
   },
   // 세로: 한 장씩. 책등이 왼쪽 끝이라 넘어간 장은 화면 왼쪽 밖으로 빠짐
   portrait: {
@@ -37,6 +48,8 @@ const LAYOUTS = {
     radius: 0.06,
     prevZone: 0.35,
     peekZone: [0.66, 0.74],
+    // 마지막 장 오른쪽 아래 클립 달린 모눈 메모지
+    memo: { cx: 82.5, cy: 82.61, w: 21.58, h: 16.67, rot: -19.5 },
   },
 } satisfies Record<string, Layout>;
 
@@ -83,6 +96,53 @@ export function DiaryClient() {
   );
 }
 
+// 손글씨: 글자마다 윤곽 획을 먼저 긋고 → 잉크가 차오름. 글자 사이는 조금씩, 단어 사이는 더 쉬고 씀
+const STROKE_S = 0.42; // 한 글자 획 긋는 시간
+const LETTER_GAP_S = 0.17; // 다음 글자 시작까지
+const WORD_GAP_S = 0.3; // 단어 사이 추가로 쉬는 시간
+
+function Handwriting({ text, start }: { text: string; start: number }) {
+  let t = start;
+  return (
+    <svg className={s.hw} viewBox="0 0 400 110" aria-hidden>
+      <text x="200" y="78" textAnchor="middle" className={marker.className}>
+        {[...text].map((ch, i) => {
+          if (ch === " ") {
+            t += WORD_GAP_S;
+            return <tspan key={i}> </tspan>;
+          }
+          const d = t;
+          t += LETTER_GAP_S;
+          return (
+            <tspan key={i} className={s.hwChar} style={{ animationDelay: `${d}s, ${d + STROKE_S * 0.7}s` }}>
+              {ch}
+            </tspan>
+          );
+        })}
+      </text>
+    </svg>
+  );
+}
+
+// 마지막 장 메모: LAST PAGE 써짐 → 메모가 날아가고 → 밑의 메모에 NEXT PAGE (끝은 또 다른 시작)
+// 마지막 장에 들어올 때마다 처음부터 재생 (날아가는 시간은 diary.module.css의 memoFly)
+function LastPageMemo({ spot }: { spot: MemoSpot }) {
+  return (
+    <div
+      className={s.memo}
+      style={{ "--cx": spot.cx, "--cy": spot.cy, "--w": spot.w, "--h": spot.h, "--rot": spot.rot } as React.CSSProperties}
+      aria-label="Last Page = Next Page"
+      role="img"
+    >
+      {spot.base && <div className={s.memoBase} />}
+      <Handwriting text="NEXT PAGE" start={4.6} />
+      <div className={s.memoPaper}>
+        <Handwriting text="LAST PAGE" start={0.7} />
+      </div>
+    </div>
+  );
+}
+
 const TURN_MS = 1600;
 const PEEK_T = 0.12;
 // 모서리를 이 정도 이상 끌고 놓으면 끝까지 넘김
@@ -122,6 +182,8 @@ function DiaryBook({
   const peekRef = useRef(false);
   const dragRef = useRef<Drag | null>(null);
   const [index, setIndex] = useState(initialIndex);
+  // 장을 넘기는 동안엔 마지막 장 메모를 숨김 (종이와 따로 놀지 않게)
+  const [turning, setTurning] = useState(false);
   const [glReady, setGlReady] = useState(false);
   // GPU 컨텍스트를 잃으면(모바일 앱 전환 등) 캔버스를 새로 만들어 다시 그림
   const [glKey, setGlKey] = useState(0);
@@ -161,6 +223,7 @@ function DiaryBook({
       onIndex(mode, to);
       busyRef.current = false;
       peekRef.current = false;
+      setTurning(false);
       void curlRef.current?.show(to);
     },
     [mode, onIndex]
@@ -172,6 +235,7 @@ function DiaryBook({
       const to = cur + dir;
       if (busyRef.current || to < 0 || to >= pages.length) return;
       busyRef.current = true;
+      setTurning(true);
       const curl = curlRef.current;
       if (curl) {
         const ms = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : TURN_MS;
@@ -266,6 +330,7 @@ function DiaryBook({
       if (Math.abs(e.clientX - drag.x0) < 6) return;
       drag.dragging = true;
       busyRef.current = true;
+      setTurning(true);
       peekRef.current = false;
       void curl.ensure(target);
       if (drag.side === "next") {
@@ -303,6 +368,7 @@ function DiaryBook({
       } else {
         await curl.tweenT(0, 320);
         busyRef.current = false;
+        setTurning(false);
         void curl.show(cur);
       }
     } else if (t <= 1 - COMMIT_T) {
@@ -311,6 +377,7 @@ function DiaryBook({
     } else {
       await curl.tweenT(1, 320);
       busyRef.current = false;
+      setTurning(false);
       void curl.show(cur);
     }
   };
@@ -352,6 +419,7 @@ function DiaryBook({
             className={`${s.canvas} ${glReady ? s.canvasReady : ""}`}
             aria-hidden
           />
+          {layout.memo && index === pages.length - 1 && !turning && <LastPageMemo spot={layout.memo} />}
         </div>
       </div>
 
