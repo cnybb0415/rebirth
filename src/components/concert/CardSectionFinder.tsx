@@ -13,7 +13,7 @@ type CardData = Record<string, Record<string, Seat[]>>;
 
 const DAYS = [
   { id: "1107", short: "11.7", endsAt: "2026-11-07T23:59:59+09:00" },
-  { id: "1108", short: "11.8", endsAt: "2026-11-08T23:59:59+09:00" },
+  // 막콘(1108)은 데이터 업데이트 후 추가
 ] as const;
 
 // 종이 색 (G 초록 · R 빨강 · W 흰색 · K 검정 · P 분홍 · B 파랑)
