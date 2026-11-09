@@ -28,8 +28,8 @@ export const diarySpreads: DiaryPage[] = [
   },
   {
     id: "letter",
-    src: `${DIR}/page3.webp`,
-    alt: "EXO 사진과 손편지가 붙은 다이어리",
+    src: `${DIR}/page3_v2.webp`,
+    alt: "EXO 사진, 콘서트 무대 사진과 손편지가 붙은 다이어리",
   },
 ];
 
