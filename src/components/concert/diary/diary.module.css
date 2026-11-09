@@ -190,3 +190,61 @@
   .memoPaper { display: none; }
   .hwChar { animation: none; fill: rgba(28, 24, 20, 0.94); stroke: none; }
 }
+
+/* ── 배경음악 버튼 (오른쪽 아래) ── */
+.bgm {
+  position: absolute;
+  right: max(clamp(10px, 2.5vmin, 32px), env(safe-area-inset-right));
+  bottom: max(clamp(10px, 2.5vmin, 28px), env(safe-area-inset-bottom));
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 32px;
+  padding: 0 12px 0 10px;
+  border: 1px solid rgba(255, 240, 220, 0.35);
+  border-radius: 999px;
+  background: rgba(30, 18, 10, 0.45);
+  color: rgba(255, 240, 220, 0.85);
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition: background 200ms ease, color 200ms ease;
+}
+.bgm:hover { background: rgba(30, 18, 10, 0.6); color: #fff4e6; }
+.bgm:focus-visible { outline: 2px solid rgba(255, 240, 220, 0.8); outline-offset: 2px; }
+.bgmOn { color: #fff4e6; }
+
+.bgmIcon {
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  width: 14px;
+  height: 12px;
+  font-size: 13px;
+  line-height: 12px;
+}
+/* 재생 중: 막대 3개가 오르내림 */
+.bgmIcon i {
+  display: block;
+  width: 2px;
+  height: 100%;
+  background: currentColor;
+  border-radius: 1px;
+  transform-origin: bottom;
+  animation: bgmBar 900ms ease-in-out infinite;
+}
+.bgmIcon i:nth-child(2) { animation-delay: -300ms; }
+.bgmIcon i:nth-child(3) { animation-delay: -600ms; }
+@keyframes bgmBar {
+  0%, 100% { transform: scaleY(0.35); }
+  50% { transform: scaleY(1); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bgmIcon i { animation: none; transform: scaleY(0.7); }
+}
+
+.bgmLabel { white-space: nowrap; }

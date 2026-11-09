@@ -5,6 +5,7 @@ import { diarySpreads, diaryPagesMobile, AUTO_FLIP_AFTER_MS, type DiaryPage } fr
 import { createDiaryCurl, type DiaryCurl } from "./pageCurl";
 import { Permanent_Marker } from "next/font/google";
 import s from "./diary.module.css";
+import { DiaryBgm } from "./DiaryBgm";
 
 // 다이어리 손글씨(대문자 마커 글씨)와 비슷한 손글씨체 — 마지막 장 메모에 씀
 const marker = Permanent_Marker({ weight: "400", subsets: ["latin"], display: "swap" });
@@ -92,6 +93,7 @@ export function DiaryClient() {
           onInteract={stopAutoFlip}
         />
       )}
+      <DiaryBgm />
     </div>
   );
 }
