@@ -68,7 +68,6 @@ export function DiaryClient() {
   // 서버에서는 화면 방향을 알 수 없으니 배경만 그리고, 브라우저에서 방향에 맞는 책을 그림(가로↔세로 깜빡임 방지)
   const mode = useSyncExternalStore(subscribeOrientation, getMode, () => null);
   const [pos, setPos] = useState({ spread: 0, portrait: 0 });
-  const [autoFlip, setAutoFlip] = useState(true);
 
   // 가로 펼침면 번호와 세로 장 번호를 함께 기억해서, 화면을 돌려도 보던 내용이 이어지게 함
   const handleIndex = useCallback((m: Mode, i: number) => {
@@ -78,7 +77,8 @@ export function DiaryClient() {
       return { spread: i, portrait: keep ? prev.portrait : diaryPagesMobile.findIndex((p) => p.spread === i) };
     });
   }, []);
-  const stopAutoFlip = useCallback(() => setAutoFlip(false), []);
+  // 손으로 넘겨도 자동 넘김은 계속 (넘긴 장부터 다시 기다림)
+  const onInteract = useCallback(() => {}, []);
 
   return (
     <div className={s.wrap} data-mode={mode ?? undefined}>
@@ -88,9 +88,9 @@ export function DiaryClient() {
           mode={mode}
           layout={LAYOUTS[mode]}
           initialIndex={mode === "portrait" ? pos.portrait : pos.spread}
-          autoFlip={autoFlip}
+          autoFlip
           onIndex={handleIndex}
-          onInteract={stopAutoFlip}
+          onInteract={onInteract}
         />
       )}
       <DiaryBgm />
@@ -256,16 +256,22 @@ function DiaryBook({
     [pages.length, settle]
   );
 
-  // 첫 장에서 잠시 머물다 두 번째 장으로 한 번만 자동으로 넘어감
+  // 장마다 잠시 머물다 다음 장으로 자동으로 넘어감 (마지막 장에서 멈춤)
+  // 손으로 넘기면 그 장부터 다시 기다림. 넘기는 중·끄는 중이면 잠깐 뒤에 다시 시도
   useEffect(() => {
-    if (!autoFlip) return;
-    const id = setTimeout(() => {
-      if (indexRef.current !== 0) return;
-      onInteract();
+    if (!autoFlip || index >= pages.length - 1) return;
+    let id = 0;
+    const tryTurn = () => {
+      if (indexRef.current !== index) return;
+      if (busyRef.current || dragRef.current) {
+        id = window.setTimeout(tryTurn, 1000);
+        return;
+      }
       void turn(1);
-    }, AUTO_FLIP_AFTER_MS);
+    };
+    id = window.setTimeout(tryTurn, AUTO_FLIP_AFTER_MS);
     return () => clearTimeout(id);
-  }, [autoFlip, onInteract, turn]);
+  }, [autoFlip, index, pages.length, turn]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
