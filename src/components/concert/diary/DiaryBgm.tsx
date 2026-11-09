@@ -17,7 +17,7 @@ function readOff() {
 
 /**
  * 다이어리 배경음악 (EXO - 피터팬)
- * 브라우저가 소리 자동재생을 막으므로, 처음 화면을 누르거나 키를 누를 때 시작하고 천천히 소리를 키움.
+ * 들어오면 바로 재생(사이트 안에서 이동해 온 경우). 브라우저가 막으면 처음 화면을 누를 때 시작. 소리는 천천히 키움.
  * 오른쪽 아래 버튼으로 끄고 켤 수 있음.
  */
 export function DiaryBgm() {
@@ -52,7 +52,7 @@ export function DiaryBgm() {
   const play = () => {
     const a = getAudio();
     a.volume = 0;
-    a.play().then(() => fadeTo(a, VOLUME, 1500)).catch(() => {});
+    return a.play().then(() => fadeTo(a, VOLUME, 1500));
   };
 
   const stop = () => {
@@ -61,12 +61,15 @@ export function DiaryBgm() {
     fadeTo(a, 0, 400, () => a.pause());
   };
 
-  // 첫 터치·클릭·키 입력에서 시작 (끈 적 있으면 시작 안 함)
+  // 들어오자마자 자동재생 시도 → 브라우저가 막으면(링크·주소로 바로 들어온 경우) 첫 터치·클릭·키 입력에서 시작
+  // (끈 적 있으면 시작 안 함)
   useEffect(() => {
     if (readOff()) return;
+    let cancelled = false;
     const start = () => {
       remove();
-      play();
+      if (audioRef.current && !audioRef.current.paused) return;
+      play().catch(() => {});
     };
     const remove = () => {
       window.removeEventListener("pointerdown", start, true);
@@ -74,7 +77,15 @@ export function DiaryBgm() {
     };
     window.addEventListener("pointerdown", start, true);
     window.addEventListener("keydown", start, true);
-    return remove;
+    play()
+      .then(() => remove())
+      .catch(() => {
+        if (cancelled) remove();
+      });
+    return () => {
+      cancelled = true;
+      remove();
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -88,7 +99,7 @@ export function DiaryBgm() {
         resume = !a.paused;
         a.pause();
       } else if (resume) {
-        play();
+        play().catch(() => {});
       }
     };
     document.addEventListener("visibilitychange", onVis);
@@ -106,7 +117,7 @@ export function DiaryBgm() {
       localStorage.setItem(OFF_KEY, playing ? "1" : "0");
     } catch {}
     if (playing) stop();
-    else play();
+    else play().catch(() => {});
   };
 
   return (
