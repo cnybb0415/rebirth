@@ -41,5 +41,5 @@ export const diaryPagesMobile: (DiaryPage & { spread: number })[] = [
   { id: "letter", src: `${DIR}/page3_2_mo.webp`, alt: "KAI 손편지가 붙은 다이어리", spread: 2 },
 ];
 
-// 첫 장에서 이 시간만큼 머문 뒤 두 번째 장으로 자동으로 넘어감 (이후는 수동)
+// 장마다 이 시간만큼 머문 뒤 다음 장으로 자동으로 넘어감 (마지막 장에서 멈춤)
 export const AUTO_FLIP_AFTER_MS = 5000;
