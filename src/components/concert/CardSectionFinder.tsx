@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import f from "./funding-page.module.css";
 import w from "./helper-wizard.module.css";
 import x from "./exchange-board.module.css";
@@ -39,6 +39,7 @@ function TitleBar({ title }: { title: string }) {
 
 export function CardSectionFinder() {
   const t = useTranslations("cardSection");
+  const locale = useLocale();
   const colorName = (c: string) => t(`color.${c}`);
 
   const [data, setData] = useState<CardData | null>(null);
@@ -91,8 +92,9 @@ export function CardSectionFinder() {
 
   // 같은 좌석으로 다른 날짜도 바로 볼 수 있게 구역·열·번호 선택은 유지
   const pickDay = (id: string) => setPicked(id);
-  const openLabel = new Date(FIRST_OPEN_AT).toLocaleString(undefined, {
-    month: "numeric", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "Asia/Seoul",
+  // 화면 언어에 맞춰, 한국시간으로 표시 (예: 11월 7일 오후 4:10)
+  const openLabel = new Date(FIRST_OPEN_AT).toLocaleString(locale, {
+    month: "long", day: "numeric", hour: "numeric", minute: "2-digit", timeZone: "Asia/Seoul",
   });
 
   return (
