@@ -37,7 +37,7 @@ export const diarySpreads: DiaryPage[] = [
 export const diaryPagesMobile: (DiaryPage & { spread: number })[] = [
   { ...diarySpreads[0], src: `${DIR}/page1_mo.webp`, spread: 0 },
   { ...diarySpreads[1], src: `${DIR}/page2_mo.webp`, spread: 1 },
-  { id: "photo", src: `${DIR}/page3_1_mo.webp`, alt: "EXO 사진이 붙은 다이어리", spread: 2 },
+  { id: "photo", src: `${DIR}/page3_1_mo_v2.webp`, alt: "EXO 사진과 콘서트 무대 사진이 붙은 다이어리", spread: 2 },
   { id: "letter", src: `${DIR}/page3_2_mo.webp`, alt: "KAI 손편지가 붙은 다이어리", spread: 2 },
 ];
 
