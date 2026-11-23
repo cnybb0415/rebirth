@@ -157,8 +157,8 @@ function getChange(
 
 function ProviderIcon({ provider, label }: { provider: ProviderKey; label: string }) {
   return (
-    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
-      <MusicServiceIcon service={provider} label={label} size={16} className="h-[16px] w-[16px] sm:h-[18px] sm:w-[18px]" />
+    <span className="inline-flex h-[26px] w-[26px] shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[#fff]">
+      <MusicServiceIcon service={provider} label={label} size={18} className="h-[18px] w-[18px]" />
     </span>
   );
 }
@@ -194,10 +194,13 @@ export async function ChartSummaryGrid({
   trackTitle,
   charts,
   moreHref,
+  bare = false,
 }: {
   trackTitle: string;
   charts: ChartsData;
   moreHref?: string;
+  /** 제목 없이 목록만 (홈 카드 안) */
+  bare?: boolean;
 }) {
   const t = await getTranslations("charts");
   const safeTitle = trackTitle?.trim().length ? trackTitle.trim() : t("title");
@@ -208,6 +211,7 @@ export async function ChartSummaryGrid({
 
   return (
     <div>
+      {bare ? null : (
       <div className="flex items-start justify-between gap-4">
         <div>
           <h2 className="text-lg font-semibold">
@@ -227,32 +231,30 @@ export async function ChartSummaryGrid({
           </Link>
         ) : null}
       </div>
+      )}
 
-      <div className="mt-4 flex flex-col gap-2">
+      <div className={cn("flex flex-col gap-2", !bare && "mt-4")}>
         {charted.map(({ card, item }) => {
           const rankText = getRankText(item, t("rankSuffix") || undefined);
           const change = getChange(item?.rank, item?.prevRank, item?.rankStatus, item?.changedRank);
           return (
-            <div key={card.id} className="flex items-center gap-3 rounded-xl bg-foreground/5 px-3 py-2.5">
+            <div key={card.id} className="flex items-center gap-2.5 rounded-xl bg-foreground/5 px-3 py-2.5 text-[13px]">
               <ProviderIcon provider={card.provider} label={card.providerLabel} />
               <div className="min-w-0 flex-1">
-                <p className="text-[13px] font-bold leading-tight">
-                  {card.providerLabel} <span className="font-medium text-foreground/55">{card.typeLabel}</span>
+                <p className="leading-tight">
+                  {card.providerLabel} <span className="text-[11px] text-foreground/50">{card.typeLabel}</span>
                 </p>
                 {item?.title ? (
-                  <p className="mt-0.5 truncate text-xs text-foreground/60">
+                  <p className="mt-0.5 truncate text-[10px] text-foreground/50">
                     {item.title}
-                    {item.count && item.count > 1 ? <span className="text-foreground/40"> +{item.count - 1}</span> : null}
+                    {item.count && item.count > 1 ? <span> +{item.count - 1}</span> : null}
                   </p>
                 ) : null}
               </div>
-              <div className="text-right">
-                <p className="text-lg font-extrabold leading-none tabular-nums">
-                  {rankText.primary}
-                  {rankText.suffix ? <span className="ml-0.5 text-xs font-bold">{rankText.suffix}</span> : null}
-                </p>
-                <p className={cn("mt-1 text-[11px] font-semibold tabular-nums", change.className)}>{change.label}</p>
-              </div>
+              <span className={cn("text-[10px] font-semibold tabular-nums", change.className)}>{change.label}</span>
+              <span className="font-display min-w-[36px] text-right text-[22px] leading-none tabular-nums">
+                {rankText.primary}
+              </span>
             </div>
           );
         })}

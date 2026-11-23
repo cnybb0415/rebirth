@@ -5,7 +5,7 @@ import { QuickActionsBar } from "@/components/QuickActionsBar";
 import { ChartSummaryGrid } from "@/components/ChartSummaryGrid";
 import { getLatestTweet } from "@/lib/x";
 import { CrownHero } from "@/components/CrownHero";
-import { HomeQuickView } from "@/components/HomeQuickView";
+import { HomeCard, HomeScheduleCard, HomeVoteCard } from "@/components/HomeCards";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 
@@ -13,7 +13,7 @@ export const revalidate = 900;
 
 function SocialIcon({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-foreground/15 bg-white">
+    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-foreground/15">
       {children}
     </span>
   );
@@ -113,47 +113,38 @@ export default async function Home({
     { label: t("actionVote"), href: "/vote", kind: "vote" as const },
   ];
 
+  const tc = await getTranslations("charts");
+
   return (
     <div className="min-h-screen text-foreground">
       <CrownHero />
-      <main className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 pt-4 pb-10 sm:px-6 lg:gap-6">
-        {/* 크라운 뮤비 조회수 */}
-        <section className="rounded-2xl border border-foreground/10 bg-white px-4 py-3">
-          <YouTubeStatsCards variant="inline" />
-        </section>
+      <main className="mx-auto flex w-full max-w-3xl flex-col gap-3.5 px-4 pt-4 pb-10 sm:px-6">
+        <YouTubeStatsCards variant="mv" />
 
-        {/* 바로가기 */}
-        <section className="rounded-2xl border border-foreground/10 bg-white p-3">
+        <HomeCard title={t("quickLinks")}>
           <QuickActionsBar
             actions={homeActions}
             albumLinks={siteConfig.albumPurchaseLinks}
             oneClickStreamingLinks={siteConfig.oneClickStreamingLinks}
             containerVariant="none"
-            gridClassName="grid-cols-2 gap-2 sm:grid-cols-3"
+            gridClassName="grid-cols-3 gap-2"
             buttonVariant="outline"
-            buttonSize="lg"
-            buttonClassName="h-12 rounded-xl text-[13px] leading-tight"
+            tile
+            buttonClassName="h-auto min-h-[78px] rounded-[14px] border-foreground/12 bg-transparent px-2.5 pt-2.5 pb-3 hover:bg-foreground/5"
           />
-        </section>
+        </HomeCard>
 
-        <section id="home-quickview">
-          <HomeQuickView />
-        </section>
+        <HomeScheduleCard />
 
-        <section className="rounded-2xl border border-foreground/10 bg-white p-5">
-          <ChartSummaryGrid trackTitle="EXO" charts={charts} moreHref="/charts" />
-        </section>
+        <HomeCard title={`EXO ${tc("chartOfShort")}`} moreHref="/charts" moreLabel={tc("more")}>
+          <ChartSummaryGrid trackTitle="EXO" charts={charts} bare />
+        </HomeCard>
 
-        {/* 최신 게시물 */}
+        <HomeVoteCard />
+
         {latestTweet ? (
-          <section id="home-latest" className="rounded-2xl border border-foreground/10 bg-white p-4">
-            <div className="flex items-center justify-between">
-              <div className="text-[15px] font-semibold">{t("latestPost")}</div>
-              <a href={latestTweet.url} target="_blank" rel="noopener noreferrer" className="text-xs text-foreground/55 hover:text-foreground">
-                {t("viewPost")} ›
-              </a>
-            </div>
-            <a href={latestTweet.url} target="_blank" rel="noopener noreferrer" className="mt-3 flex gap-3">
+          <HomeCard title={t("latestPost")}>
+            <a href={latestTweet.url} target="_blank" rel="noopener noreferrer" className="flex gap-3">
               {latestTweet.mediaUrl || latestTweet.previewImageUrl ? (
                 <img
                   src={latestTweet.mediaUrl ?? latestTweet.previewImageUrl}
@@ -163,19 +154,14 @@ export default async function Home({
                 />
               ) : null}
               <div className="min-w-0">
-                <p className="line-clamp-3 whitespace-pre-wrap text-sm text-foreground/85">{latestTweet.text}</p>
-                <p className="mt-1.5 text-xs text-foreground/45">
-                  @{latestTweet.username}
-                  {latestTweet.createdAt
-                    ? ` · ${new Date(latestTweet.createdAt).toLocaleDateString(locale === "ko" ? "ko-KR" : locale === "ja" ? "ja-JP" : locale === "zh" ? "zh-CN" : "en-US", { timeZone: "Asia/Seoul" })}`
-                    : ""}
-                </p>
+                <p className="line-clamp-3 whitespace-pre-wrap text-[13px] text-foreground/85">{latestTweet.text}</p>
+                <p className="mt-1.5 text-[11px] text-foreground/45">@{latestTweet.username}</p>
               </div>
             </a>
-          </section>
+          </HomeCard>
         ) : null}
 
-        <div className="flex items-center justify-center gap-4 pt-2">
+        <div className="flex items-center justify-center gap-4 pt-3">
           <a href={siteConfig.contacts.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-foreground/70 hover:text-foreground">
             <SocialIcon><InstagramIcon /></SocialIcon>
           </a>
@@ -188,20 +174,16 @@ export default async function Home({
         </div>
       </main>
 
-      <footer className="border-t border-foreground/10">
-        <div className="mx-auto flex w-full max-w-6xl flex-col items-center gap-3 px-4 py-9 text-center sm:px-6">
-          <img
-            src="/images/logo_width.webp"
-            alt="EXO RE:BIRTH"
-            className="h-auto w-56 object-contain invert mix-blend-screen"
-          />
-          <p className="text-xs font-semibold text-foreground/60">{t("copyright")}</p>
-          <div className="space-y-0.5 text-[11px] text-foreground/40">
-            <p><span className="font-medium text-foreground/55">MAIN</span> &nbsp;rebirth.exo@gmail.com</p>
-            <p><span className="font-medium text-foreground/55">STRM</span> &nbsp;exo.strm@gmail.com</p>
-            <p><span className="font-medium text-foreground/55">DEV</span> &nbsp;exo.dev0408@gmail.com</p>
-          </div>
-        </div>
+      <footer className="pt-6 pb-8 text-center">
+        <img
+          src="/images/logo_width.webp"
+          alt="EXO RE:BIRTH"
+          className="mx-auto mb-2.5 h-auto w-[220px] object-contain invert mix-blend-screen"
+        />
+        <p className="text-[10px] text-foreground/45">© EXO RE:BIRTH</p>
+        <p className="mt-2 text-[10px] leading-relaxed text-foreground/35">
+          rebirth.exo@gmail.com · exo.strm@gmail.com · exo.dev0408@gmail.com
+        </p>
       </footer>
     </div>
   );

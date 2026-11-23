@@ -43,7 +43,8 @@
     "copyright": "Copyright ⓒ EXO RE:BIRTH All rights reserved.",
     "prevImage": "이전 이미지",
     "nextImage": "다음 이미지",
-    "viewImage": "이미지 {n} 보기"
+    "viewImage": "이미지 {n} 보기",
+    "quickLinks": "바로가기"
   },
   "quickview": {
     "thisWeekSchedule": "이번 주 스케줄",
@@ -251,7 +252,9 @@
     "updatedLabel": "업데이트:",
     "chartOf": "의 실시간 차트",
     "moreCharts": "음원차트 더보기 →",
-    "rankSuffix": "위"
+    "rankSuffix": "위",
+    "chartOfShort": "실시간 차트",
+    "more": "더보기"
   },
   "guide": {
     "title": "가이드",

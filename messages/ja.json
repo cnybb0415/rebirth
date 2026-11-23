@@ -43,7 +43,8 @@
     "copyright": "Copyright ⓒ EXO RE:BIRTH All rights reserved.",
     "prevImage": "前の画像",
     "nextImage": "次の画像",
-    "viewImage": "画像{n}を見る"
+    "viewImage": "画像{n}を見る",
+    "quickLinks": "ショートカット"
   },
   "quickview": {
     "thisWeekSchedule": "今週のスケジュール",
@@ -251,7 +252,9 @@
     "updatedLabel": "更新:",
     "chartOf": " リアルタイムチャート",
     "moreCharts": "チャートをもっと →",
-    "rankSuffix": "位"
+    "rankSuffix": "位",
+    "chartOfShort": "リアルタイムチャート",
+    "more": "もっと見る"
   },
   "guide": {
     "title": "ガイド",

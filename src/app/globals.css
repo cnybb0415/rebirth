@@ -158,13 +158,10 @@ html:has(.crown-theme) {
   --surface: rgb(255 255 255 / 0.06);
   --surface-80: rgb(255 255 255 / 0.06);
   --surface-90: rgb(255 255 255 / 0.08);
-  --glass: rgb(255 255 255 / 0.055);
+  --glass: rgb(22 22 26 / 0.5);
   --glass-strong: rgb(22 22 26 / 0.92);
   --line: rgb(255 255 255 / 0.11);
   color-scheme: dark;
-}
-html:has(.crown-theme) body {
-  background: #060608;
 }
 
 /* 흰 카드·버튼 → 반투명 유리 */
@@ -220,7 +217,55 @@ html:has(.crown-theme) nav.fixed.bottom-0 {
 html:has(.crown-theme) img {
   color-scheme: normal;
 }
-/* 검은 로고는 밝게 */
-html:has(.crown-theme) header.sticky img[alt="EXO RE:BIRTH"] {
-  filter: invert(1);
+
+.font-display {
+  font-family: var(--font-display), "Bebas Neue", sans-serif;
+  letter-spacing: 0.01em;
+}
+
+/* ── 크라운 테마: 고래 배경 · 유리 카드 · 하단 메뉴 ── */
+.crown-bg {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgb(5 5 5 / 0.1), rgb(5 5 5 / 0.45)), url("/images/home/whale_bg.jpg") center top / cover no-repeat, #050505;
+  pointer-events: none;
+}
+/* body에 배경이 있으면 뒤에 깔린 고래 배경을 덮어서, 배경색은 html에만 */
+html:has(.crown-theme) {
+  background: #050505;
+}
+html:has(.crown-theme) body {
+  background: transparent;
+}
+/* 페이지 바탕은 비우고 고래 배경이 보이게 (떠 있는 창은 아래에서 따로) */
+html:has(.crown-theme) .bg-background {
+  background-color: transparent;
+}
+html:has(.crown-theme) :is(.home-card, .rounded-2xl.bg-white, .rounded-xl.bg-white, .rounded-\[18px\].bg-white) {
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+.home-card {
+  background: rgb(22 22 26 / 0.5);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+}
+html:has(.crown-theme) header.sticky {
+  background: rgb(5 5 5 / 0.55);
+  border-color: transparent;
+}
+html:has(.crown-theme) nav.fixed.bottom-0 {
+  background: rgb(5 5 5 / 0.7);
+  border-color: rgb(255 255 255 / 0.12);
+}
+html:has(.crown-theme) nav.fixed.bottom-0 a {
+  color: rgb(255 255 255 / 0.55);
+}
+html:has(.crown-theme) nav.fixed.bottom-0 a > span:first-child {
+  background: transparent;
+}
+html:has(.crown-theme) nav.fixed.bottom-0 a:is(.text-yellow-700) {
+  color: #fff;
+  font-weight: 700;
 }

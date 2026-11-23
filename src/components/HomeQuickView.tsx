@@ -2,7 +2,7 @@ import { unstable_cache } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 
-type ScheduleItem = {
+export type ScheduleItem = {
   id: string;
   date: string;
   time?: string;
@@ -11,7 +11,7 @@ type ScheduleItem = {
   city?: string;
 };
 
-type VoteItem = {
+export type VoteItem = {
   name: string;
   organizer: string;
   deadline: string;
@@ -45,20 +45,20 @@ function parseCSVLine(line: string): string[] {
   return result;
 }
 
-function getKSTToday(): string {
+export function getKSTToday(): string {
   const now = new Date();
   const kst = new Date(now.getTime() + (now.getTimezoneOffset() + 540) * 60000);
   return `${kst.getFullYear()}-${String(kst.getMonth() + 1).padStart(2, "0")}-${String(kst.getDate()).padStart(2, "0")}`;
 }
 
-function getKSTWeekEnd(): string {
+export function getKSTWeekEnd(): string {
   const now = new Date();
   const kst = new Date(now.getTime() + (now.getTimezoneOffset() + 540) * 60000);
   kst.setDate(kst.getDate() + 6);
   return `${kst.getFullYear()}-${String(kst.getMonth() + 1).padStart(2, "0")}-${String(kst.getDate()).padStart(2, "0")}`;
 }
 
-const fetchAllFutureSchedule = unstable_cache(
+export const fetchAllFutureSchedule = unstable_cache(
   async (): Promise<ScheduleItem[]> => {
     const csvUrl = process.env.SCHEDULE_SHEET_CSV_URL;
     if (!csvUrl) return [];
@@ -91,7 +91,7 @@ const fetchAllFutureSchedule = unstable_cache(
   { revalidate: 7200 }
 );
 
-const fetchRawVotes = unstable_cache(
+export const fetchRawVotes = unstable_cache(
   async (): Promise<VoteItem[]> => {
     const csvUrl = process.env.VOTE_SHEET_CSV_URL;
     if (!csvUrl) return [];

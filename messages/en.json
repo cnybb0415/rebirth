@@ -43,7 +43,8 @@
     "copyright": "Copyright ⓒ EXO RE:BIRTH All rights reserved.",
     "prevImage": "Previous image",
     "nextImage": "Next image",
-    "viewImage": "View image {n}"
+    "viewImage": "View image {n}",
+    "quickLinks": "Shortcuts"
   },
   "quickview": {
     "thisWeekSchedule": "This Week's Schedule",
@@ -251,7 +252,9 @@
     "updatedLabel": "Updated:",
     "chartOf": "'s Real-time Charts",
     "moreCharts": "More Charts →",
-    "rankSuffix": ""
+    "rankSuffix": "",
+    "chartOfShort": "Live Chart",
+    "more": "More"
   },
   "guide": {
     "title": "Guide",
