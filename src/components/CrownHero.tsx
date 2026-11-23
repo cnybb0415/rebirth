@@ -7,6 +7,7 @@ import { siteConfig } from "@/config/site";
 // 영상이 실제로 재생 중일 때만 보이고, 그 전(로딩)·반복 사이·자동재생이 막힌 경우에는 같은 장면 사진을 보여줌
 // → 유튜브 자체 썸네일·재생 버튼·제목이 보이지 않음
 // 몇 초가 지나도 한 번도 재생되지 않으면(저전력 모드 등으로 자동재생이 막힘) 벽에 기댄 단체 사진으로 바꿈
+// 다른 화면에 갔다 오거나 앱을 내렸다 올리면 영상이 멈춰 있을 수 있어서, 멈춘 걸 알면 다시 재생 명령을 보냄
 const START = 171;
 const END = 191;
 
@@ -15,8 +16,15 @@ export function CrownHero() {
   const [everPlayed, setEverPlayed] = useState(false);
   const [blocked, setBlocked] = useState(false);
   const frameRef = useRef<HTMLIFrameElement>(null);
+  const heardRef = useRef(false); // 유튜브에서 응답을 한 번이라도 받았는지
   const id = siteConfig.youtube.videoId;
   const [src, setSrc] = useState<string | null>(null);
+
+  const send = (msg: object) => frameRef.current?.contentWindow?.postMessage(JSON.stringify(msg), "*");
+  const play = () => {
+    send({ event: "command", func: "mute", args: [] });
+    send({ event: "command", func: "playVideo", args: [] });
+  };
 
   useEffect(() => {
     // origin을 넣어야 유튜브가 재생 상태를 알려줌
@@ -44,9 +52,12 @@ export function CrownHero() {
           : data.event === "infoDelivery" && data.info && typeof data.info === "object"
             ? (data.info as { playerState?: number }).playerState
             : undefined;
+      heardRef.current = true;
       if (typeof state === "number") {
         setPlaying(state === 1);
         if (state === 1) setEverPlayed(true);
+        // -1 시작 전 · 2 멈춤 · 5 대기 → 소리 끈 채로 다시 재생
+        if (state === -1 || state === 2 || state === 5) play();
       }
     };
     window.addEventListener("message", onMessage);
@@ -60,10 +71,28 @@ export function CrownHero() {
     return () => window.clearTimeout(t);
   }, [everPlayed]);
 
-  // 플레이어가 준비되면 상태를 알려달라고 요청
+  // 플레이어가 뜨기 전에 보낸 요청은 버려지므로, 응답이 올 때까지 0.25초마다 상태를 알려달라고 요청
   const onLoad = () => {
-    frameRef.current?.contentWindow?.postMessage(JSON.stringify({ event: "listening", id: "crown" }), "*");
+    heardRef.current = false;
+    let tries = 0;
+    const timer = window.setInterval(() => {
+      if (heardRef.current || ++tries > 60) return window.clearInterval(timer);
+      send({ event: "listening", id: "crown" });
+    }, 250);
   };
+
+  // 화면으로 돌아오면(탭 전환·앱 복귀·뒤로가기) 다시 재생
+  useEffect(() => {
+    const resume = () => document.visibilityState === "visible" && play();
+    document.addEventListener("visibilitychange", resume);
+    window.addEventListener("pageshow", resume);
+    window.addEventListener("focus", resume);
+    return () => {
+      document.removeEventListener("visibilitychange", resume);
+      window.removeEventListener("pageshow", resume);
+      window.removeEventListener("focus", resume);
+    };
+  }, []);
 
   return (
     <section className="relative aspect-video w-full overflow-hidden bg-black lg:mx-auto lg:max-w-6xl lg:rounded-b-3xl">
