@@ -1,5 +1,5 @@
 name: charts-refresh
-# 매시 1분(KST)에 차트 수집기를 직접 돌려 엑소 차트 저장본(Supabase)을 갱신
+# 매시 1분에 차트 수집기를 직접 돌려 엑소 차트를 모으고, 사이트(/api/charts/ingest)로 보내 저장
 on:
   schedule:
     - cron: "1 * * * *"
@@ -7,6 +7,9 @@ on:
 concurrency:
   group: charts-refresh
   cancel-in-progress: false
+permissions:
+  contents: read
+  id-token: write # 비밀키 대신 GitHub 인증 토큰으로 사이트에 저장
 jobs:
   refresh:
     runs-on: ubuntu-latest
@@ -42,8 +45,6 @@ jobs:
       - name: 저장본 갱신
         env:
           KOREA_MUSIC_CHART_API_BASE_URL: http://localhost:8080
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
         run: |
           npm ci --ignore-scripts --no-audit --no-fund
           npx -y tsx@4 scripts/refresh-charts.ts

@@ -1,13 +1,12 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { fetchFullChartsData, type FullChartsData } from "@/lib/chartsFullData";
+import type { FullChartsData } from "@/lib/chartsFullData";
 import type { ChartsData, ChartItem } from "@/lib/charts";
 
 // 차트는 GitHub Actions(.github/workflows/charts-refresh.yml)가 매시 수집기를 직접 돌려
-// DB(chart_snapshots)에 저장하고, 사이트는 저장본만 읽음.
+// /api/charts/ingest로 보내면(GitHub 인증 토큰으로 확인) DB(chart_snapshots)에 저장하고, 사이트는 저장본만 읽음.
 // 받아오기에 실패한 차트는 직전에 성공한 순위를 그대로 둠.
 
 const ID = "exo_full";
-const REFRESH_EVERY_MS = 50 * 60_000; // 같은 시간대에 여러 번 불려도 한 번만 갱신
 
 type Row = { id: string; data: FullChartsData; updated_at: string };
 
@@ -26,18 +25,13 @@ export async function readChartSnapshot(): Promise<{ data: FullChartsData; updat
   return { data: (data as Row).data, updatedAt: (data as Row).updated_at };
 }
 
-export async function refreshChartSnapshot(force = false): Promise<{ status: "skipped" | "updated" | "failed"; updatedAt?: string }> {
+// 새로 받은 차트를 저장. 실패한 차트는 직전 성공 순위로 채움
+export async function saveChartSnapshot(fresh: FullChartsData): Promise<{ status: "updated" | "failed"; updatedAt?: string }> {
   const client = db();
   if (!client) return { status: "failed" };
+  if (!fresh || !Array.isArray(fresh.providers)) return { status: "failed" };
 
   const prev = await readChartSnapshot();
-  if (!force && prev && Date.now() - Date.parse(prev.updatedAt) < REFRESH_EVERY_MS) {
-    return { status: "skipped", updatedAt: prev.updatedAt };
-  }
-
-  const fresh = await fetchFullChartsData();
-
-  // 실패한 차트는 직전 성공 순위로 채움
   const prevSections = new Map<string, FullChartsData["providers"][number]["sections"][number]>();
   prev?.data.providers.forEach((p) => p.sections.forEach((s) => prevSections.set(s.label, s)));
   let ok = 0;
@@ -46,13 +40,13 @@ export async function refreshChartSnapshot(force = false): Promise<{ status: "sk
     sections: p.sections.map((s) => {
       if (!s.error) {
         ok++;
-        return s;
+        return { ...s, stale: undefined };
       }
       const old = prevSections.get(s.label);
       return old && !old.error ? { ...old, stale: true } : s;
     }),
   }));
-  if (ok === 0 && prev) return { status: "failed", updatedAt: prev.updatedAt };
+  if (ok === 0) return { status: "failed", updatedAt: prev?.updatedAt };
 
   const data: FullChartsData = { lastUpdated: fresh.lastUpdated, providers };
   const updatedAt = new Date().toISOString();
