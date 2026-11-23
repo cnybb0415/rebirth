@@ -1,5 +1,5 @@
 import { siteConfig } from "@/config/site";
-import { getChartsData } from "@/lib/charts";
+import { readChartSnapshot, toSummary } from "@/lib/chartSnapshot";
 import { YouTubeStatsCards } from "@/components/YouTubeStatsCards";
 import { QuickActionsBar } from "@/components/QuickActionsBar";
 import { ChartSummaryGrid } from "@/components/ChartSummaryGrid";
@@ -98,7 +98,9 @@ export default async function Home({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("home");
-  const charts = await getChartsData();
+  // 차트 저장본을 바로 읽음 (매시 GitHub Actions가 갱신)
+  const snap = await readChartSnapshot();
+  const charts = snap ? toSummary(snap.data) : { lastUpdated: new Date().toISOString(), items: [] };
   const latestTweet = await getLatestTweet();
   // 앨범 구매 버튼은 추후 발매 시 재노출 예정 (홈 화면에서만 숨김)
   const smsAction = siteConfig.actions.find((a): a is Extract<typeof siteConfig.actions[number], { kind: "smsVote" }> =>
