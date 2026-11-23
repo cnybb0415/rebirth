@@ -1,16 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePathname } from "@/i18n/navigation";
 import { Link } from "@/i18n/navigation";
 import { useTranslations } from "next-intl";
-import logoPng from "@/../public/images/exo_logo.png";
 import { guideCategories } from "@/lib/guideCategories";
 import { streamingCategories } from "@/lib/streamingCategories";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { useOpenCardDays } from "@/data/cardSection";
+import { isLightOnlyPath } from "@/lib/theme";
 
 export function SiteHeader() {
   const t = useTranslations("nav");
@@ -38,6 +37,7 @@ export function SiteHeader() {
   const [openConcert, setOpenConcert] = useState(false);
   const [openSupport, setOpenSupport] = useState(false);
   const pathname = usePathname();
+  const crown = !isLightOnlyPath(pathname);
 
   useEffect(() => {
     setOpenMenu(false);
@@ -46,9 +46,15 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-foreground/10 bg-slate-100">
       <div className="mx-auto flex h-14 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:max-w-none">
-        <Link href="/" className="flex items-center gap-2">
-          <Image src={logoPng} alt="EXO RE:BIRTH" width={20} height={20} className="h-5 w-5" priority />
-          <span className="relative top-[-1px] text-sm font-semibold tracking-wide text-foreground/80">EXO RE:BIRTH</span>
+        <Link href="/" aria-label="EXO RE:BIRTH" className="flex items-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/logo_wordmark.webp"
+            alt="EXO RE:BIRTH"
+            width={1025}
+            height={88}
+            className={`h-[17px] w-auto ${crown ? "invert" : ""}`}
+          />
         </Link>
 
         <div className="flex items-center gap-3">

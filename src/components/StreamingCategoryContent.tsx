@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { siteConfig } from "@/config/site";
 import { StreamingLinksGrid } from "@/components/StreamingLinksGrid";
 import { OneClickStreamingGrid } from "@/components/OneClickStreamingGrid";
 import { type StreamingCategoryId } from "@/lib/streamingCategories";
 
-function RecommendedChecklist({ title }: { title: string }) {
+function RecommendedChecklist() {
   const [listImages, setListImages] = useState<Array<{ name: string; src: string }>>([]);
 
   useEffect(() => {
@@ -32,11 +31,7 @@ function RecommendedChecklist({ title }: { title: string }) {
   }, []);
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div>
         {listImages.length > 0 ? (
           <div className="overflow-hidden rounded-2xl border border-foreground/10 bg-white">
             {listImages.map((img) => (
@@ -47,8 +42,7 @@ function RecommendedChecklist({ title }: { title: string }) {
             ))}
           </div>
         ) : null}
-      </CardContent>
-    </Card>
+    </div>
   );
 }
 
@@ -56,39 +50,29 @@ export function StreamingCategoryContent({ categoryId }: { categoryId: Streaming
   const t = useTranslations("streaming");
 
   if (categoryId === "recommended") {
-    return <RecommendedChecklist title={t("cat.recommended")} />;
+    return <RecommendedChecklist />;
   }
 
   if (categoryId === "oneclick") {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>{t("cat.oneclick")}</CardTitle>
-        </CardHeader>
-        <CardContent>
+      <div className="rounded-2xl border border-foreground/10 bg-white p-3">
           <OneClickStreamingGrid
             links={siteConfig.oneClickStreamingLinks}
             columnsClassName="grid-cols-2 gap-2 sm:grid-cols-3"
             buttonVariant="outline"
           />
-        </CardContent>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{t("cat.links")}</CardTitle>
-      </CardHeader>
-      <CardContent>
+    <div className="rounded-2xl border border-foreground/10 bg-white p-3">
         <StreamingLinksGrid
           links={siteConfig.streamingLinks}
           youtubeUrl={siteConfig.youtube.url}
           columnsClassName="grid-cols-2 gap-2 sm:grid-cols-3"
           buttonVariant="secondary"
         />
-      </CardContent>
-    </Card>
+    </div>
   );
 }

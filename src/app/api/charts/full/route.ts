@@ -1,9 +1,10 @@
-import { fetchFullChartsData } from "@/lib/chartsFullData";
+import { readChartSnapshot } from "@/lib/chartSnapshot";
 
 export const runtime = "nodejs";
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export async function GET(): Promise<Response> {
-  const data = await fetchFullChartsData();
-  return Response.json(data, { headers: { "cache-control": "no-store" } });
+  const snap = await readChartSnapshot();
+  if (!snap) return Response.json({ error: "no_data" }, { status: 503 });
+  return Response.json(snap.data, { headers: { "cache-control": "public, s-maxage=300, stale-while-revalidate=600" } });
 }

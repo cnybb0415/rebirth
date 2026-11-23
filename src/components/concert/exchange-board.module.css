@@ -258,3 +258,40 @@
 /* 글 비밀번호: 로그인 비밀번호가 아니라서 type="password" 대신 글자만 가림
    (브라우저가 저장·유출 경고를 띄우지 않게) */
 .pin { -webkit-text-security: disc; letter-spacing: 0.2em; }
+
+/* 교환 물건 사진 (최대 4장) */
+.photos { display: flex; flex-wrap: wrap; gap: 6px; margin: 2px 0 4px; }
+.photoBtn {
+  position: relative;
+  width: 72px;
+  height: 72px;
+  padding: 0;
+  background: #fff;
+  border: 2px solid;
+  border-color: #7a1a50 #ffccee #ffccee #7a1a50;
+  overflow: hidden;
+  cursor: pointer;
+}
+.photoBtn img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.photoAdd {
+  font-family: inherit;
+  font-size: 11px;
+  color: #7a1a50;
+  background: #fff0f8;
+  border-style: dashed;
+  border-color: #7a1a50;
+}
+.photoAdd:disabled { opacity: 0.6; cursor: wait; }
+.photoRemove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  font-size: 11px;
+  line-height: 1;
+  color: #fff;
+  background: rgb(80 16 45 / 0.85);
+  border: 0;
+  cursor: pointer;
+}

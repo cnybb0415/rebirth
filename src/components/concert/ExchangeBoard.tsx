@@ -1,37 +1,43 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import f from "./funding-page.module.css";
 import w from "./helper-wizard.module.css";
 import s from "./exchange-board.module.css";
 import {
-  EXCHANGE_DATES,
+  EXCHANGE_CATEGORIES,
   EXCHANGE_LIMITS,
+  PHOTO_CATEGORIES,
   contactHref,
-  hasPremium,
-  isDateOpen,
+  hasMoney,
+  maxShowDate,
+  minShowDate,
   normalizeContact,
   type ContactType,
-  type ExchangeKind,
-  type HaveRow,
-  type WantRow,
-} from "@/data/ticketExchange";
+  type ExchangeCategory,
+  type ItemRow,
+  type TicketHave,
+  type TicketWant,
+} from "@/data/exchange";
 import type { ExchangePost } from "@/lib/exchangeDb";
 
-// 공지(src/data/announcements.ts)에 있는 앙콘 좌석배치도
-const PAGE_SIZE = 20;
-const SEAT_MAP_SRC = "/images/concert/notice/encore/01-1 좌배도.jpg";
-
+// 교환 게시판 — 포토카드 / 굿즈 / 티켓 / 기타
+// 글은 Supabase(exchange_posts), 사진은 exchange-photos 버킷. 완료 표시·삭제는 글 비밀번호로
 // 문구는 messages/*.json 의 "exchange"
 
-// 콘서트 티켓 교환 게시판 — 날짜 교환 / 좌석 교환
-// 글은 Supabase(ticket_exchanges)에 저장. 완료 표시·삭제는 글 비밀번호로
+const PAGE_SIZE = 20;
+
+type Photo = { path: string; url: string };
 
 type Form = {
-  seatDate: string; // 좌석 교환: 한 날짜
-  haves: HaveRow[]; // 가진 티켓 (+ 로 추가)
-  wants: WantRow[]; // 원하는 회차·좌석 (+ 로 추가)
+  etcLabel: string;
+  eventName: string;
+  haves: string[]; // 포토카드·굿즈·기타
+  wants: string[];
+  tHaves: TicketHave[]; // 티켓
+  tWants: TicketWant[];
+  photos: Photo[];
   contactType: ContactType;
   contact: string;
   memo: string;
@@ -39,13 +45,17 @@ type Form = {
   agreed: boolean;
 };
 
-const NEW_HAVE: HaveRow = { date: "", seat: "", qty: 1 };
-const NEW_WANT: WantRow = { date: "", seat: "" };
+const NEW_T_HAVE: TicketHave = { date: "", seat: "", qty: 1 };
+const NEW_T_WANT: TicketWant = { date: "", seat: "" };
 
 const EMPTY: Form = {
-  seatDate: "",
-  haves: [NEW_HAVE],
-  wants: [NEW_WANT],
+  etcLabel: "",
+  eventName: "",
+  haves: [""],
+  wants: [""],
+  tHaves: [NEW_T_HAVE],
+  tWants: [NEW_T_WANT],
+  photos: [],
   contactType: "x",
   contact: "",
   memo: "",
@@ -57,17 +67,41 @@ const EMPTY: Form = {
 const SERVER_ERR: Record<string, string> = {
   contact: "sContact",
   phone: "sPhone",
-  premium: "ePremium",
+  money: "eMoney",
+  date: "sDate",
   too_many: "sTooMany",
   wrong_password: "sWrongPw",
   locked: "sLocked",
   not_found: "sNotFound",
+  photo_missing: "sPhotoMissing",
+  too_big: "sPhotoBig",
+  not_image: "sPhoto",
 };
+
+const isTicketPost = (it: ExchangePost): it is ExchangePost & { haves: TicketHave[]; wants: TicketWant[] } =>
+  it.category === "ticket";
+
+// 큰 사진은 올리기 전에 브라우저에서 줄임 (서버에서 한 번 더 줄이고 사진 정보를 지움)
+async function shrink(file: File): Promise<Blob> {
+  if (file.size < 1.5 * 1024 * 1024) return file;
+  try {
+    const bmp = await createImageBitmap(file);
+    const scale = Math.min(1, 1800 / Math.max(bmp.width, bmp.height));
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.round(bmp.width * scale);
+    canvas.height = Math.round(bmp.height * scale);
+    canvas.getContext("2d")?.drawImage(bmp, 0, 0, canvas.width, canvas.height);
+    const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, "image/jpeg", 0.85));
+    return blob ?? file;
+  } catch {
+    return file;
+  }
+}
 
 function TitleBar({ title }: { title: string }) {
   return (
     <div className={f.titleBar}>
-      <span className={f.titleIcon} aria-hidden>🎟️</span>
+      <span className={f.titleIcon} aria-hidden>🔁</span>
       <span className={f.titleText}>{title}</span>
       <div className={f.winBtns} aria-hidden>
         <span className={f.winBtn}>─</span>
@@ -80,14 +114,21 @@ function TitleBar({ title }: { title: string }) {
 
 export function ExchangeBoard() {
   const t = useTranslations("exchange");
-  const dateLabel = (id: string) => (t.has(`dates.${id}`) ? t(`dates.${id}`) : id);
-  const seatText = (seat: string) => seat.trim() || t("anySeat");
+  const locale = useLocale();
   const serverErr = (code: string | undefined, fallback: string) => t(SERVER_ERR[code ?? ""] ?? fallback);
   const notice = t.raw("notice") as string[];
-  const kinds: { id: ExchangeKind; label: string; desc: string }[] = [
-    { id: "date", label: t("kindDate"), desc: t("kindDateDesc") },
-    { id: "seat", label: t("kindSeat"), desc: t("kindSeatDesc") },
-  ];
+  const catLabel = (c: ExchangeCategory) => t(`cat.${c}`);
+  const dateText = (ymd: string) => {
+    if (!ymd) return t("anyDate");
+    const d = new Date(`${ymd}T12:00:00+09:00`);
+    return d.toLocaleDateString(locale === "ko" ? "ko-KR" : locale === "ja" ? "ja-JP" : locale === "zh" ? "zh-CN" : "en-US", {
+      timeZone: "Asia/Seoul",
+      year: d.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
+      month: "short",
+      day: "numeric",
+      weekday: "short",
+    });
+  };
   const timeAgo = (iso: string) => {
     const m = Math.max(0, Math.round((Date.now() - Date.parse(iso)) / 60_000));
     if (m < 1) return t("justNow");
@@ -96,9 +137,8 @@ export function ExchangeBoard() {
     if (h < 24) return t("hoursAgo", { n: h });
     return t("daysAgo", { n: Math.round(h / 24) });
   };
-  const openDates = useMemo(() => EXCHANGE_DATES.filter((d) => isDateOpen(d)), []);
-  const [kind, setKind] = useState<ExchangeKind>("date");
-  const [dateFilter, setDateFilter] = useState<string>("all");
+
+  const [category, setCategory] = useState<ExchangeCategory>("photocard");
   const [openOnly, setOpenOnly] = useState(true);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
@@ -109,18 +149,20 @@ export function ExchangeBoard() {
   const [form, setForm] = useState<Form>(EMPTY);
   const [errors, setErrors] = useState<string[]>([]);
   const [sending, setSending] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [honeypot, setHoneypot] = useState("");
   const [manage, setManage] = useState<{ id: string; action: "done" | "open" | "delete" } | null>(null);
   const [managePw, setManagePw] = useState("");
   const [manageErr, setManageErr] = useState("");
-  const [mapOpen, setMapOpen] = useState(false);
+  const [lightbox, setLightbox] = useState<string | null>(null);
   const windowRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
-  const load = useCallback(async (k: ExchangeKind, date: string) => {
+  const load = useCallback(async (c: ExchangeCategory) => {
     setItems(null);
     setLoadError(false);
     try {
-      const res = await fetch(`/api/exchange?kind=${k}${date !== "all" ? `&date=${date}` : ""}`, { cache: "no-store" });
+      const res = await fetch(`/api/exchange?category=${c}`, { cache: "no-store" });
       if (!res.ok) throw new Error();
       const json = (await res.json()) as { items: ExchangePost[] };
       setItems(json.items);
@@ -132,60 +174,96 @@ export function ExchangeBoard() {
 
   useEffect(() => {
     setVisible(PAGE_SIZE);
-  }, [kind, dateFilter, openOnly, query]);
+  }, [category, openOnly, query]);
 
   useEffect(() => {
-    void load(kind, dateFilter);
-  }, [kind, dateFilter, load]);
+    void load(category);
+  }, [category, load]);
 
   useEffect(() => {
-    if (!mapOpen) return;
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMapOpen(false);
+    if (!lightbox) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setLightbox(null);
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [mapOpen]);
+  }, [lightbox]);
 
   const scrollTop = () => windowRef.current?.scrollIntoView({ block: "start", behavior: "smooth" });
   const set = <K extends keyof Form>(key: K, value: Form[K]) => setForm((p) => ({ ...p, [key]: value }));
 
-  const q = query.trim().toLowerCase().replace(/\s/g, "");
-  const shown = (items ?? []).filter(
-    (it) =>
-      (dateFilter === "all" || it.have_dates.includes(dateFilter) || it.want_dates.includes(dateFilter)) &&
-      (!openOnly || it.status === "open") &&
-      (!q || [...it.haves, ...it.wants].some((r) => (r.seat ?? "").toLowerCase().replace(/\s/g, "").includes(q))),
-  );
+  const norm = (v: string | null | undefined) => (v ?? "").toLowerCase().replace(/\s/g, "");
+  const q = norm(query);
+  const searchText = (it: ExchangePost) =>
+    norm(
+      [
+        it.event_name,
+        it.etc_label,
+        it.memo,
+        ...(isTicketPost(it)
+          ? [...it.haves.map((h) => h.seat), ...it.wants.map((x) => x.seat)]
+          : [...(it.haves as ItemRow[]), ...(it.wants as ItemRow[])].map((r) => r.text)),
+      ].join(" "),
+    );
+  const shown = (items ?? []).filter((it) => (!openOnly || it.status === "open") && (!q || searchText(it).includes(q)));
   const pageItems = shown.slice(0, visible);
-
-  const kindInfo = kinds.find((k) => k.id === kind)!;
+  const isTicket = category === "ticket";
+  const canPhoto = PHOTO_CATEGORIES.includes(category);
 
   const validate = (): string[] => {
     const e: string[] = [];
-    // 웃돈(추금) 표현은 다른 오류보다 먼저 보이게
-    if ([form.memo, ...form.haves.map((h) => h.seat), ...form.wants.map((x) => x.seat)].some(hasPremium)) e.push(t("ePremium"));
-    if (kind === "seat") {
-      if (!form.seatDate) e.push(t("eSeatDate"));
-      if (form.haves.some((h) => !h.seat.trim())) e.push(t("eHaveSeats"));
-      if (form.wants.some((x) => !x.seat.trim())) e.push(t("eWantSeats"));
-    } else {
-      if (form.haves.some((h) => !h.date)) e.push(t("eHaveDates"));
-      if (form.wants.some((x) => !x.date)) e.push(t("eWantDates"));
-      const haveDates = form.haves.map((h) => h.date);
-      if (form.wants.some((x) => x.date && haveDates.includes(x.date))) e.push(t("eSameDate"));
+    const texts = [
+      form.memo,
+      form.etcLabel,
+      form.eventName,
+      ...(isTicket ? [...form.tHaves.map((h) => h.seat), ...form.tWants.map((x) => x.seat)] : [...form.haves, ...form.wants]),
+    ];
+    // 돈 거래 표현은 다른 오류보다 먼저 보이게
+    if (texts.some(hasMoney)) e.push(t("eMoney"));
+    if (category === "etc" && !form.etcLabel.trim()) e.push(t("eEtcLabel"));
+    if (isTicket) {
+      if (!form.eventName.trim()) e.push(t("eEvent"));
+      if (form.tHaves.some((h) => !h.date)) e.push(t("eHaveDates"));
+      if (form.tWants.some((x) => !x.date && !x.seat.trim())) e.push(t("eWantTicket"));
+    } else if ([...form.haves, ...form.wants].some((v) => !v.trim())) {
+      e.push(t("eItems"));
     }
-    if (!normalizeContact(form.contactType, form.contact))
-      e.push(form.contactType === "x" ? t("eX") : t("eOpenChat"));
+    if (!normalizeContact(form.contactType, form.contact)) e.push(form.contactType === "x" ? t("eX") : t("eOpenChat"));
     if (!/^\d{6}$/.test(form.password)) e.push(t("ePw"));
     if (!form.agreed) e.push(t("eAgree"));
     return e;
   };
 
   const startWrite = () => {
-    const pre = dateFilter !== "all" ? dateFilter : "";
-    setForm({ ...EMPTY, seatDate: pre, haves: [{ ...NEW_HAVE, date: kind === "date" ? pre : "" }] });
+    setForm(EMPTY);
     setErrors([]);
     setView("write");
     scrollTop();
+  };
+
+  const addPhotos = async (files: FileList | null) => {
+    if (!files?.length) return;
+    const room = EXCHANGE_LIMITS.photos - form.photos.length;
+    const list = Array.from(files).slice(0, Math.max(0, room));
+    setUploading(true);
+    setErrors([]);
+    try {
+      for (const file of list) {
+        const body = new FormData();
+        body.append("file", await shrink(file));
+        const res = await fetch("/api/exchange/photo", { method: "POST", body });
+        const j = (await res.json().catch(() => ({}))) as { path?: string; url?: string; error?: string };
+        if (!res.ok || !j.path || !j.url) {
+          setErrors([serverErr(j.error, "sPhoto")]);
+          break;
+        }
+        const photo = { path: j.path, url: j.url };
+        setForm((p) => ({ ...p, photos: [...p.photos, photo].slice(0, EXCHANGE_LIMITS.photos) }));
+      }
+    } catch {
+      setErrors([t("sPhoto")]);
+    } finally {
+      setUploading(false);
+      if (fileRef.current) fileRef.current.value = "";
+    }
   };
 
   const submit = async () => {
@@ -198,14 +276,17 @@ export function ExchangeBoard() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          kind,
-          seatDate: kind === "seat" ? form.seatDate : undefined,
-          haves: form.haves,
-          wants: form.wants,
+          category,
+          etcLabel: category === "etc" ? form.etcLabel : undefined,
+          eventName: isTicket ? form.eventName : undefined,
+          haves: isTicket ? form.tHaves : form.haves.map((text) => ({ text })),
+          wants: isTicket ? form.tWants : form.wants.map((text) => ({ text })),
+          photos: canPhoto ? form.photos.map((p) => p.path) : [],
           contactType: form.contactType,
           contact: form.contact,
           memo: form.memo,
           password: form.password,
+          agreed: form.agreed,
           website: honeypot,
         }),
       });
@@ -215,8 +296,7 @@ export function ExchangeBoard() {
         return;
       }
       setView("list");
-      setDateFilter("all");
-      await load(kind, dateFilter);
+      await load(category);
       scrollTop();
     } catch {
       setErrors([t("sPostNet")]);
@@ -241,11 +321,40 @@ export function ExchangeBoard() {
       }
       setManage(null);
       setManagePw("");
-      await load(kind, dateFilter);
+      await load(category);
     } catch {
       setManageErr(t("sManageFail"));
     }
   };
+
+  // 물건 줄 (가진 것 / 원하는 것) 입력
+  const itemRows = (key: "haves" | "wants", legend: string) => (
+    <fieldset className={w.group}>
+      <legend className={w.legend}>{legend}<span className={w.req}>*</span></legend>
+      <div className={s.rows}>
+        {form[key].map((v, i) => (
+          <div key={i} className={s.rowLine}>
+            <input
+              className={w.input}
+              aria-label={`${legend} ${t("fItemN", { n: i + 1 })}`}
+              maxLength={EXCHANGE_LIMITS.item}
+              placeholder={t(`fItemPh.${category === "ticket" ? "etc" : category}`)}
+              value={v}
+              onChange={(e) => set(key, form[key].map((r, j) => (j === i ? e.target.value : r)))}
+            />
+            {form[key].length > 1 ? (
+              <button type="button" className={s.linkBtn} onClick={() => set(key, form[key].filter((_, j) => j !== i))} aria-label={t("fRemoveN", { n: i + 1 })}>
+                {t("fRemove")}
+              </button>
+            ) : null}
+          </div>
+        ))}
+        {form[key].length < EXCHANGE_LIMITS.rows ? (
+          <button type="button" className={s.addBtn} onClick={() => set(key, [...form[key], ""])}>{t("fAdd")}</button>
+        ) : null}
+      </div>
+    </fieldset>
+  );
 
   return (
     <div className={`${f.desktop} ${s.board}`}>
@@ -259,28 +368,23 @@ export function ExchangeBoard() {
         <div className={f.body}>
           {/* 탭 */}
           <div className={s.tabs} role="tablist" aria-label={t("kindsAria")}>
-            {kinds.map((k) => (
+            {EXCHANGE_CATEGORIES.map((c) => (
               <button
-                key={k.id}
+                key={c}
                 type="button"
                 role="tab"
-                aria-selected={kind === k.id}
-                className={`${s.tab} ${kind === k.id ? s.tabActive : ""}`}
+                aria-selected={category === c}
+                className={`${s.tab} ${category === c ? s.tabActive : ""}`}
                 onClick={() => {
-                  setKind(k.id);
+                  setCategory(c);
                   setView("list");
                   setManage(null);
+                  setErrors([]);
                 }}
               >
-                {k.label}
+                {catLabel(c)}
               </button>
             ))}
-          </div>
-          <div className={s.descRow}>
-            <p className={w.text}>{kindInfo.desc}</p>
-            <button type="button" className={s.mapBtn} onClick={() => setMapOpen(true)}>
-              {t("seatMap")}
-            </button>
           </div>
 
           {view === "list" ? (
@@ -295,16 +399,6 @@ export function ExchangeBoard() {
               </div>
 
               <div className={s.toolbar}>
-                <div className={s.chips} style={{ flexBasis: "100%" }} role="group" aria-label={t("dateFilterAria")}>
-                  <button type="button" className={`${s.chip} ${dateFilter === "all" ? s.chipOn : ""}`} aria-pressed={dateFilter === "all"} onClick={() => setDateFilter("all")}>
-                    {t("all")}
-                  </button>
-                  {openDates.map((d) => (
-                    <button key={d.id} type="button" className={`${s.chip} ${dateFilter === d.id ? s.chipOn : ""}`} aria-pressed={dateFilter === d.id} onClick={() => setDateFilter(d.id)}>
-                      {d.short}
-                    </button>
-                  ))}
-                </div>
                 <button type="button" className={s.chip} aria-expanded={searchOpen} onClick={() => { setSearchOpen((v) => !v); if (searchOpen) setQuery(""); }}>
                   {t("searchBtn")}
                 </button>
@@ -318,7 +412,7 @@ export function ExchangeBoard() {
                   className={w.input}
                   type="search"
                   autoFocus
-                  maxLength={20}
+                  maxLength={30}
                   placeholder={t("searchPlaceholder")}
                   aria-label={t("searchBtn")}
                   value={query}
@@ -326,9 +420,7 @@ export function ExchangeBoard() {
                 />
               )}
 
-              {openDates.length === 0 ? (
-                <p className={s.empty}>{t("closed")}</p>
-              ) : items === null ? (
+              {items === null ? (
                 <p className={s.empty}>{t("loading")}</p>
               ) : loadError ? (
                 <p className={s.empty}>{t("loadError")}</p>
@@ -336,181 +428,235 @@ export function ExchangeBoard() {
                 <p className={s.empty}>{q ? t("noResult") : t("empty")}</p>
               ) : (
                 <>
-                <ul className={s.list}>
-                  {pageItems.map((it) => {
-                    const done = it.status === "done";
-                    const managing = manage?.id === it.id;
-                    return (
-                      <li key={it.id} className={`${s.card} ${done ? s.cardDone : ""}`}>
-                        <div className={s.cardTop}>
-                          <span className={`${s.badge} ${done ? s.badgeDone : ""}`}>{done ? t("statusDone") : t("statusOpen")}</span>
-                          <span className={s.meta}>{timeAgo(it.created_at)}</span>
-                        </div>
-                        {it.kind === "seat" ? <p className={s.cardDate}>{dateLabel(it.have_dates[0])}</p> : null}
-
-                        <div className={s.swapBlock}>
-                          <span className={s.swapLabel}>{t("have")}</span>
-                          <ul className={s.swapList}>
-                            {it.haves.map((h, i) => (
-                              <li key={i} className={s.have}>
-                                {it.kind === "date" ? <b>{dateLabel(h.date)}</b> : null}
-                                {it.kind === "date" ? (h.seat.trim() ? ` ${h.seat}` : "") : seatText(h.seat)}
-                                <span className={s.qty}> · {t("qty", { n: h.qty })}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        <div className={s.swapBlock}>
-                          <span className={`${s.swapLabel} ${s.swapLabelWant}`}>{t("want")}</span>
-                          <ul className={s.swapList}>
-                            {it.wants.map((x, i) => (
-                              <li key={i} className={s.want}>
-                                {it.kind === "date" ? <b>{dateLabel(x.date)}</b> : null}
-                                {it.kind === "date" ? ` ${seatText(x.seat)}` : seatText(x.seat)}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                        {it.memo ? <p className={s.memo}>{it.memo}</p> : null}
-
-                        <div className={s.cardActions}>
-                          {!done ? (
-                            <a href={contactHref(it.contact_type, it.contact)} target="_blank" rel="noopener noreferrer nofollow" className={s.contact}>
-                              {it.contact_type === "x" ? `X @${it.contact}` : t("openChat")} ↗
-                            </a>
-                          ) : (
-                            <span />
-                          )}
-                          <span className={s.manageBtns}>
-                            <button type="button" className={s.linkBtn} onClick={() => { setManage({ id: it.id, action: done ? "open" : "done" }); setManagePw(""); setManageErr(""); }}>
-                              {done ? t("reopen") : t("markDone")}
-                            </button>
-                            <button type="button" className={s.linkBtn} onClick={() => { setManage({ id: it.id, action: "delete" }); setManagePw(""); setManageErr(""); }}>
-                              {t("delete")}
-                            </button>
-                          </span>
-                        </div>
-
-                        {managing ? (
-                          <div className={s.managePanel}>
-                            <label className={w.label} htmlFor={`pw-${it.id}`}>
-                              {t("pwFor", { action: manage.action === "delete" ? t("delete") : manage.action === "done" ? t("markDone") : t("reopen") })}
-                            </label>
-                            <div className={s.manageRow}>
-                              <input
-                                id={`pw-${it.id}`} className={`${w.input} ${s.pin}`} type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} autoComplete="off" name={`exchange-pin-${it.id}`} data-1p-ignore data-lpignore="true"
-                                placeholder={t("pwShort")} value={managePw} onChange={(e) => setManagePw(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                                onKeyDown={(e) => e.key === "Enter" && void runManage()}
-                              />
-                              <button type="button" className={f.btn} style={{ maxWidth: 80 }} onClick={() => void runManage()}>{t("confirm")}</button>
-                              <button type="button" className={s.linkBtn} onClick={() => setManage(null)}>{t("cancel")}</button>
-                            </div>
-                            {manageErr ? <p className={s.manageErr} role="alert">{manageErr}</p> : null}
+                  <ul className={s.list}>
+                    {pageItems.map((it) => {
+                      const done = it.status === "done";
+                      const managing = manage?.id === it.id;
+                      return (
+                        <li key={it.id} className={`${s.card} ${done ? s.cardDone : ""}`}>
+                          <div className={s.cardTop}>
+                            <span className={`${s.badge} ${done ? s.badgeDone : ""}`}>{done ? t("statusDone") : t("statusOpen")}</span>
+                            <span className={s.meta}>{timeAgo(it.created_at)}</span>
                           </div>
-                        ) : null}
-                      </li>
-                    );
-                  })}
-                </ul>
-                {shown.length > visible && (
-                  <button type="button" className={s.addBtn} onClick={() => setVisible((v) => v + PAGE_SIZE)}>
-                    {t("loadMore", { n: shown.length - visible })}
-                  </button>
-                )}
+                          {it.event_name ? <p className={s.cardDate}>{it.event_name}</p> : null}
+                          {it.etc_label ? <p className={s.cardDate}>{it.etc_label}</p> : null}
+
+                          {it.photos.length ? (
+                            <div className={s.photos}>
+                              {it.photos.map((src, i) => (
+                                <button key={src} type="button" className={s.photoBtn} onClick={() => setLightbox(src)} aria-label={t("photoOpen")}>
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img src={src} alt={t("photoAlt", { n: i + 1 })} loading="lazy" />
+                                </button>
+                              ))}
+                            </div>
+                          ) : null}
+
+                          <div className={s.swapBlock}>
+                            <span className={s.swapLabel}>{t("have")}</span>
+                            <ul className={s.swapList}>
+                              {isTicketPost(it)
+                                ? it.haves.map((h, i) => (
+                                    <li key={i} className={s.have}>
+                                      <b>{dateText(h.date)}</b>
+                                      {h.seat.trim() ? ` ${h.seat}` : ""}
+                                      <span className={s.qty}> · {t("qty", { n: h.qty })}</span>
+                                    </li>
+                                  ))
+                                : (it.haves as ItemRow[]).map((h, i) => <li key={i} className={s.have}>{h.text}</li>)}
+                            </ul>
+                          </div>
+                          <div className={s.swapBlock}>
+                            <span className={`${s.swapLabel} ${s.swapLabelWant}`}>{t("want")}</span>
+                            <ul className={s.swapList}>
+                              {isTicketPost(it)
+                                ? it.wants.map((x, i) => (
+                                    <li key={i} className={s.want}>
+                                      <b>{dateText(x.date)}</b> {x.seat.trim() || t("anySeat")}
+                                    </li>
+                                  ))
+                                : (it.wants as ItemRow[]).map((x, i) => <li key={i} className={s.want}>{x.text}</li>)}
+                            </ul>
+                          </div>
+                          {it.memo ? <p className={s.memo}>{it.memo}</p> : null}
+
+                          <div className={s.cardActions}>
+                            {!done ? (
+                              <a href={contactHref(it.contact_type, it.contact)} target="_blank" rel="noopener noreferrer nofollow" className={s.contact}>
+                                {it.contact_type === "x" ? `X @${it.contact}` : t("openChat")} ↗
+                              </a>
+                            ) : (
+                              <span />
+                            )}
+                            <span className={s.manageBtns}>
+                              <button type="button" className={s.linkBtn} onClick={() => { setManage({ id: it.id, action: done ? "open" : "done" }); setManagePw(""); setManageErr(""); }}>
+                                {done ? t("reopen") : t("markDone")}
+                              </button>
+                              <button type="button" className={s.linkBtn} onClick={() => { setManage({ id: it.id, action: "delete" }); setManagePw(""); setManageErr(""); }}>
+                                {t("delete")}
+                              </button>
+                            </span>
+                          </div>
+
+                          {managing ? (
+                            <div className={s.managePanel}>
+                              <label className={w.label} htmlFor={`pw-${it.id}`}>
+                                {t("pwFor", { action: manage.action === "delete" ? t("delete") : manage.action === "done" ? t("markDone") : t("reopen") })}
+                              </label>
+                              <div className={s.manageRow}>
+                                <input
+                                  id={`pw-${it.id}`} className={`${w.input} ${s.pin}`} type="text" inputMode="numeric" pattern="[0-9]*" maxLength={6} autoComplete="off" name={`exchange-pin-${it.id}`} data-1p-ignore data-lpignore="true"
+                                  placeholder={t("pwShort")} value={managePw} onChange={(e) => setManagePw(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                                  onKeyDown={(e) => e.key === "Enter" && void runManage()}
+                                />
+                                <button type="button" className={f.btn} style={{ maxWidth: 80 }} onClick={() => void runManage()}>{t("confirm")}</button>
+                                <button type="button" className={s.linkBtn} onClick={() => setManage(null)}>{t("cancel")}</button>
+                              </div>
+                              {manageErr ? <p className={s.manageErr} role="alert">{manageErr}</p> : null}
+                            </div>
+                          ) : null}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                  {shown.length > visible && (
+                    <button type="button" className={s.addBtn} onClick={() => setVisible((v) => v + PAGE_SIZE)}>
+                      {t("loadMore", { n: shown.length - visible })}
+                    </button>
+                  )}
                 </>
               )}
 
-              {openDates.length > 0 ? (
-                <div className={w.navBar}>
-                  <button type="button" className={f.btn} onClick={startWrite}>{t("write")}</button>
-                </div>
-              ) : null}
+              <div className={w.navBar}>
+                <button type="button" className={f.btn} onClick={startWrite}>{t("write")}</button>
+              </div>
             </>
           ) : (
             <>
               <div className={w.fields}>
-                {kind === "seat" ? (
-                  <fieldset className={w.group}>
-                    <legend className={w.legend}>{t("fDate")}<span className={w.req}>*</span></legend>
-                    {openDates.map((d) => (
-                      <label key={d.id} className={w.check}>
-                        <input type="radio" name="seatDate" className={s.radio} checked={form.seatDate === d.id} onChange={() => set("seatDate", d.id)} />
-                        {dateLabel(d.id)}
-                      </label>
-                    ))}
-                  </fieldset>
+                {category === "etc" ? (
+                  <label>
+                    <span className={w.label}>{t("fEtcLabel")}<span className={w.req}>*</span></span>
+                    <input className={w.input} maxLength={EXCHANGE_LIMITS.etcLabel} placeholder={t("fEtcLabelPh")} value={form.etcLabel} onChange={(e) => set("etcLabel", e.target.value)} />
+                  </label>
                 ) : null}
 
-                {/* 가진 티켓 — 여러 장이면 + 로 추가 */}
-                <fieldset className={w.group}>
-                  <legend className={w.legend}>{t("fHaves")}<span className={w.req}>*</span></legend>
-                  <div className={s.rows}>
-                    {form.haves.map((h, i) => (
-                      <div key={i} className={s.rowBox}>
-                        <div className={s.rowHead}>
-                          <span className={s.rowNo}>{t("fTicketN", { n: i + 1 })}</span>
-                          {form.haves.length > 1 ? (
-                            <button type="button" className={s.linkBtn} onClick={() => set("haves", form.haves.filter((_, j) => j !== i))} aria-label={t("fRemoveTicket", { n: i + 1 })}>
-                              {t("fRemove")}
-                            </button>
-                          ) : null}
-                        </div>
-                        {kind === "date" ? (
-                          <select className={w.input} aria-label={t("fTicketDate", { n: i + 1 })} value={h.date} onChange={(e) => set("haves", form.haves.map((r, j) => (j === i ? { ...r, date: e.target.value } : r)))}>
-                            <option value="">{t("fSelectDate")}</option>
-                            {openDates.map((d) => <option key={d.id} value={d.id}>{dateLabel(d.id)}</option>)}
-                          </select>
-                        ) : null}
-                        <div className={s.rowLine}>
-                          <input
-                            className={w.input} aria-label={t("fTicketSeat", { n: i + 1 })} maxLength={EXCHANGE_LIMITS.seat}
-                            placeholder={kind === "date" ? t("fSeatOptional") : t("fSeatRequired")}
-                            value={h.seat} onChange={(e) => set("haves", form.haves.map((r, j) => (j === i ? { ...r, seat: e.target.value } : r)))}
-                          />
-                          <select className={`${w.input} ${s.qtySelect}`} aria-label={t("fTicketQty", { n: i + 1 })} value={h.qty} onChange={(e) => set("haves", form.haves.map((r, j) => (j === i ? { ...r, qty: Number(e.target.value) } : r)))}>
-                            {Array.from({ length: EXCHANGE_LIMITS.qtyMax }, (_, n) => n + 1).map((n) => <option key={n} value={n}>{t("qty", { n })}</option>)}
-                          </select>
-                        </div>
-                      </div>
-                    ))}
-                    {form.haves.length < EXCHANGE_LIMITS.rows ? (
-                      <button type="button" className={s.addBtn} onClick={() => set("haves", [...form.haves, { ...NEW_HAVE }])}>{t("fAddTicket")}</button>
-                    ) : null}
-                  </div>
-                </fieldset>
+                {isTicket ? (
+                  <>
+                    <label>
+                      <span className={w.label}>{t("fEvent")}<span className={w.req}>*</span></span>
+                      <input className={w.input} maxLength={EXCHANGE_LIMITS.event} placeholder={t("fEventPh")} value={form.eventName} onChange={(e) => set("eventName", e.target.value)} />
+                    </label>
 
-                {/* 원하는 회차·좌석 — 여러 개면 + 로 추가 */}
-                <fieldset className={w.group}>
-                  <legend className={w.legend}>{kind === "date" ? t("fWantsDate") : t("fWantsSeat")}<span className={w.req}>*</span></legend>
-                  <div className={s.rows}>
-                    {form.wants.map((x, i) => (
-                      <div key={i} className={s.rowBox}>
-                        <div className={s.rowHead}>
-                          <span className={s.rowNo}>{t("fWantN", { n: i + 1 })}</span>
-                          {form.wants.length > 1 ? (
-                            <button type="button" className={s.linkBtn} onClick={() => set("wants", form.wants.filter((_, j) => j !== i))} aria-label={t("fRemoveWant", { n: i + 1 })}>
-                              {t("fRemove")}
-                            </button>
-                          ) : null}
-                        </div>
-                        {kind === "date" ? (
-                          <select className={w.input} aria-label={t("fWantDate", { n: i + 1 })} value={x.date} onChange={(e) => set("wants", form.wants.map((r, j) => (j === i ? { ...r, date: e.target.value } : r)))}>
-                            <option value="">{t("fSelectShow")}</option>
-                            {openDates.filter((d) => !form.haves.some((h) => h.date === d.id)).map((d) => <option key={d.id} value={d.id}>{dateLabel(d.id)}</option>)}
-                          </select>
+                    {/* 가진 티켓 — 여러 장이면 + 로 추가 */}
+                    <fieldset className={w.group}>
+                      <legend className={w.legend}>{t("fHaveTickets")}<span className={w.req}>*</span></legend>
+                      <div className={s.rows}>
+                        {form.tHaves.map((h, i) => (
+                          <div key={i} className={s.rowBox}>
+                            <div className={s.rowHead}>
+                              <span className={s.rowNo}>{t("fTicketN", { n: i + 1 })}</span>
+                              {form.tHaves.length > 1 ? (
+                                <button type="button" className={s.linkBtn} onClick={() => set("tHaves", form.tHaves.filter((_, j) => j !== i))} aria-label={t("fRemoveN", { n: i + 1 })}>
+                                  {t("fRemove")}
+                                </button>
+                              ) : null}
+                            </div>
+                            <input
+                              type="date" className={w.input} aria-label={`${t("fTicketN", { n: i + 1 })} ${t("fDate")}`}
+                              min={minShowDate()} max={maxShowDate()} value={h.date}
+                              onChange={(e) => set("tHaves", form.tHaves.map((r, j) => (j === i ? { ...r, date: e.target.value } : r)))}
+                            />
+                            <div className={s.rowLine}>
+                              <input
+                                className={w.input} aria-label={`${t("fTicketN", { n: i + 1 })} ${t("fSeatPh")}`} maxLength={EXCHANGE_LIMITS.seat}
+                                placeholder={t("fSeatPh")} value={h.seat}
+                                onChange={(e) => set("tHaves", form.tHaves.map((r, j) => (j === i ? { ...r, seat: e.target.value } : r)))}
+                              />
+                              <select className={`${w.input} ${s.qtySelect}`} aria-label={`${t("fTicketN", { n: i + 1 })} ${t("fQty")}`} value={h.qty} onChange={(e) => set("tHaves", form.tHaves.map((r, j) => (j === i ? { ...r, qty: Number(e.target.value) } : r)))}>
+                                {Array.from({ length: EXCHANGE_LIMITS.qtyMax }, (_, n) => n + 1).map((n) => <option key={n} value={n}>{t("qty", { n })}</option>)}
+                              </select>
+                            </div>
+                          </div>
+                        ))}
+                        {form.tHaves.length < EXCHANGE_LIMITS.rows ? (
+                          <button type="button" className={s.addBtn} onClick={() => set("tHaves", [...form.tHaves, { ...NEW_T_HAVE }])}>{t("fAdd")}</button>
                         ) : null}
-                        <input
-                          className={w.input} aria-label={t("fWantSeat", { n: i + 1 })} maxLength={EXCHANGE_LIMITS.seat}
-                          placeholder={kind === "date" ? t("fWantSeatOptional") : t("fWantSeatRequired")}
-                          value={x.seat} onChange={(e) => set("wants", form.wants.map((r, j) => (j === i ? { ...r, seat: e.target.value } : r)))}
-                        />
                       </div>
-                    ))}
-                    {form.wants.length < EXCHANGE_LIMITS.rows ? (
-                      <button type="button" className={s.addBtn} onClick={() => set("wants", [...form.wants, { ...NEW_WANT }])}>{t("fAddWant")}</button>
-                    ) : null}
-                  </div>
-                </fieldset>
+                    </fieldset>
+
+                    {/* 원하는 날짜·좌석 — 비우면 무관 */}
+                    <fieldset className={w.group}>
+                      <legend className={w.legend}>{t("fWantTickets")}<span className={w.req}>*</span></legend>
+                      <p className={w.subLabel}>{t("fWantDateHint")}</p>
+                      <div className={s.rows}>
+                        {form.tWants.map((x, i) => (
+                          <div key={i} className={s.rowBox}>
+                            <div className={s.rowHead}>
+                              <span className={s.rowNo}>{t("fWantN", { n: i + 1 })}</span>
+                              {form.tWants.length > 1 ? (
+                                <button type="button" className={s.linkBtn} onClick={() => set("tWants", form.tWants.filter((_, j) => j !== i))} aria-label={t("fRemoveN", { n: i + 1 })}>
+                                  {t("fRemove")}
+                                </button>
+                              ) : null}
+                            </div>
+                            <input
+                              type="date" className={w.input} aria-label={`${t("fWantN", { n: i + 1 })} ${t("fDate")}`}
+                              min={minShowDate()} max={maxShowDate()} value={x.date}
+                              onChange={(e) => set("tWants", form.tWants.map((r, j) => (j === i ? { ...r, date: e.target.value } : r)))}
+                            />
+                            <input
+                              className={w.input} aria-label={`${t("fWantN", { n: i + 1 })} ${t("fWantSeatPh")}`} maxLength={EXCHANGE_LIMITS.seat}
+                              placeholder={t("fWantSeatPh")} value={x.seat}
+                              onChange={(e) => set("tWants", form.tWants.map((r, j) => (j === i ? { ...r, seat: e.target.value } : r)))}
+                            />
+                          </div>
+                        ))}
+                        {form.tWants.length < EXCHANGE_LIMITS.rows ? (
+                          <button type="button" className={s.addBtn} onClick={() => set("tWants", [...form.tWants, { ...NEW_T_WANT }])}>{t("fAdd")}</button>
+                        ) : null}
+                      </div>
+                    </fieldset>
+                  </>
+                ) : (
+                  <>
+                    {itemRows("haves", t("fHaves"))}
+                    {itemRows("wants", t("fWants"))}
+                  </>
+                )}
+
+                {canPhoto ? (
+                  <fieldset className={w.group}>
+                    <legend className={w.legend}>{t("fPhotos")}</legend>
+                    <p className={w.subLabel}>{t("fPhotoHint")}</p>
+                    <div className={s.photos}>
+                      {form.photos.map((p, i) => (
+                        <div key={p.path} className={s.photoBtn}>
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={p.url} alt={t("photoAlt", { n: i + 1 })} />
+                          <button
+                            type="button"
+                            className={s.photoRemove}
+                            onClick={() => set("photos", form.photos.filter((_, j) => j !== i))}
+                            aria-label={t("fRemovePhoto", { n: i + 1 })}
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                      {form.photos.length < EXCHANGE_LIMITS.photos ? (
+                        <button type="button" className={`${s.photoBtn} ${s.photoAdd}`} onClick={() => fileRef.current?.click()} disabled={uploading}>
+                          {uploading ? "…" : t("fAddPhoto")}
+                        </button>
+                      ) : null}
+                    </div>
+                    {uploading ? <p className={w.subLabel}>{t("uploading")}</p> : null}
+                    <input
+                      ref={fileRef} type="file" accept="image/*" multiple hidden
+                      onChange={(e) => void addPhotos(e.target.files)}
+                    />
+                  </fieldset>
+                ) : null}
 
                 <fieldset className={w.group}>
                   <legend className={w.legend}>{t("fContact")}<span className={w.req}>*</span></legend>
@@ -534,7 +680,7 @@ export function ExchangeBoard() {
 
                 <label>
                   <span className={w.label}>{t("fMemo")}</span>
-                  <textarea className={`${w.input} ${s.textarea}`} rows={3} maxLength={EXCHANGE_LIMITS.memo} placeholder={t("fMemoPlaceholder")} value={form.memo} onChange={(e) => set("memo", e.target.value)} />
+                  <textarea className={`${w.input} ${s.textarea}`} rows={3} maxLength={EXCHANGE_LIMITS.memo} placeholder={t("fMemoPh")} value={form.memo} onChange={(e) => set("memo", e.target.value)} />
                   <span className={s.memoWarn}>{t("fMemoWarn")}</span>
                 </label>
 
@@ -561,7 +707,7 @@ export function ExchangeBoard() {
                 <button type="button" className={`${f.btn} ${w.navBtn}`} onClick={() => { setView("list"); setErrors([]); }} disabled={sending}>
                   {t("backToList")}
                 </button>
-                <button type="button" className={`${f.btn} ${w.navBtn}`} onClick={() => void submit()} disabled={sending}>
+                <button type="button" className={`${f.btn} ${w.navBtn}`} onClick={() => void submit()} disabled={sending || uploading}>
                   {sending ? t("submitting") : t("submit")}
                 </button>
               </div>
@@ -569,26 +715,26 @@ export function ExchangeBoard() {
           )}
         </div>
         <div className={f.statusBar}>
-          {view === "list" ? t("listStatus", { kind: kindInfo.label, n: items ? shown.length : 0 }) : t("writeStatus", { kind: kindInfo.label })}
+          {view === "list" ? t("listStatus", { kind: catLabel(category), n: items ? shown.length : 0 }) : t("writeStatus", { kind: catLabel(category) })}
         </div>
       </div>
 
-      {mapOpen ? (
-        <div className={w.overlay} onClick={() => setMapOpen(false)}>
-          <div className={f.dialog} style={{ maxWidth: 560 }} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label={t("seatMap")}>
+      {lightbox ? (
+        <div className={w.overlay} onClick={() => setLightbox(null)} role="dialog" aria-modal="true" aria-label={t("photoOpen")}>
+          <div className={f.dialog} style={{ maxWidth: 560 }} onClick={(e) => e.stopPropagation()}>
             <div className={f.titleBar}>
-              <span className={f.titleIcon} aria-hidden>🗺️</span>
-              <span className={f.titleText}>{t("seatMap")}.jpg</span>
+              <span className={f.titleIcon} aria-hidden>🖼️</span>
+              <span className={f.titleText}>photo.webp</span>
               <div className={f.winBtns}>
                 <span className={f.winBtn} aria-hidden>─</span>
                 <span className={f.winBtn} aria-hidden>□</span>
-                <button type="button" className={`${f.winBtnClose} ${w.closeBtn}`} onClick={() => setMapOpen(false)} aria-label={t("close")} autoFocus>✕</button>
+                <button type="button" className={`${f.winBtnClose} ${w.closeBtn}`} onClick={() => setLightbox(null)} aria-label={t("close")} autoFocus>✕</button>
               </div>
             </div>
             <div className={f.imageBody}>
               <div className={f.imageCanvas}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={SEAT_MAP_SRC} alt={t("seatMapAlt")} className={f.noticeImg} />
+                <img src={lightbox} alt="" className={f.noticeImg} />
               </div>
             </div>
           </div>

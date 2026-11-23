@@ -25,13 +25,15 @@ export function LabContact({ lang }: { lang: LabLang }) {
           spin-spin ↗
         </a>
         <span aria-hidden>·</span>
-        <a
-          href={`mailto:${EMAIL}?subject=${encodeURIComponent(c.subject)}`}
-          className="underline underline-offset-2 hover:text-foreground"
-        >
-          {EMAIL}
-        </a>
-        <CopyCode text={EMAIL} lang={lang} showText={false} />
+        <span className="inline-flex items-center gap-1 whitespace-nowrap">
+          <a
+            href={`mailto:${EMAIL}?subject=${encodeURIComponent(c.subject)}`}
+            className="underline underline-offset-2 hover:text-foreground"
+          >
+            {EMAIL}
+          </a>
+          <CopyCode text={EMAIL} lang={lang} showText={false} />
+        </span>
       </p>
     </footer>
   );

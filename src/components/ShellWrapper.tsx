@@ -4,6 +4,7 @@ import { usePathname } from "@/i18n/navigation";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooterNav } from "@/components/SiteFooterNav";
 import { HomeVotePopup } from "@/components/HomeVotePopup";
+import { isLightOnlyPath } from "@/lib/theme";
 
 // 투표 광고 팝업을 띄우지 않을 페이지: 다이어리 미리보기, 어드민,
 // EXO.zip(다운로드 버튼에 같은 광고가 이미 있어서 두 번 보이지 않게)
@@ -23,6 +24,12 @@ export function ShellWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      {!isLightOnlyPath(pathname) && (
+        <>
+          <span className="crown-theme" hidden />
+          <div aria-hidden className="crown-bg" />
+        </>
+      )}
       {!noPopup(pathname) && <HomeVotePopup />}
       <SiteHeader />
       <div className="pb-24">{children}</div>

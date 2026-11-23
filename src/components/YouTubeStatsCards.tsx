@@ -74,7 +74,7 @@ async function fetchYouTubeStats(signal?: AbortSignal): Promise<YouTubeStats> {
 export function YouTubeStatsCards({
   variant = "cards",
 }: {
-  variant?: "cards" | "inline";
+  variant?: "cards" | "inline" | "mv";
 }) {
   const tc = useTranslations("common");
   const locale = useLocale();
@@ -96,6 +96,39 @@ export function YouTubeStatsCards({
 
   const ready = state.status === "ready";
   const errored = state.status === "error";
+
+  if (variant === "mv") {
+    const num = (n: number) => n.toLocaleString("en-US");
+    return (
+      <a
+        href="https://youtu.be/BWfKkqo1Mk8"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="relative block h-[150px] overflow-hidden rounded-[18px]"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/images/home/mv_card.jpg" alt="" className="absolute inset-0 h-full w-full object-cover object-[center_20%]" />
+        <span aria-hidden className="absolute inset-0 bg-black/55" />
+        <span className="relative z-10 flex h-full flex-col justify-center px-5 text-[#fff8ef]">
+          <span className="text-[11px] tracking-wide opacity-85">CROWN M/V</span>
+          <span className="mt-2 flex gap-6">
+            <span>
+              <span className="font-display block text-[30px] leading-none tracking-[0.02em] tabular-nums">
+                {ready ? num(state.data.viewCount) : errored ? "-" : "···"}
+              </span>
+              <span className="mt-1 block text-[10px] opacity-80">{tc("viewCount")}</span>
+            </span>
+            <span>
+              <span className="font-display block text-[30px] leading-none tracking-[0.02em] tabular-nums">
+                {ready ? num(state.data.likeCount) : errored ? "-" : "···"}
+              </span>
+              <span className="mt-1 block text-[10px] opacity-80">{tc("likes")}</span>
+            </span>
+          </span>
+        </span>
+      </a>
+    );
+  }
 
   if (variant === "inline") {
     return (

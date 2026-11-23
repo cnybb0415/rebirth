@@ -100,6 +100,7 @@ export function QuickActionsBar({
   buttonVariant = "outline",
   buttonSize,
   buttonClassName,
+  tile = false,
 }: {
   actions: ReadonlyArray<QuickAction>;
   albumLinks?: ReadonlyArray<QuickLink>;
@@ -110,6 +111,8 @@ export function QuickActionsBar({
   buttonVariant?: React.ComponentProps<typeof Button>["variant"];
   buttonSize?: React.ComponentProps<typeof Button>["size"];
   buttonClassName?: string;
+  /** 아이콘 위·글자 아래로 쌓은 타일 모양 (홈) */
+  tile?: boolean;
 }) {
   const t = useTranslations("common");
   const [openModal, setOpenModal] = React.useState<ModalType | null>(null);
@@ -185,6 +188,15 @@ export function QuickActionsBar({
 
         const icon = action.kind ? kindIcons[action.kind] : null;
         const labelNode = renderActionLabel(action.label, action.kind);
+        const inner = (fallback: React.ReactNode) =>
+          tile ? (
+            <span className="flex h-full w-full flex-col items-start justify-between gap-3 text-left">
+              <span className="flex h-4 items-center opacity-80">{icon ?? "↗"}</span>
+              <span className="whitespace-normal break-keep text-[13px] font-bold leading-snug">{labelNode}</span>
+            </span>
+          ) : (
+            fallback
+          );
         const shared = {
           variant: buttonVariant,
           size: buttonSize,
@@ -195,10 +207,12 @@ export function QuickActionsBar({
         if (isStreaming) {
           return (
             <Button key={action.label} {...shared} onClick={openStreamingModal}>
-              <span className="inline-flex items-center gap-2 justify-center align-middle h-[22px]">
-                <span className="flex items-center h-full">{icon}</span>
-                <span className="flex items-center h-full">{labelNode}</span>
-              </span>
+              {inner(
+                <span className="inline-flex items-center gap-2 justify-center align-middle h-[22px]">
+                  <span className="flex items-center h-full">{icon}</span>
+                  <span className="flex items-center h-full">{labelNode}</span>
+                </span>
+              )}
             </Button>
           );
         }
@@ -206,7 +220,7 @@ export function QuickActionsBar({
         if (isAlbum) {
           return (
             <Button key={action.label} {...shared} onClick={openAlbumModal}>
-              <span className="inline-flex items-center gap-2">{icon}{labelNode}</span>
+              {inner(<span className="inline-flex items-center gap-2">{icon}{labelNode}</span>)}
             </Button>
           );
         }
@@ -214,7 +228,7 @@ export function QuickActionsBar({
         if (isSmsVote) {
           return (
             <Button key={action.label} {...shared} onClick={() => openSmsVote(action)}>
-              <span className="inline-flex items-center gap-2">{icon}{labelNode}</span>
+              {inner(<span className="inline-flex items-center gap-2">{icon}{labelNode}</span>)}
             </Button>
           );
         }
@@ -231,10 +245,12 @@ export function QuickActionsBar({
               className="w-full"
             >
               <Button {...shared}>
-                <span className="inline-flex items-center gap-2">
-                  {icon}
-                  {labelNode}
-                </span>
+                {inner(
+                  <span className="inline-flex items-center gap-2">
+                    {icon}
+                    {labelNode}
+                  </span>
+                )}
               </Button>
             </a>
           );
@@ -243,7 +259,7 @@ export function QuickActionsBar({
         return (
           <Link key={action.label} href={action.href} className="w-full">
             <Button {...shared}>
-              <span className="inline-flex items-center gap-2">{icon}{labelNode}</span>
+              {inner(<span className="inline-flex items-center gap-2">{icon}{labelNode}</span>)}
             </Button>
           </Link>
         );

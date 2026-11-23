@@ -13,6 +13,8 @@ export type ChartSection = {
   label: string;
   items: FullChartEntry[];
   error?: string;
+  /** 이번에 못 받아와서 직전 성공 순위를 보여주는 중 */
+  stale?: boolean;
 };
 
 export type FullChartProvider = {
@@ -169,7 +171,7 @@ async function fetchSection(
   artistName: string
 ): Promise<ChartSection> {
   try {
-    const res = await fetch(endpoint, { headers: { accept: "application/json" }, next: { revalidate: 3600 } });
+    const res = await fetch(endpoint, { headers: { accept: "application/json" }, cache: "no-store", signal: AbortSignal.timeout(25_000) });
     if (!res.ok) return { label: sectionLabel, items: [], error: "차트 연동 실패" };
 
     const json = (await res.json()) as unknown;
@@ -195,6 +197,18 @@ async function fetchSection(
   } catch {
     return { label: sectionLabel, items: [], error: "서버 연결 실패" };
   }
+}
+
+/** 저장본이 아직 없을 때 보여줄 빈 차트 */
+export function emptyChartsData(): FullChartsData {
+  return {
+    lastUpdated: getKstNowIso(),
+    providers: PROVIDER_DEFS.map((p) => ({
+      key: p.key,
+      label: p.label,
+      sections: p.sections.map((s) => ({ label: s.label, items: [], error: "집계 준비 중" })),
+    })),
+  };
 }
 
 export async function fetchFullChartsData(): Promise<FullChartsData> {

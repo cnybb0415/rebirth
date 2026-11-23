@@ -1,0 +1,56 @@
+name: charts-refresh
+# 매시 1분에 차트 수집기를 직접 돌려 엑소 차트를 모으고, 사이트(/api/charts/ingest)로 보내 저장
+on:
+  schedule:
+    - cron: "1 * * * *"
+  workflow_dispatch:
+concurrency:
+  group: charts-refresh
+  cancel-in-progress: false
+permissions:
+  contents: read
+  id-token: write # 비밀키 대신 GitHub 인증 토큰으로 사이트에 저장
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: "11"
+          cache: maven
+
+      - name: 차트 수집기 빌드
+        working-directory: korea-music-chart-api
+        run: chmod +x mvnw && ./mvnw -q -DskipTests package
+
+      - name: 차트 수집기 실행
+        working-directory: korea-music-chart-api
+        run: |
+          PORT=8080 nohup java -jar target/music-chart-api-0.1.jar > ../chart-api.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://localhost:8080/flo/chart/EXO && echo "ready after ${i}s" && exit 0
+            sleep 1
+          done
+          cat ../chart-api.log; exit 1
+
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: 저장본 갱신
+        env:
+          KOREA_MUSIC_CHART_API_BASE_URL: http://localhost:8080
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npx -y tsx@4.23.15 scripts/refresh-charts.ts
+
+      - name: 수집기 로그
+        if: failure()
+        run: tail -100 chart-api.log || true

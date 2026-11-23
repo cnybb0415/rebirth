@@ -96,7 +96,7 @@ function SectionBlock({
         ) : null}
         <p className="text-sm font-semibold text-neutral-600">{section.label}</p>
       </div>
-      <div className="overflow-hidden rounded-xl border border-neutral-100">
+      <div className="overflow-hidden rounded-xl border border-neutral-100 bg-white">
         <div className="flex items-center text-xs text-neutral-400 h-9 border-b border-neutral-100 bg-neutral-50">
           <p className="w-10 text-center">{t("rank")}</p>
           <div className="flex-1 px-3">{t("titleCol")}</div>
@@ -112,6 +112,22 @@ function SectionBlock({
           ))
         )}
       </div>
+    </div>
+  );
+}
+
+// 엑소 곡이 없는 차트는 한 상자에 한 줄씩만
+function EmptySections({ sections }: { sections: ChartSection[] }) {
+  const t = useTranslations("charts");
+  if (!sections.length) return null;
+  return (
+    <div className="mt-5 overflow-hidden rounded-xl border border-neutral-100 bg-white first:mt-0">
+      {sections.map((s) => (
+        <div key={s.label} className="flex items-center justify-between border-b border-neutral-100 px-3 py-3 text-sm last:border-b-0">
+          <span className="font-medium text-neutral-600">{s.label}</span>
+          <span className="text-xs text-neutral-400">{s.error ?? t("notCharted")}</span>
+        </div>
+      ))}
     </div>
   );
 }
@@ -153,11 +169,16 @@ export function ChartsFullPanel({ data }: { data: FullChartsData }) {
         })}
       </div>
 
-      <div className="mt-5">
-        {!activeProvider ? null : activeProvider.sections.map((section) => (
-          <SectionBlock key={section.label} section={section} providerKey={activeProvider.key} providerLabel={activeProvider.label} />
-        ))}
-      </div>
+      {activeProvider ? (
+        <div className="mt-5">
+          {activeProvider.sections
+            .filter((s) => s.items.length > 0)
+            .map((section) => (
+              <SectionBlock key={section.label} section={section} providerKey={activeProvider.key} providerLabel={activeProvider.label} />
+            ))}
+          <EmptySections sections={activeProvider.sections.filter((s) => s.items.length === 0)} />
+        </div>
+      ) : null}
     </div>
   );
 }

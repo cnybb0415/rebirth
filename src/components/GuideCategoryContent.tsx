@@ -54,6 +54,13 @@ function GuideImage({
 
   const [index, setIndex] = React.useState(0);
   const current = candidates[index];
+  const imgRef = React.useRef<HTMLImageElement | null>(null);
+
+  // 화면이 준비되기 전에 이미 실패한 이미지는 onError가 안 불려서 다음 후보로 못 넘어감 → 직접 확인
+  React.useEffect(() => {
+    const el = imgRef.current;
+    if (el && el.complete && el.naturalWidth === 0) setIndex((prev) => prev + 1);
+  }, [current]);
 
   if (!current) {
     return (
@@ -71,6 +78,7 @@ function GuideImage({
   return (
     /* eslint-disable-next-line @next/next/no-img-element */
     <img
+      ref={imgRef}
       src={current}
       alt={alt}
       className="h-auto w-full"
@@ -115,11 +123,7 @@ function Assets({
   if (!assets.length) return <EmptyState title={title} lines={emptyLines} />;
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-3">
+    <div className="space-y-3">
         {assets.map((asset, idx) => {
           if (asset.type === "pdf") {
             return (
@@ -152,8 +156,7 @@ function Assets({
             </div>
           );
         })}
-      </CardContent>
-    </Card>
+    </div>
   );
 }
 

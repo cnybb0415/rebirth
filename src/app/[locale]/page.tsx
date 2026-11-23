@@ -1,11 +1,11 @@
 import { siteConfig } from "@/config/site";
-import { getChartsData } from "@/lib/charts";
+import { readChartSnapshot, toSummary } from "@/lib/chartSnapshot";
 import { YouTubeStatsCards } from "@/components/YouTubeStatsCards";
 import { QuickActionsBar } from "@/components/QuickActionsBar";
 import { ChartSummaryGrid } from "@/components/ChartSummaryGrid";
 import { getLatestTweet } from "@/lib/x";
-import { HomeHero } from "@/components/HomeHero";
-import { HomeQuickView } from "@/components/HomeQuickView";
+import { CrownHero } from "@/components/CrownHero";
+import { HomeCard, HomeScheduleCard, HomeVoteCard } from "@/components/HomeCards";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import type { ReactNode } from "react";
 
@@ -13,7 +13,7 @@ export const revalidate = 900;
 
 function SocialIcon({ children }: { children: ReactNode }) {
   return (
-    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-foreground/15 bg-white shadow-sm">
+    <span className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-foreground/15">
       {children}
     </span>
   );
@@ -98,7 +98,9 @@ export default async function Home({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("home");
-  const charts = await getChartsData();
+  // 차트 저장본을 바로 읽음 (매시 GitHub Actions가 갱신)
+  const snap = await readChartSnapshot();
+  const charts = snap ? toSummary(snap.data) : { lastUpdated: new Date().toISOString(), items: [] };
   const latestTweet = await getLatestTweet();
   // 앨범 구매 버튼은 추후 발매 시 재노출 예정 (홈 화면에서만 숨김)
   const smsAction = siteConfig.actions.find((a): a is Extract<typeof siteConfig.actions[number], { kind: "smsVote" }> =>
@@ -113,203 +115,77 @@ export default async function Home({
     { label: t("actionVote"), href: "/vote", kind: "vote" as const },
   ];
 
+  const tc = await getTranslations("charts");
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <HomeHero />
-      <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
-        <section id="home-quickview" className="grid gap-10 lg:grid-cols-2">
-          {/* Left: schedule + active votes */}
-          <HomeQuickView />
+    <div className="min-h-screen text-foreground">
+      <CrownHero />
+      <main className="mx-auto flex w-full max-w-3xl flex-col gap-3.5 px-4 pt-4 pb-10 sm:px-6">
+        <YouTubeStatsCards variant="mv" />
 
-          {/* Right: actions */}
-          <div className="flex flex-col items-center text-center lg:items-start lg:justify-between lg:text-left">
-            <div className="w-full max-w-md">
-              <img
-                src="/images/logo_width.webp"
-                alt="EXO RE:BIRTH 로고"
-                className="mx-auto mt-2.5 mb-[25px] h-auto w-full max-w-md object-contain lg:mx-0"
-              />
-              <QuickActionsBar
-                actions={homeActions}
-                albumLinks={siteConfig.albumPurchaseLinks}
-                oneClickStreamingLinks={siteConfig.oneClickStreamingLinks}
-                containerVariant="none"
-                gridClassName="grid-cols-2 gap-3"
-                buttonVariant="outline"
-                buttonSize="lg"
-                buttonClassName="h-12 rounded-2xl text-xs leading-tight sm:text-sm"
-              />
-            </div>
+        <HomeCard title={t("quickLinks")}>
+          <QuickActionsBar
+            actions={homeActions}
+            albumLinks={siteConfig.albumPurchaseLinks}
+            oneClickStreamingLinks={siteConfig.oneClickStreamingLinks}
+            containerVariant="none"
+            gridClassName="grid-cols-3 gap-2"
+            buttonVariant="outline"
+            tile
+            buttonClassName="h-auto min-h-[78px] rounded-[14px] border-foreground/12 bg-transparent px-2.5 pt-2.5 pb-3 hover:bg-foreground/5"
+          />
+        </HomeCard>
 
-            <div className="mt-7 w-full max-w-md">
-              <div className="flex items-center justify-center gap-5">
-                <a
-                  href={siteConfig.contacts.instagramUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="Instagram"
-                  className="text-foreground/80 hover:text-foreground"
-                >
-                  <SocialIcon>
-                    <InstagramIcon />
-                  </SocialIcon>
-                </a>
-                <a
-                  href={siteConfig.youtube.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="YouTube"
-                  className="text-foreground/80 hover:text-foreground"
-                >
-                  <SocialIcon>
-                    <YouTubeIcon />
-                  </SocialIcon>
-                </a>
-                <a
-                  href={siteConfig.contacts.twitterUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="X"
-                  className="text-foreground/80 hover:text-foreground"
-                >
-                  <SocialIcon>
-                    <XIcon />
-                  </SocialIcon>
-                </a>
-                <a
-                  href="https://kwangya119.smtown.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label="광야119 허위정보 신고"
-                  className="text-foreground/80 hover:text-foreground"
-                >
-                  <SocialIcon>
-                    <img src="/images/icon/siren.png" alt="" className="h-[18px] w-[18px]" />
-                  </SocialIcon>
-                </a>
+        <HomeScheduleCard />
+
+        <HomeCard title={`EXO ${tc("chartOfShort")}`} moreHref="/charts" moreLabel={tc("more")}>
+          <ChartSummaryGrid trackTitle="EXO" charts={charts} bare />
+        </HomeCard>
+
+        <HomeVoteCard />
+
+        {latestTweet ? (
+          <HomeCard title={t("latestPost")}>
+            <a href={latestTweet.url} target="_blank" rel="noopener noreferrer" className="flex gap-3">
+              {latestTweet.mediaUrl || latestTweet.previewImageUrl ? (
+                <img
+                  src={latestTweet.mediaUrl ?? latestTweet.previewImageUrl}
+                  alt=""
+                  className="h-20 w-20 shrink-0 rounded-xl object-cover"
+                  loading="lazy"
+                />
+              ) : null}
+              <div className="min-w-0">
+                <p className="line-clamp-3 whitespace-pre-wrap text-[13px] text-foreground/85">{latestTweet.text}</p>
+                <p className="mt-1.5 text-[11px] text-foreground/45">@{latestTweet.username}</p>
               </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Latest X post */}
-        <section id="home-latest" className="mt-10 rounded-2xl border border-foreground/10 bg-white p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-base font-semibold">{t("latestPost")}</div>
-              <div className="text-sm text-foreground/60">{t("latestPostSource")}</div>
-            </div>
-            <a
-              href={siteConfig.contacts.twitterUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-sm font-medium text-foreground/70 hover:text-foreground"
-            >
-              {t("goToX")}
             </a>
-          </div>
-          <div className="mt-4">
-            {latestTweet ? (
-              <article className="rounded-xl border border-white/10 bg-neutral-900 p-3 text-white shadow-sm">
-                <div className="text-sm font-semibold text-white/90">@{latestTweet.username}</div>
-                <p className="mt-2 whitespace-pre-wrap text-sm text-white/90">{latestTweet.text}</p>
-                {latestTweet.mediaUrl || latestTweet.previewImageUrl ? (
-                  <div className="mt-3 overflow-hidden rounded-lg border border-white/10">
-                    <img
-                      src={latestTweet.mediaUrl ?? latestTweet.previewImageUrl}
-                      alt="X preview"
-                      className="aspect-square w-full object-cover"
-                      loading="lazy"
-                    />
-                  </div>
-                ) : null}
-                {latestTweet.previewUrl ? (
-                  <a
-                    href={latestTweet.previewUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="mt-2 block text-xs text-sky-300 hover:text-sky-200"
-                  >
-                    {latestTweet.previewUrl}
-                  </a>
-                ) : null}
-                <div className="mt-3 flex items-center justify-between text-xs text-white/60">
-                  {latestTweet.createdAt ? (
-                    <span>{new Date(latestTweet.createdAt).toLocaleString(locale === "ko" ? "ko-KR" : locale === "ja" ? "ja-JP" : locale === "zh" ? "zh-CN" : "en-US")}</span>
-                  ) : (
-                    <span />
-                  )}
-                  <a
-                    href={latestTweet.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="font-medium text-white/80 hover:text-white"
-                  >
-                    {t("viewPost")}
-                  </a>
-                </div>
-              </article>
-            ) : (
-              <div className="rounded-xl border border-foreground/10 bg-white p-4 text-sm text-foreground/60">
-                {t("noPost")}
-              </div>
-            )}
-          </div>
-        </section>
+          </HomeCard>
+        ) : null}
 
-        <div className="mt-10 border-t border-foreground/10" />
-
-        <section className="mt-2 rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
-          <ChartSummaryGrid trackTitle={siteConfig.trackTitle} charts={charts} moreHref="/charts" />
-        </section>
-
-        <section id="home-video" className="mt-6 rounded-2xl border border-foreground/10 bg-white p-6 shadow-sm">
-          <div className="overflow-hidden rounded-2xl border border-foreground/10 bg-white shadow-sm">
-            <div className="flex h-9 items-center gap-2 bg-[#ff4b4b] px-3">
-              <span className="h-2.5 w-2.5 rounded-full bg-white/90" aria-hidden />
-              <span className="h-2.5 w-2.5 rounded-full bg-white/90" aria-hidden />
-              <span className="h-2.5 w-2.5 rounded-full bg-white/90" aria-hidden />
-            </div>
-            <div className="aspect-video w-full bg-black">
-              <iframe
-                className="h-full w-full"
-                src={siteConfig.youtube.embedUrl}
-                title="YouTube video player"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              />
-            </div>
-            <div className="px-4 pb-4">
-              <YouTubeStatsCards variant="inline" />
-            </div>
-          </div>
-        </section>
-
+        <div className="flex items-center justify-center gap-4 pt-3">
+          <a href={siteConfig.contacts.instagramUrl} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="text-foreground/70 hover:text-foreground">
+            <SocialIcon><InstagramIcon /></SocialIcon>
+          </a>
+          <a href={siteConfig.youtube.url} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="text-foreground/70 hover:text-foreground">
+            <SocialIcon><YouTubeIcon /></SocialIcon>
+          </a>
+          <a href={siteConfig.contacts.twitterUrl} target="_blank" rel="noopener noreferrer" aria-label="X" className="text-foreground/70 hover:text-foreground">
+            <SocialIcon><XIcon /></SocialIcon>
+          </a>
+        </div>
       </main>
 
-      <footer className="mt-10 border-t border-foreground/10 bg-white">
-        <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6">
-          <div className="flex flex-col gap-3">
-            <p className="text-xs font-semibold text-foreground/70">
-              {t("copyright")}
-            </p>
-            <div className="space-y-0.5 text-[11px] text-foreground/45">
-              <p><span className="font-medium text-foreground/60">MAIN</span> &nbsp;rebirth.exo@gmail.com</p>
-              <p><span className="font-medium text-foreground/60">STRM</span> &nbsp;exo.strm@gmail.com</p>
-              <p><span className="font-medium text-foreground/60">DEV</span> &nbsp;exo.dev0408@gmail.com</p>             
-            </div>
-            <a
-              href="https://x.com/EXO_REBIRTH"
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label="X @EXO_REBIRTH"
-              className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-foreground/15 bg-white text-foreground/60 shadow-sm transition hover:bg-foreground/5 hover:text-foreground"
-            >
-              <XIcon />
-            </a>
-          </div>
-        </div>
+      <footer className="pt-6 pb-8 text-center">
+        <img
+          src="/images/logo_width.webp"
+          alt="EXO RE:BIRTH"
+          className="mx-auto mb-2.5 h-auto w-[220px] object-contain invert mix-blend-screen"
+        />
+        <p className="text-[10px] text-foreground/45">© EXO RE:BIRTH</p>
+        <p className="mt-2 text-[10px] leading-relaxed text-foreground/35">
+          rebirth.exo@gmail.com · exo.strm@gmail.com · exo.dev0408@gmail.com
+        </p>
       </footer>
     </div>
   );
