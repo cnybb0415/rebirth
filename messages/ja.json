@@ -69,7 +69,8 @@
     "noVotes": "登録された投票がありません",
     "endedSection": "終了した投票",
     "rankLabel": "現在順位: {rank}位",
-    "rankLabelWithPercent": "現在順位: {rank}位 ({percent}%)"
+    "rankLabelWithPercent": "現在順位: {rank}位 ({percent}%)",
+    "noActive": "開催中の投票はありません"
   },
   "schedule": {
     "title": "EXOスケジュール"

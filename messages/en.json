@@ -69,7 +69,8 @@
     "noVotes": "No votes registered",
     "endedSection": "Ended Votes",
     "rankLabel": "Rank: #{rank}",
-    "rankLabelWithPercent": "Rank: #{rank} ({percent}%)"
+    "rankLabelWithPercent": "Rank: #{rank} ({percent}%)",
+    "noActive": "No active votes"
   },
   "schedule": {
     "title": "EXO Schedule"

@@ -23,6 +23,13 @@ const CARDS: CardDef[] = [
     matchLabels: ["멜론 TOP100"],
   },
   {
+    id: "melon_daily",
+    provider: "melon",
+    providerLabel: "멜론",
+    typeLabel: "일간",
+    matchLabels: ["멜론 일간"],
+  },
+  {
     id: "melon_hot100_100d",
     provider: "melon",
     providerLabel: "멜론",
@@ -44,6 +51,13 @@ const CARDS: CardDef[] = [
     matchLabels: ["지니", "지니 TOP200"],
   },
   {
+    id: "genie_daily",
+    provider: "genie",
+    providerLabel: "지니",
+    typeLabel: "일간",
+    matchLabels: ["지니 일간"],
+  },
+  {
     id: "bugs_realtime",
     provider: "bugs",
     providerLabel: "벅스",
@@ -61,8 +75,8 @@ const CARDS: CardDef[] = [
     id: "vibe_domestic",
     provider: "vibe",
     providerLabel: "바이브",
-    typeLabel: "국내 급상승",
-    matchLabels: ["바이브 국내 급상승"],
+    typeLabel: "급상승",
+    matchLabels: ["바이브 급상승", "바이브 국내 급상승"],
   },
   {
     id: "vibe_today_top100",
@@ -95,7 +109,7 @@ function formatKstTimestampTopOfHour(iso: string): string {
 }
 
 function findItem(items: ChartItem[], matchLabels: string[]): ChartItem | undefined {
-  return items.find((item) => matchLabels.some((label) => item.label.includes(label)));
+  return items.find((item) => matchLabels.includes(item.label));
 }
 
 function getRankText(item?: ChartItem, rankSuffix?: string): { primary: string; suffix?: string } {
@@ -141,34 +155,9 @@ function getChange(
   return { label: `↓${rank - prevRank}`, className: "text-blue-500" };
 }
 
-function renderTypeLabel(typeLabel: string) {
-  const hotMatch = typeLabel.match(/^HOT100\s+(100일|30일)$/);
-  if (hotMatch) {
-    const day = hotMatch[1];
-    return (
-      <span>
-        HOT100 <span className="text-[10px] font-semibold text-neutral-400">({day})</span>
-      </span>
-    );
-  }
-
-  const realtimeMatch = typeLabel.match(/^(.*)\s+\((실시간)\)$/);
-  if (realtimeMatch) {
-    const base = realtimeMatch[1].trim();
-    const suffix = realtimeMatch[2];
-    return (
-      <span>
-        {base} <span className="text-[10px] font-semibold text-neutral-400">({suffix})</span>
-      </span>
-    );
-  }
-
-  return <span>{typeLabel}</span>;
-}
-
 function ProviderIcon({ provider, label }: { provider: ProviderKey; label: string }) {
   return (
-    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-white shadow-sm border border-foreground/10 sm:h-8 sm:w-8">
+    <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-white">
       <MusicServiceIcon service={provider} label={label} size={16} className="h-[16px] w-[16px] sm:h-[18px] sm:w-[18px]" />
     </span>
   );
@@ -213,6 +202,9 @@ export async function ChartSummaryGrid({
   const t = await getTranslations("charts");
   const safeTitle = trackTitle?.trim().length ? trackTitle.trim() : t("title");
   const updated = formatKstTimestampTopOfHour(charts.lastUpdated);
+  const rows = CARDS.map((card) => ({ card, item: findItem(charts.items, card.matchLabels) }));
+  const charted = rows.filter((r) => typeof r.item?.rank === "number");
+  const uncharted = rows.filter((r) => typeof r.item?.rank !== "number");
 
   return (
     <div>
@@ -236,68 +228,42 @@ export async function ChartSummaryGrid({
         ) : null}
       </div>
 
-      <div className="mt-5 grid grid-cols-2 gap-1.5 sm:gap-4">
-        {CARDS.map((card) => {
-          const item = findItem(charts.items, card.matchLabels);
-          const rankSuffix = t("rankSuffix");
-          const rankText = getRankText(item, rankSuffix || undefined);
+      <div className="mt-4 flex flex-col gap-2">
+        {charted.map(({ card, item }) => {
+          const rankText = getRankText(item, t("rankSuffix") || undefined);
           const change = getChange(item?.rank, item?.prevRank, item?.rankStatus, item?.changedRank);
-
           return (
-            <div
-              key={card.id}
-              className={cn(
-                "rounded-xl border border-foreground/10 bg-white px-2.5 py-2.5 shadow-sm sm:rounded-2xl sm:px-5 sm:py-4",
-                "transition-colors hover:border-sky-300"
-              )}
-            >
-              <div className="flex items-center justify-between gap-2 sm:gap-4">
-                <div className="flex items-center gap-1.5 sm:gap-3 min-w-0">
-                  <ProviderIcon provider={card.provider} label={card.providerLabel} />
-                  <div className="min-w-0">
-                    <p className="text-[11px] sm:text-sm font-bold leading-tight break-keep">
-                      {card.providerLabel}
-                    </p>
-                    <p className="mt-0.5 sm:mt-1 text-[9.5px] sm:text-xs text-neutral-500 leading-tight break-keep">
-                      {renderTypeLabel(card.typeLabel)}
-                    </p>
-                    {item?.title ? (
-                      <p className="mt-0.5 truncate text-[9.5px] sm:text-xs font-semibold text-foreground/70 leading-tight">
-                        {item.title}
-                        {item.count && item.count > 1 ? <span className="font-normal text-neutral-400"> +{item.count - 1}</span> : null}
-                      </p>
-                    ) : null}
-                  </div>
-                </div>
-
-                <div className="text-right">
-                  <p className="text-[12px] sm:text-xl font-extrabold tabular-nums leading-none">
-                    {rankText.suffix ? (
-                      <span className="inline-flex items-baseline gap-0.5">
-                        <span>{rankText.primary}</span>
-                        <span className="text-[8px] sm:text-sm font-bold">
-                          {rankText.suffix}
-                        </span>
-                      </span>
-                    ) : (
-                      <span className="text-[8px] sm:text-sm font-semibold text-neutral-500 whitespace-nowrap">
-                        {rankText.primary}
-                      </span>
-                    )}
+            <div key={card.id} className="flex items-center gap-3 rounded-xl bg-foreground/5 px-3 py-2.5">
+              <ProviderIcon provider={card.provider} label={card.providerLabel} />
+              <div className="min-w-0 flex-1">
+                <p className="text-[13px] font-bold leading-tight">
+                  {card.providerLabel} <span className="font-medium text-foreground/55">{card.typeLabel}</span>
+                </p>
+                {item?.title ? (
+                  <p className="mt-0.5 truncate text-xs text-foreground/60">
+                    {item.title}
+                    {item.count && item.count > 1 ? <span className="text-foreground/40"> +{item.count - 1}</span> : null}
                   </p>
-                  <p
-                    className={cn(
-                      "mt-0.5 sm:mt-1 text-[9.5px] sm:text-xs font-semibold tabular-nums",
-                      change.className
-                    )}
-                  >
-                    {change.label}
-                  </p>
-                </div>
+                ) : null}
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-extrabold leading-none tabular-nums">
+                  {rankText.primary}
+                  {rankText.suffix ? <span className="ml-0.5 text-xs font-bold">{rankText.suffix}</span> : null}
+                </p>
+                <p className={cn("mt-1 text-[11px] font-semibold tabular-nums", change.className)}>{change.label}</p>
               </div>
             </div>
           );
         })}
+        {charted.length === 0 ? (
+          <div className="rounded-xl bg-foreground/5 px-3 py-4 text-center text-sm text-foreground/50">{t("notCharted")}</div>
+        ) : null}
+        {uncharted.length > 0 ? (
+          <p className="px-1 pt-1 text-[11px] leading-relaxed text-foreground/45">
+            {t("notCharted")} · {uncharted.map(({ card }) => `${card.providerLabel} ${card.typeLabel}`).join(", ")}
+          </p>
+        ) : null}
       </div>
     </div>
   );

@@ -370,11 +370,11 @@ export function RadioPageClient({ stations }: { stations: RadioStation[] }) {
 
       <div className="min-h-screen bg-transparent text-foreground">
         <main className="mx-auto w-full max-w-2xl px-3 py-10 sm:px-6 sm:py-14">
-          <div className="flex items-start justify-between gap-4">
-            <div>
-              <h1 className="text-xl font-semibold">{t("pageTitle")}</h1>
+          <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-3">
+            <div className="min-w-0">
+              <h1 className="text-2xl font-bold leading-tight">{t("pageTitle")}</h1>
               {mins !== null && (
-                <p className="mt-0.5 text-xs text-foreground/40">
+                <p className="mt-1.5 text-xs text-foreground/45">
                   {t("timeNote", { time: formatTime(mins) })}
                 </p>
               )}

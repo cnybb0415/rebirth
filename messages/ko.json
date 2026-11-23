@@ -69,7 +69,8 @@
     "noVotes": "등록된 투표가 없습니다",
     "endedSection": "종료된 투표",
     "rankLabel": "현재순위: {rank}위",
-    "rankLabelWithPercent": "현재순위: {rank}위 ({percent}%)"
+    "rankLabelWithPercent": "현재순위: {rank}위 ({percent}%)",
+    "noActive": "진행 중인 투표가 없어요"
   },
   "schedule": {
     "title": "EXO 스케줄"

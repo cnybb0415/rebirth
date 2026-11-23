@@ -9,19 +9,26 @@ export default async function SupportIdDonationPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("support");
-  const tc = await getTranslations("common");
   return (
     <div className="min-h-screen bg-transparent text-foreground">
       <main className="mx-auto w-full max-w-4xl px-4 py-10 sm:px-6 sm:py-14">
         <Link
           href="/support"
-          className="mb-4 inline-flex items-center gap-2 text-sm font-medium text-foreground/70 hover:text-foreground"
+          className="mb-3 inline-flex items-center gap-1 text-[13px] font-medium text-foreground/55 transition hover:text-foreground"
         >
-          <span className="text-sm sm:text-xl" aria-hidden>‹</span>
+          <span aria-hidden>‹</span>
           {t("back")}
         </Link>
         <h1 className="text-2xl font-bold">{t("idDonationTitle")}</h1>
-        <p className="mt-2 text-sm text-foreground/70">{tc("loading")}</p>
+        <div className="mt-6 overflow-hidden rounded-2xl border border-foreground/10 bg-white">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/images/support/id-donation/아이디기부.png"
+            alt={t("idDonationTitle")}
+            className="h-auto w-full"
+            loading="lazy"
+          />
+        </div>
       </main>
     </div>
   );

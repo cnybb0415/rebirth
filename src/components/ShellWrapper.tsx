@@ -12,6 +12,13 @@ const noPopup = (pathname: string) =>
   pathname.startsWith("/admin") ||
   pathname.startsWith("/lab");
 
+// 크라운 다크 테마를 쓰지 않는 페이지: 콘서트(공지·응원법 포함)와 어드민
+const lightOnly = (pathname: string) =>
+  pathname.startsWith("/concert") ||
+  pathname.startsWith("/notice") ||
+  pathname.startsWith("/cheer") ||
+  pathname.startsWith("/admin");
+
 export function ShellWrapper({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const isQR = pathname.startsWith("/QR") || /^\/concert\/encore\/(event\/)?day\d+$/.test(pathname);
@@ -23,6 +30,7 @@ export function ShellWrapper({ children }: { children: React.ReactNode }) {
 
   return (
     <>
+      {!lightOnly(pathname) && <span className="crown-theme" hidden />}
       {!noPopup(pathname) && <HomeVotePopup />}
       <SiteHeader />
       <div className="pb-24">{children}</div>

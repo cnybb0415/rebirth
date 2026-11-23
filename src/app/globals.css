@@ -146,3 +146,81 @@ b {
   font-family: "NanumBarunGothicBold", "NanumBarunGothic", var(--font-sans),
     ui-sans-serif, system-ui;
 }
+
+/* ───────────────────────────────────────────────
+   크라운 다크 테마
+   콘서트·QR·어드민을 뺀 페이지에서 ShellWrapper가 .crown-theme 표식을 넣으면
+   html 전체(팝업 포함)가 어두운 유리 카드 테마로 바뀜
+   ─────────────────────────────────────────────── */
+html:has(.crown-theme) {
+  --background: #060608;
+  --foreground: #f1f1f3;
+  --surface: rgb(255 255 255 / 0.06);
+  --surface-80: rgb(255 255 255 / 0.06);
+  --surface-90: rgb(255 255 255 / 0.08);
+  --glass: rgb(255 255 255 / 0.055);
+  --glass-strong: rgb(22 22 26 / 0.92);
+  --line: rgb(255 255 255 / 0.11);
+  color-scheme: dark;
+}
+html:has(.crown-theme) body {
+  background: #060608;
+}
+
+/* 흰 카드·버튼 → 반투명 유리 */
+html:has(.crown-theme) :is(.bg-white, .bg-white\/90, .bg-neutral-50, .bg-gray-50, .bg-slate-50) {
+  background-color: var(--glass);
+}
+html:has(.crown-theme) :is(.bg-neutral-100, .bg-slate-100, .bg-slate-200, .bg-neutral-200) {
+  background-color: rgb(255 255 255 / 0.09);
+}
+/* 떠 있는 패널(메뉴·모달)은 비치지 않게 */
+html:has(.crown-theme) :is(aside.bg-white, [role="dialog"] .bg-white, .fixed .bg-background) {
+  background-color: var(--glass-strong);
+  backdrop-filter: blur(18px);
+}
+html:has(.crown-theme) :is(.border-neutral-100, .border-neutral-200, .border-gray-200, .border-gray-100) {
+  border-color: var(--line);
+}
+html:has(.crown-theme) :is(.shadow-sm, .shadow-md, .shadow) {
+  box-shadow: none;
+}
+
+/* 진한 글자 → 밝은 글자 */
+html:has(.crown-theme) :is(.text-black, .text-neutral-900, .text-neutral-800, .text-neutral-700, .text-slate-700, .text-gray-900, .text-gray-800) {
+  color: var(--foreground);
+}
+html:has(.crown-theme) :is(.text-neutral-600, .text-neutral-500, .text-gray-600, .text-gray-500) {
+  color: rgb(255 255 255 / 0.6);
+}
+
+/* 파스텔 태그 → 어두운 배경에 맞춘 반투명 태그 */
+html:has(.crown-theme) :is(.bg-purple-100, .bg-blue-100, .bg-pink-100, .bg-red-100, .bg-orange-100, .bg-yellow-100, .bg-emerald-100, .bg-sky-100, .bg-rose-100, .bg-lime-100, .bg-amber-100) {
+  background-color: rgb(255 255 255 / 0.12);
+}
+html:has(.crown-theme) :is(.text-purple-700, .text-blue-700, .text-pink-700, .text-red-700, .text-orange-700, .text-yellow-700, .text-yellow-800, .text-emerald-700, .text-sky-700, .text-rose-700, .text-amber-700, .text-amber-800) {
+  color: rgb(255 255 255 / 0.88);
+}
+
+/* 헤더·하단 메뉴 */
+html:has(.crown-theme) header.sticky {
+  background: rgb(6 6 8 / 0.72);
+  backdrop-filter: blur(16px);
+  border-color: var(--line);
+}
+html:has(.crown-theme) nav[aria-label] .bg-\[\#FEF9C3\] {
+  background-color: rgb(255 255 255 / 0.16);
+}
+html:has(.crown-theme) nav.fixed.bottom-0 {
+  background: rgb(6 6 8 / 0.8);
+  backdrop-filter: blur(16px);
+}
+
+/* 포스터·안내 이미지는 원본 색 그대로 */
+html:has(.crown-theme) img {
+  color-scheme: normal;
+}
+/* 검은 로고는 밝게 */
+html:has(.crown-theme) header.sticky img[alt="EXO RE:BIRTH"] {
+  filter: invert(1);
+}

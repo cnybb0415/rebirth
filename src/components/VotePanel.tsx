@@ -132,6 +132,7 @@ function VoteCard({ item }: { item: VoteItem }) {
 export function VotePanel({ items, guideHref }: { items: VoteItem[]; guideHref?: string }) {
   const t = useTranslations("vote");
   const [activeTab, setActiveTab] = useState<Tab>("전체");
+  const [showEnded, setShowEnded] = useState(false);
 
   const TAB_LABELS: Record<Tab, string> = {
     "전체": t("tab.all"),
@@ -185,16 +186,34 @@ export function VotePanel({ items, guideHref }: { items: VoteItem[]; guideHref?:
           </div>
         ) : (
           <>
-            <div className="grid grid-cols-2 gap-3">
-              {active.map((item, i) => (
-                <VoteCard key={i} item={item} />
-              ))}
-            </div>
-            {ended.length > 0 && active.length > 0 && (
-              <p className="pt-4 pb-2 text-xs font-semibold text-neutral-400">{t("endedSection")}</p>
+            {active.length > 0 ? (
+              <div className="grid grid-cols-2 gap-3">
+                {active.map((item, i) => (
+                  <VoteCard key={i} item={item} />
+                ))}
+              </div>
+            ) : (
+              <div className="flex h-20 items-center justify-center rounded-2xl border border-foreground/10 bg-white text-sm text-foreground/50">
+                {t("noActive")}
+              </div>
             )}
             {ended.length > 0 && (
-              <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setShowEnded((v) => !v)}
+                aria-expanded={showEnded}
+                className="mt-5 flex w-full items-center justify-between rounded-2xl border border-foreground/10 bg-white px-4 py-3 text-sm font-medium text-foreground/70 transition hover:text-foreground"
+              >
+                <span>
+                  {t("endedSection")} <span className="text-foreground/40 tabular-nums">{ended.length}</span>
+                </span>
+                <svg viewBox="0 0 24 24" className={cn("h-4 w-4 transition", showEnded && "rotate-180")} fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M6 9l6 6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </button>
+            )}
+            {showEnded && ended.length > 0 && (
+              <div className="mt-3 grid grid-cols-2 gap-3">
                 {ended.map((item, i) => (
                   <VoteCard key={`ended-${i}`} item={item} />
                 ))}

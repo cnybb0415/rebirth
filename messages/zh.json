@@ -69,7 +69,8 @@
     "noVotes": "暂无投票项目",
     "endedSection": "已结束投票",
     "rankLabel": "当前排名: 第{rank}位",
-    "rankLabelWithPercent": "当前排名: 第{rank}位 ({percent}%)"
+    "rankLabelWithPercent": "当前排名: 第{rank}位 ({percent}%)",
+    "noActive": "暂无进行中的投票"
   },
   "schedule": {
     "title": "EXO 日程"
