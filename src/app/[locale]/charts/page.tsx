@@ -1,10 +1,13 @@
 import { Link } from "@/i18n/navigation";
 import { siteConfig } from "@/config/site";
 import { ChartsFullPanel } from "@/components/ChartsFullPanel";
-import { fetchFullChartsData } from "@/lib/chartsFullData";
+import { emptyChartsData } from "@/lib/chartsFullData";
+import { readChartSnapshot } from "@/lib/chartSnapshot";
+
+// 저장본만 읽으니 5분마다 새로 그려도 충분
+export const revalidate = 300;
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-export const revalidate = 3600;
 
 function formatKst(iso: string): string {
   const date = new Date(iso);
@@ -33,7 +36,8 @@ export default async function ChartsPage({
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("charts");
-  const data = await fetchFullChartsData();
+  // 저장본(매시 갱신)만 읽음
+  const data = (await readChartSnapshot())?.data ?? emptyChartsData();
 
   return (
     <div className="min-h-screen bg-background text-foreground">

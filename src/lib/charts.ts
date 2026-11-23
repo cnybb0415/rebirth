@@ -7,6 +7,10 @@ export type ChartItem = {
   prevRank?: number;
   rankStatus?: string;
   changedRank?: number;
+  /** 이 차트에서 가장 높은 엑소 곡 */
+  title?: string;
+  /** 이 차트에 든 엑소 곡 수 */
+  count?: number;
 };
 
 export type ChartsData = {

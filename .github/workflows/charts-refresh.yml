@@ -1,0 +1,53 @@
+name: charts-refresh
+# 매시 1분(KST)에 차트 수집기를 직접 돌려 엑소 차트 저장본(Supabase)을 갱신
+on:
+  schedule:
+    - cron: "1 * * * *"
+  workflow_dispatch:
+concurrency:
+  group: charts-refresh
+  cancel-in-progress: false
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "11"
+          cache: maven
+
+      - name: 차트 수집기 빌드
+        working-directory: korea-music-chart-api
+        run: chmod +x mvnw && ./mvnw -q -DskipTests package
+
+      - name: 차트 수집기 실행
+        working-directory: korea-music-chart-api
+        run: |
+          PORT=8080 nohup java -jar target/music-chart-api-0.1.jar > ../chart-api.log 2>&1 &
+          for i in $(seq 1 60); do
+            curl -sf -o /dev/null http://localhost:8080/flo/chart/EXO && echo "ready after ${i}s" && exit 0
+            sleep 1
+          done
+          cat ../chart-api.log; exit 1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - name: 저장본 갱신
+        env:
+          KOREA_MUSIC_CHART_API_BASE_URL: http://localhost:8080
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npx -y tsx@4 scripts/refresh-charts.ts
+
+      - name: 수집기 로그
+        if: failure()
+        run: tail -100 chart-api.log || true

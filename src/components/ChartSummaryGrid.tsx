@@ -261,6 +261,12 @@ export async function ChartSummaryGrid({
                     <p className="mt-0.5 sm:mt-1 text-[9.5px] sm:text-xs text-neutral-500 leading-tight break-keep">
                       {renderTypeLabel(card.typeLabel)}
                     </p>
+                    {item?.title ? (
+                      <p className="mt-0.5 truncate text-[9.5px] sm:text-xs font-semibold text-foreground/70 leading-tight">
+                        {item.title}
+                        {item.count && item.count > 1 ? <span className="font-normal text-neutral-400"> +{item.count - 1}</span> : null}
+                      </p>
+                    ) : null}
                   </div>
                 </div>
 
