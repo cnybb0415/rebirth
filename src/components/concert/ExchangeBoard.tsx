@@ -386,7 +386,6 @@ export function ExchangeBoard() {
               </button>
             ))}
           </div>
-          <p className={w.text}>{t(`catDesc.${category}`)}</p>
 
           {view === "list" ? (
             <>

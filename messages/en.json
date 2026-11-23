@@ -297,12 +297,6 @@
       "ticket": "Tickets",
       "etc": "Other"
     },
-    "catDesc": {
-      "photocard": "Swap photocards",
-      "goods": "Swap goods",
-      "ticket": "Swap concert ticket dates and seats",
-      "etc": "Swap anything else"
-    },
     "kindsAria": "Swap type",
     "noticeTitle": "Please read before trading",
     "notice": [

@@ -297,12 +297,6 @@
       "ticket": "门票",
       "etc": "其他"
     },
-    "catDesc": {
-      "photocard": "小卡互换",
-      "goods": "周边互换",
-      "ticket": "交换演出门票的场次和座位",
-      "etc": "交换其他物品"
-    },
     "kindsAria": "交换类型",
     "noticeTitle": "交易前请务必阅读",
     "notice": [
