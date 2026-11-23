@@ -1,12 +1,18 @@
 "use client";
 
-import { Link } from "@/i18n/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { BarChart3, Disc3, Link2, ListMusic, MousePointerClick } from "lucide-react";
+import { MenuTiles } from "@/components/MenuTiles";
 import { siteConfig } from "@/config/site";
 import { streamingCategories } from "@/lib/streamingCategories";
+
+const STREAMING_EN: Record<string, { en: string; Icon: typeof Link2 }> = {
+  recommended: { en: "PLAYLIST", Icon: ListMusic },
+  oneclick: { en: "ONE CLICK", Icon: MousePointerClick },
+  links: { en: "LINKS", Icon: Link2 },
+};
 
 export default function StreamingPage() {
   const t = useTranslations("streaming");
@@ -25,58 +31,19 @@ export default function StreamingPage() {
       <main className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
         <h1 className="text-2xl font-bold">{t("title")}</h1>
 
-        <div className="mt-6 grid gap-3 sm:grid-cols-2">
-          <Link href="/charts" className="block">
-            <Card className="transition hover:shadow-md">
-              <CardContent className="flex items-center justify-between gap-3 p-4">
-                <div>
-                  <div className="text-sm font-semibold">{tn("charts")}</div>
-                  <div className="mt-1 text-xs text-foreground/70"></div>
-                </div>
-                <span className="text-foreground/60" aria-hidden>
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-                    <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-              </CardContent>
-            </Card>
-          </Link>
-          {streamingCategories.map((category) => (
-            <Link key={category.id} href={`/streaming/${category.id}`} className="block">
-              <Card className="transition hover:shadow-md">
-                <CardContent className="flex items-center justify-between gap-3 p-4">
-                  <div>
-                    <div className="text-sm font-semibold">{streamingCatLabels[category.id] ?? category.label}</div>
-                    <div className="mt-1 text-xs text-foreground/70">{category.description}</div>
-                  </div>
-                  <span className="text-foreground/60" aria-hidden>
-                    <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-                      <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-                    </svg>
-                  </span>
-                </CardContent>
-              </Card>
-            </Link>
-          ))}
-          <button
-            type="button"
-            onClick={() => setOpenAlbumModal(true)}
-            className="text-left"
-          >
-            <Card className="transition hover:shadow-md">
-              <CardContent className="flex items-center justify-between gap-3 p-4">
-                <div>
-                  <div className="text-sm font-semibold">{tc("albumBuy")}</div>
-                </div>
-                <span className="text-foreground/60" aria-hidden>
-                  <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8">
-                    <path d="M9 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </span>
-              </CardContent>
-            </Card>
-          </button>
-        </div>
+        <MenuTiles
+          items={[
+            { id: "charts", label: tn("charts"), en: "CHART", Icon: BarChart3, href: "/charts" },
+            ...streamingCategories.map((c) => ({
+              id: c.id,
+              label: streamingCatLabels[c.id] ?? c.label,
+              en: STREAMING_EN[c.id]?.en ?? c.id.toUpperCase(),
+              Icon: STREAMING_EN[c.id]?.Icon ?? Link2,
+              href: `/streaming/${c.id}`,
+            })),
+            { id: "album", label: tc("albumBuy"), en: "ALBUM", Icon: Disc3, onClick: () => setOpenAlbumModal(true) },
+          ]}
+        />
       </main>
 
       {openAlbumModal ? (
