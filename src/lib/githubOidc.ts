@@ -7,8 +7,10 @@ const JWKS_URL = `${ISSUER}/.well-known/jwks`;
 type Jwk = JsonWebKey & { kid?: string };
 let cache: { at: number; keys: Jwk[] } | null = null;
 
+// 모르는 kid로 계속 찔러서 GitHub 공개키를 반복해서 받게 만드는 걸 막기 위해, 강제 갱신은 5분에 한 번만
 async function getKeys(force = false): Promise<Jwk[]> {
-  if (!force && cache && Date.now() - cache.at < 60 * 60_000) return cache.keys;
+  const age = cache ? Date.now() - cache.at : Infinity;
+  if (cache && (age < 60 * 60_000 && (!force || age < 5 * 60_000))) return cache.keys;
   const res = await fetch(JWKS_URL, { cache: "no-store", signal: AbortSignal.timeout(10_000) });
   if (!res.ok) throw new Error("jwks");
   const json = (await res.json()) as { keys: Jwk[] };
@@ -26,6 +28,8 @@ export type GithubOidcClaims = {
   exp: number;
   nbf?: number;
   repository: string;
+  repository_id?: string;
+  repository_owner_id?: string;
   ref: string;
   workflow_ref?: string;
   event_name?: string;
@@ -33,7 +37,15 @@ export type GithubOidcClaims = {
 
 export async function verifyGithubOidc(
   token: string,
-  expect: { audience: string; repository: string; ref: string; workflowPath: string }
+  expect: {
+    audience: string;
+    repository: string;
+    repositoryId: string;
+    repositoryOwnerId: string;
+    ref: string;
+    workflowPath: string;
+    events: string[];
+  }
 ): Promise<GithubOidcClaims | null> {
   const parts = token.split(".");
   if (parts.length !== 3) return null;
@@ -70,6 +82,10 @@ export async function verifyGithubOidc(
   if (typeof claims.exp !== "number" || claims.exp < now - 30) return null;
   if (typeof claims.nbf === "number" && claims.nbf > now + 30) return null;
   if (claims.repository !== expect.repository) return null;
+  // 저장소 이름이 바뀌거나 같은 이름으로 다시 만들어져도 원래 저장소만 통과하도록 숫자 ID까지 확인
+  if (String(claims.repository_id) !== expect.repositoryId) return null;
+  if (String(claims.repository_owner_id) !== expect.repositoryOwnerId) return null;
+  if (!claims.event_name || !expect.events.includes(claims.event_name)) return null;
   if (claims.ref !== expect.ref) return null;
   if (!claims.workflow_ref?.startsWith(`${expect.repository}/${expect.workflowPath}@`)) return null;
   return claims;
