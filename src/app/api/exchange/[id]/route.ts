@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { deleteExchange, setExchangeStatus } from "@/lib/exchangeDb";
+import { sameOrigin } from "@/lib/exchangeRequest";
 
 export const runtime = "nodejs";
 
@@ -13,15 +14,7 @@ async function readBody(req: NextRequest): Promise<{ password?: unknown; status?
   }
 }
 
-function forbiddenOrigin(req: NextRequest) {
-  const origin = req.headers.get("origin");
-  const host = req.headers.get("x-forwarded-host") ?? req.headers.get("host");
-  try {
-    return !(origin && host && new URL(origin).host === host);
-  } catch {
-    return true;
-  }
-}
+const forbiddenOrigin = (req: NextRequest) => !sameOrigin(req);
 
 const result = (r: "ok" | "forbidden" | "not_found" | "locked") => {
   if (r === "ok") return NextResponse.json({ ok: true });
