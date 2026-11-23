@@ -235,7 +235,7 @@ html:has(.crown-theme) img {
   z-index: -1;
   transform: translateZ(0);
   will-change: transform;
-  background: linear-gradient(180deg, rgb(5 5 5 / 0.1), rgb(5 5 5 / 0.45)), url("/images/home/whale_bg.jpg") center top / cover no-repeat, #050505;
+  background: linear-gradient(180deg, rgb(5 5 5 / 0.15), rgb(5 5 5 / 0.5)), url("/images/home/snow_bg.jpg") center 42% / cover no-repeat, #050505;
   pointer-events: none;
 }
 /* body에 배경이 있으면 뒤에 깔린 고래 배경을 덮어서, 배경색은 html에만 */
