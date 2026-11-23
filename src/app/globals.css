@@ -158,7 +158,7 @@ html:has(.crown-theme) {
   --surface: rgb(255 255 255 / 0.06);
   --surface-80: rgb(255 255 255 / 0.06);
   --surface-90: rgb(255 255 255 / 0.08);
-  --glass: rgb(22 22 26 / 0.5);
+  --glass: rgb(22 22 26 / 0.62);
   --glass-strong: rgb(22 22 26 / 0.92);
   --line: rgb(255 255 255 / 0.11);
   color-scheme: dark;
@@ -224,11 +224,18 @@ html:has(.crown-theme) img {
 }
 
 /* ── 크라운 테마: 고래 배경 · 유리 카드 · 하단 메뉴 ── */
+/* 주소창이 숨거나 나올 때 배경 크기가 바뀌며 튀지 않게, 화면 높이는 주소창이 숨은 최대 높이(lvh)로 고정 */
 .crown-bg {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100lvh;
   z-index: -1;
-  background: linear-gradient(180deg, rgb(5 5 5 / 0.1), rgb(5 5 5 / 0.45)), url("/images/home/whale_bg.jpg") center top / cover no-repeat, #050505;
+  transform: translateZ(0);
+  will-change: transform;
+  background: linear-gradient(180deg, rgb(5 5 5 / 0.15), rgb(5 5 5 / 0.5)), url("/images/home/snow_bg.jpg") center 42% / cover no-repeat, #050505;
   pointer-events: none;
 }
 /* body에 배경이 있으면 뒤에 깔린 고래 배경을 덮어서, 배경색은 html에만 */
@@ -242,14 +249,9 @@ html:has(.crown-theme) body {
 html:has(.crown-theme) .bg-background {
   background-color: transparent;
 }
-html:has(.crown-theme) :is(.home-card, .rounded-2xl.bg-white, .rounded-xl.bg-white, .rounded-\[18px\].bg-white) {
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
-}
+/* 카드 뒤 흐림(blur)은 휴대폰에서 스크롤할 때 버벅여서 빼고, 대신 조금 더 진하게 */
 .home-card {
-  background: rgb(22 22 26 / 0.5);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: rgb(22 22 26 / 0.62);
 }
 html:has(.crown-theme) header.sticky {
   background: rgb(5 5 5 / 0.55);
