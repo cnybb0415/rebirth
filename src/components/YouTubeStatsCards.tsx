@@ -104,22 +104,27 @@ export function YouTubeStatsCards({
         href="https://youtu.be/BWfKkqo1Mk8"
         target="_blank"
         rel="noopener noreferrer"
-        className="relative block h-[150px] overflow-hidden rounded-[18px]"
+        className="relative block h-[150px] overflow-hidden rounded-[18px] bg-[#0d0d10]"
       >
+        {/* 사진은 오른쪽에, 숫자는 왼쪽 빈 곳에 → 멤버 얼굴을 가리지 않게 */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src="/images/home/mv_card.jpg" alt="" className="absolute inset-0 h-full w-full object-cover object-[center_20%]" />
-        <span aria-hidden className="absolute inset-0 bg-black/55" />
-        <span className="relative z-10 flex h-full flex-col justify-center px-5 text-[#fff8ef]">
+        <img
+          src="/images/home/mv_card.jpg"
+          alt=""
+          className="absolute inset-y-0 right-0 h-full w-[62%] object-cover object-[center_22%]"
+        />
+        <span aria-hidden className="absolute inset-y-0 left-[38%] w-[14%] bg-gradient-to-r from-[#0d0d10] to-transparent" />
+        <span className="relative z-10 flex h-full w-[52%] flex-col justify-center pl-5 text-[#fff8ef]">
           <span className="text-[11px] tracking-wide opacity-85">CROWN M/V</span>
-          <span className="mt-2 flex gap-6">
+          <span className="mt-2 flex flex-col gap-2.5">
             <span>
-              <span className="font-display block text-[30px] leading-none tracking-[0.02em] tabular-nums">
+              <span className="font-display block text-[26px] leading-none tracking-[0.02em] tabular-nums">
                 {ready ? num(state.data.viewCount) : errored ? "-" : "···"}
               </span>
               <span className="mt-1 block text-[10px] opacity-80">{tc("viewCount")}</span>
             </span>
             <span>
-              <span className="font-display block text-[30px] leading-none tracking-[0.02em] tabular-nums">
+              <span className="font-display block text-[26px] leading-none tracking-[0.02em] tabular-nums">
                 {ready ? num(state.data.likeCount) : errored ? "-" : "···"}
               </span>
               <span className="mt-1 block text-[10px] opacity-80">{tc("likes")}</span>
