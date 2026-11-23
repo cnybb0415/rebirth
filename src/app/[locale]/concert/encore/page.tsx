@@ -1,10 +1,5 @@
 import { setRequestLocale } from "next-intl/server";
-import { isDiaryOpen } from "@/data/diary";
 import { EncoreMenuClient } from "./EncoreMenuClient";
-import { DiaryClient } from "@/components/concert/diary/DiaryClient";
-
-// 전환 시점(11/8 21:00 KST)을 지나면 1분 내에 다이어리로 바뀌도록
-export const revalidate = 60;
 
 export default async function EncorePage({
   params,
@@ -14,6 +9,6 @@ export default async function EncorePage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  if (isDiaryOpen()) return <DiaryClient />;
+  // 콘서트 종료 후 다이어리는 내리고 원래 앙코르 화면으로 (다이어리는 /concert/encore/diary 에 남겨 둠)
   return <EncoreMenuClient />;
 }
